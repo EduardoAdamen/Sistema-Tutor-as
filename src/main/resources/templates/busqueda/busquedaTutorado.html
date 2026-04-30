@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <h2 class="mi-titulo mb-4">
+            Reporte Histórico: Seguimiento de Tutorado
+        </h2>
+        <hr>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form th:action="@{/busqueda/tutorado}" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="numeroControl" class="form-label">Número de Control *</label>
+                        <input type="text" name="numeroControl" id="numeroControl" class="form-control"
+                               required th:value="${filtroNumeroControl}" placeholder="Ej. 19230531" />
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Buscar Tutorado
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a th:href="@{/busqueda/tutorado}" class="btn btn-secondary w-100">Limpiar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div th:if="${tutorado != null}">
+            <!-- Perfil del Tutorado -->
+            <div class="card mb-4 border-info">
+                <div class="card-body">
+                    <h5 class="card-title text-info mb-3">
+                        <i class="bi bi-person-badge"></i> Perfil del Alumno
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nombre Completo:</strong> <span th:text="${tutorado.nombreCompleto}"></span></p>
+                            <p><strong>Número de Control:</strong> <span th:text="${tutorado.numeroIdentificacion}"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Correo Electrónico:</strong> <span th:text="${tutorado.correo}"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de Asignaciones -->
+            <h4>Historial de Tutorías</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle mt-3">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Periodo Semestral</th>
+                        <th>Semestre de Ingreso a Tutoría</th>
+                        <th>Tutor Asignado</th>
+                        <th>Carrera / Grupo</th>
+                        <th>Asistencia Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="hist : ${historialAsignaciones}">
+                        <td th:text="${hist.asignacion.periodo.nombrePeriodo}">Ene-Jun 2023</td>
+                        <td th:text="${hist.semestreCursado}">1</td>
+                        <td th:text="${hist.asignacion.tutor.nombreCompleto}">Juan Pérez</td>
+                        <td>
+                            Carrera: <strong th:text="${hist.asignacion.carrera.nombre}"></strong><br>
+                            Grupo: <span th:text="${hist.asignacion.grupo}"></span>
+                        </td>
+                        <td>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar"
+                                     th:style="'width:' + ${porcentajes[hist.asignacion.id]} + '%'"
+                                     th:attr="aria-valuenow=${porcentajes[hist.asignacion.id]}"
+                                     aria-valuemin="0" aria-valuemax="100"
+                                     th:text="${#numbers.formatDecimal(porcentajes[hist.asignacion.id], 1, 1)} + '%'">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(historialAsignaciones)}">
+                        <td colspan="5" class="text-center text-muted py-4">El alumno no tiene un historial registrado de tutorías.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

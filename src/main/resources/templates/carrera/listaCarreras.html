@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+
+        <!-- Mensaje flash de éxito -->
+        <div th:if="${msg}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${msg}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mi-titulo mb-0">
+                Gestión de Carreras
+            </h2>
+            <a th:href="@{/carrera/nuevo}" class="btn btn-encabezado">
+                <i class="bi bi-plus-circle"></i> Nueva Carrera
+            </a>
+        </div>
+
+        <!-- Tabla de carreras -->
+        <div class="table-responsive">
+            <table class="table table-hover bordes-fuertes align-middle">
+                <thead>
+                    <tr class="mi-etiqueta">
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Clave</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="carrera : ${carreras}">
+                        <td th:text="${carrera.id}"></td>
+                        <td th:text="${carrera.nombre}"></td>
+                        <td th:text="${carrera.clave}"></td>
+                        <td>
+                            <span th:if="${carrera.estado.name() == 'activa'}"
+                                  class="badge bg-success">Activa</span>
+                            <span th:if="${carrera.estado.name() == 'inactiva'}"
+                                  class="badge bg-secondary">Inactiva</span>
+                        </td>
+                        <td class="text-center">
+                            <a th:href="@{/carrera/ver/{id}(id=${carrera.id})}"
+                               class="btn-crud btn-ver" title="Ver">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a th:href="@{/carrera/editar/{id}(id=${carrera.id})}"
+                               class="btn-crud btn-editar" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a th:href="@{/carrera/eliminar/{id}(id=${carrera.id})}"
+                               class="btn-crud btn-eliminar" title="Eliminar"
+                               onclick="return confirm('¿Está seguro de eliminar esta carrera?');">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(carreras)}">
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="bi bi-info-circle"></i> No hay carreras registradas.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

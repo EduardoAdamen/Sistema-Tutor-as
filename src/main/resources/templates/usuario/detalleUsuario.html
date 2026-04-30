@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        Detalle de Usuario
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th class="text-end" style="width: 40%;">ID:</th>
+                                <td th:text="${usuario.id}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Identificación:</th>
+                                <td th:text="${usuario.numeroIdentificacion}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Nombre Completo:</th>
+                                <td th:text="${usuario.nombreCompleto}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Correo Electrónico:</th>
+                                <td th:text="${usuario.correo}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Rol en Sistema:</th>
+                                <td>
+                                    <span th:if="${usuario.rol.name() == 'admin'}" class="badge bg-primary">Administrador</span>
+                                    <span th:if="${usuario.rol.name() == 'tutor'}" class="badge bg-success">Tutor</span>
+                                    <span th:if="${usuario.rol.name() == 'tutorado'}" class="badge bg-info text-dark">Tutorado</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Carrera Asignada:</th>
+                                <td>
+                                    <span th:if="${usuario.carrera != null}" th:text="${usuario.carrera.nombre}"></span>
+                                    <span th:if="${usuario.carrera == null}" class="text-muted fst-italic">Sin Carrera Asignada</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Fecha de Registro:</th>
+                                <td th:text="${#temporals.format(usuario.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Estado:</th>
+                                <td>
+                                    <span th:if="${usuario.estado.name() == 'activo'}" class="badge bg-success">Activo</span>
+                                    <span th:if="${usuario.estado.name() == 'inactivo'}" class="badge bg-secondary">Inactivo</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-end align-middle">Foto de Perfil:</th>
+                                <td>
+                                    <img th:if="${usuario.fotoPerfil != null}" th:src="@{'/uploads/usuarios/' + ${usuario.fotoPerfil}}" alt="Foto de Perfil" class="rounded shadow-sm object-fit-cover" style="width: 80px; height: 80px;">
+                                    <img th:if="${usuario.fotoPerfil == null}" src="/img/sin-imagen.png" alt="Sin foto" class="rounded shadow-sm opacity-50 object-fit-cover" style="width: 80px; height: 80px;">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a th:href="@{/usuario/usuarios}" class="btn btn-outline-secondary">
+                            Volver al listado
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

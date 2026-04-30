@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <h2 class="mi-titulo mb-2">
+            <i class="bi bi-journal-plus"></i> Registro de Actividades
+        </h2>
+        <h5 class="text-muted">
+            <span th:text="${actividad.id == null ? 'Nueva Actividad' : 'Editar Actividad'}"></span>
+        </h5>
+        <hr>
+        
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+                <form th:action="@{/pat/guardar}" th:object="${actividad}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" th:field="*{sesion.id}" />
+
+                    <!-- Información de la Sesión / Asignación -->
+                    <div class="alert alert-secondary mb-4">
+                        <strong>Datos de la Asignación:</strong><br/>
+                        Carrera: <span th:text="${actividad.sesion.asignacion.carrera.nombre}"></span> - 
+                        Grupo: <span th:text="${actividad.sesion.asignacion.grupo}"></span> | 
+                        Tutor: <span th:text="${actividad.sesion.asignacion.tutor.nombreCompleto}"></span>
+                        <br/>
+                        <strong>Sesión Correspondiente:</strong> 
+                        Fecha: <span th:text="${#temporals.format(actividad.sesion.fecha, 'dd/MM/yyyy')}"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 form-group">
+                            <label for="titulo" class="form-label">Título de la Actividad *</label>
+                            <input type="text" id="titulo" class="form-control" th:field="*{titulo}" required placeholder="Ej: Taller de Técnicas de Estudio" />
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="tipoActividad" class="form-label">Tipo de Actividad *</label>
+                            <select id="tipoActividad" class="form-select" th:field="*{tipoActividad}" required>
+                                <option value="" disabled selected>-- Seleccione un Tipo --</option>
+                                <option th:each="tipo : ${tiposActividad}"
+                                        th:value="${tipo}"
+                                        th:text="${tipo}">Tipo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea id="descripcion" class="form-control" th:field="*{descripcion}" rows="3" placeholder="Detalle lo que se realizará en esta actividad..."></textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea id="observaciones" class="form-control" th:field="*{observaciones}" rows="2" placeholder="Notas adicionales o comentarios..."></textarea>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="archivoEvidencia" class="form-label">Subir Evidencia (PDF, Imagen, DOC)</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="archivoEvidencia" name="archivoEvidencia" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" />
+                            <div th:if="${actividad.evidencia != null}" class="input-group-text bg-success text-white">
+                                <i class="bi bi-file-earmark-check"></i> Archivo Previo OK
+                            </div>
+                        </div>
+                        <small class="text-muted">El archivo se guardará localmente. Deje vacío si no desea reemplazar o subir archivo.</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar Actividad
+                        </button>
+                        <a th:href="@{/pat/actividades}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar / Regresar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

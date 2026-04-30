@@ -1,0 +1,94 @@
+:root {
+    --color-primario: #003366;   /* Azul marino ITCH */
+    --color-acento: #c0392b;     /* Rojo institucional */
+    --color-claro: #f4f6fb;
+    --color-texto: #2c3e50;
+}
+
+body {
+    background-color: var(--color-claro);
+    color: var(--color-texto);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Navbar */
+.mi-navbar {
+    background-color: var(--color-primario);
+}
+
+/* Footer */
+.mi-footer {
+    background-color: var(--color-primario);
+}
+
+/* Títulos de sección */
+.mi-titulo {
+    color: var(--color-primario);
+    font-weight: 700;
+}
+
+/* Encabezado de tabla */
+.mi-etiqueta {
+    background-color: var(--color-primario);
+    color: #fff;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Tabla con bordes */
+.bordes-fuertes {
+    border: 2px solid var(--color-primario);
+    border-radius: 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+}
+.bordes-fuertes td, .bordes-fuertes th {
+    border: 1px solid #b0c4de;
+}
+
+/* Botón de encabezado (Agregar) */
+.btn-encabezado {
+    background-color: var(--color-acento);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 0.4rem 1rem;
+}
+.btn-encabezado:hover {
+    background-color: #96281b;
+    color: #fff;
+}
+
+/* Botones de CRUD en tabla */
+.btn-crud {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+.btn-ver     { background-color: #17a2b8; color: #fff; }
+.btn-editar  { background-color: #ffc107; color: #212529; }
+.btn-eliminar{ background-color: #dc3545; color: #fff; }
+.btn-crud:hover { opacity: 0.8; color: inherit; }
+
+/* Miniatura de foto en tabla */
+.thumb-foto {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--color-primario);
+}
+
+/* Badge de estado de asistencia */
+.badge-presente   { background-color: #28a745; }
+.badge-ausente    { background-color: #dc3545; }
+.badge-justificado{ background-color: #fd7e14; }

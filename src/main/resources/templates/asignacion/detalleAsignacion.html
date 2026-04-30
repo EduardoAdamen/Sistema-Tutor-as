@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <div th:if="${msg}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <span th:text="${msg}"></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <span th:text="${error}"></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header mi-etiqueta pt-3 pb-3">
+                        Detalles de Asignación
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless mb-0">
+                            <tr>
+                                <th class="text-end" style="width: 40%;">ID:</th>
+                                <td th:text="${asignacion.id}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Tutor:</th>
+                                <td th:text="${asignacion.tutor.nombreCompleto}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Periodo:</th>
+                                <td th:text="${asignacion.periodo.clave}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Carrera:</th>
+                                <td th:text="${asignacion.carrera.nombre}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Grupo:</th>
+                                <td th:text="${asignacion.grupo}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Aula:</th>
+                                <td th:text="${asignacion.aula}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Día:</th>
+                                <td th:text="${asignacion.diaHorario}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Hora:</th>
+                                <td th:text="${asignacion.horaHorario}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
+                        <a th:href="@{/asignacion/asignaciones}" class="btn btn-outline-secondary">
+                            Volver al listado
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                     <div class="card-header mi-etiqueta pt-3 pb-3">
+                         Sesiones Registradas
+                     </div>
+                     <div class="card-body p-0">
+                         <ul class="list-group list-group-flush mb-0">
+                             <li class="list-group-item px-3 py-3" th:each="s : ${sesiones}">
+                                  <div class="fw-bold"><span th:text="${s.fecha}"></span></div>
+                                  <small class="text-muted"><span th:text="${s.horaInicio} + ' - ' + ${s.horaFin}"></span></small>
+                                  <div class="text-end mt-2">
+                                      <a th:href="@{/sesion/ver/{id}(id=${s.id})}" class="btn btn-sm btn-outline-dark">Ver</a>
+                                  </div>
+                             </li>
+                             <li th:if="${sesiones.empty}" class="list-group-item text-center p-4 text-muted">
+                                 Sin sesiones documentadas
+                             </li>
+                         </ul>
+                     </div>
+                 </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card shadow-sm h-100">
+                     <div class="card-header mi-etiqueta pt-3 pb-3 d-flex justify-content-between align-items-center">
+                         <span>Tutorados Inscritos</span>
+                         <span class="badge bg-light text-dark border">Total: <span th:text="${#lists.size(asigTutorados)}"></span></span>
+                     </div>
+                     
+                     <div class="card-body bg-light border-bottom p-3" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin'}">
+                         <!-- El formulario se muestra para probar el Sprint 1 (sin sesión). En el Sprint 2 se debe volver a proteger con sec:authorize o th:if -->
+                         <form th:action="@{/asignacion/{id}/agregar-tutorado(id=${asignacion.id})}" method="post" class="row g-2 align-items-center">
+                              <div class="col">
+                                  <input type="text" name="numeroIdentificacion" class="form-control" placeholder="Ingresa No. Control / Matrícula..." required>
+                              </div>
+                              <div class="col-auto">
+                                  <button type="submit" class="btn btn-secondary">Inscribir</button>
+                              </div>
+                         </form>
+                     </div>
+
+                     <div class="table-responsive m-0">
+                          <table class="table table-hover align-middle mb-0 bordes-fuertes">
+                               <thead class="table-light">
+                                   <tr>
+                                       <th class="ps-4">Tutorado</th>
+                                       <th>Matrícula</th>
+                                       <th class="text-center" style="width: 25%">Asistencia</th>
+                                       <th th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin'}" class="text-center pe-4">Acción</th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                   <tr th:each="at : ${asigTutorados}">
+                                       <td class="ps-4" th:text="${at.tutorado.nombreCompleto}"></td>
+                                       <td th:text="${at.tutorado.numeroIdentificacion}"></td>
+                                       <td class="text-center">
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-secondary"
+                                                     role="progressbar"
+                                                     th:style="'width: ' + ${porcentajes[at.tutorado.id]} + '%'"
+                                                     th:text="${porcentajes[at.tutorado.id]} + '%'">
+                                                </div>
+                                            </div>
+                                       </td>
+                                       <td th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin'}" class="text-center pe-4">
+                                            <a th:href="@{/asignacion/{id}/quitar-tutorado/{tId}(id=${asignacion.id}, tId=${at.tutorado.id})}" 
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('¿Remover este alumno de la asignación?')">
+                                               Quitar
+                                            </a>
+                                       </td>
+                                   </tr>
+                                   <tr th:if="${asigTutorados.empty}">
+                                       <td th:colspan="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin' ? 4 : 3}" class="text-center py-4 text-muted">
+                                           No hay tutorados asignados a este grupo.
+                                       </td>
+                                   </tr>
+                               </tbody>
+                          </table>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

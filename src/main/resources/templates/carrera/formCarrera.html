@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-mortarboard"></i>
+                        <span th:if="${carrera.id == null}">Nueva Carrera</span>
+                        <span th:if="${carrera.id != null}">Editar Carrera</span>
+                    </div>
+                    <div class="card-body">
+
+                        <!-- Mensaje de error -->
+                        <div th:if="${error}" class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span th:text="${error}"></span>
+                        </div>
+
+                        <form th:action="@{/carrera/guardar}" method="post" th:object="${carrera}">
+
+                            <!-- ID oculto para edición -->
+                            <input type="hidden" th:field="*{id}">
+
+                            <!-- Nombre -->
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label fw-semibold">Nombre de la Carrera</label>
+                                <input type="text" class="form-control" id="nombre"
+                                       th:field="*{nombre}" required
+                                       placeholder="Ej: Ingeniería en Sistemas Computacionales">
+                            </div>
+
+                            <!-- Clave -->
+                            <div class="mb-3">
+                                <label for="clave" class="form-label fw-semibold">Clave</label>
+                                <input type="text" class="form-control" id="clave"
+                                       th:field="*{clave}" required
+                                       placeholder="Ej: ISC" maxlength="20">
+                            </div>
+
+                            <!-- Estatus -->
+                            <div class="mb-3">
+                                <label for="estado" class="form-label fw-semibold">Estatus</label>
+                                <select class="form-select" id="estado" th:field="*{estado}" required>
+                                    <option value="activa">Activa</option>
+                                    <option value="inactiva">Inactiva</option>
+                                </select>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/carrera/carreras}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-encabezado">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

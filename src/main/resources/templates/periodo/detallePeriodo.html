@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-calendar3"></i> Detalle del Periodo Semestral
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th class="text-end" style="width: 40%;">ID:</th>
+                                <td th:text="${periodo.id}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Clave:</th>
+                                <td th:text="${periodo.clave}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Fecha de Inicio:</th>
+                                <td th:text="${periodo.fechaInicio}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Fecha de Fin:</th>
+                                <td th:text="${periodo.fechaFin}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Estatus:</th>
+                                <td>
+                                    <span th:if="${periodo.estatus.name() == 'activo'}"
+                                          class="badge bg-success">Activo</span>
+                                    <span th:if="${periodo.estatus.name() == 'cerrado'}"
+                                          class="badge bg-secondary">Cerrado</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a th:href="@{/periodo/periodos}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver al listado
+                        </a>
+                        <div class="d-flex gap-2">
+                            <a th:if="${periodo.estatus.name() == 'activo'}"
+                               th:href="@{/periodo/cerrar/{id}(id=${periodo.id})}"
+                               class="btn btn-outline-danger"
+                               onclick="return confirm('¿Está seguro de cerrar este periodo?');">
+                                <i class="bi bi-lock"></i> Cerrar
+                            </a>
+                            <a th:href="@{/periodo/editar/{id}(id=${periodo.id})}" class="btn btn-encabezado">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

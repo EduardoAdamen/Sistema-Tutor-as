@@ -1,0 +1,177 @@
+CREATE DATABASE IF NOT EXISTS sistema_tutorias
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE sistema_tutorias;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================
+--  BLOQUE 1 — CATÁLOGOS MAESTROS Y SEGURIDAD
+-- ============================================================
+
+CREATE TABLE carrera (
+    id      INT          NOT NULL AUTO_INCREMENT,
+    nombre  VARCHAR(120) NOT NULL,
+    clave   VARCHAR(20)  NOT NULL,
+    estado  ENUM('activa','inactiva') NOT NULL DEFAULT 'activa',
+    CONSTRAINT pk_carrera PRIMARY KEY (id),
+    CONSTRAINT uq_carrera_nombre UNIQUE (nombre),
+    CONSTRAINT uq_carrera_clave  UNIQUE (clave)
+) ENGINE=InnoDB COMMENT='Catálogo de carreras del instituto';
+
+CREATE TABLE usuario (
+    id                    INT          NOT NULL AUTO_INCREMENT,
+    numero_identificacion VARCHAR(30)  NOT NULL COMMENT 'Número de empleado o matrícula',
+    nombre_completo       VARCHAR(150) NOT NULL,
+    correo                VARCHAR(120) NOT NULL,
+    contrasena_hash       VARCHAR(255) NOT NULL,
+    rol                   ENUM('admin','tutor','tutorado') NOT NULL,
+    carrera_id            INT          NULL COMMENT 'Carrera a la que pertenece (si aplica)',
+    foto_perfil           VARCHAR(255) NULL COMMENT 'Ruta relativa a la foto de perfil (JPG/PNG)',
+    estado                ENUM('activo','inactivo') NOT NULL DEFAULT 'activo',
+    created_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_usuario PRIMARY KEY (id),
+    CONSTRAINT uq_usuario_num_id UNIQUE (numero_identificacion),
+    CONSTRAINT uq_usuario_correo UNIQUE (correo),
+    CONSTRAINT fk_usuario_carrera
+        FOREIGN KEY (carrera_id) REFERENCES carrera (id)
+        ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB COMMENT='Catálogo de usuarios del sistema (administrador, tutor, tutorado)';
+
+CREATE TABLE periodo_semestral (
+    id           INT         NOT NULL AUTO_INCREMENT,
+    clave        VARCHAR(20) NOT NULL COMMENT 'Ej: ENE-JUN-2025',
+    fecha_inicio DATE        NOT NULL,
+    fecha_fin    DATE        NOT NULL,
+    estado       ENUM('activo','cerrado') NOT NULL DEFAULT 'activo',
+    CONSTRAINT pk_periodo PRIMARY KEY (id),
+    CONSTRAINT uq_periodo_clave UNIQUE (clave),
+    CONSTRAINT chk_periodo_fechas CHECK (fecha_fin > fecha_inicio)
+) ENGINE=InnoDB COMMENT='Periodos semestrales del programa de tutorías';
+
+-- ============================================================
+--  BLOQUE 2 — ASIGNACIONES
+-- ============================================================
+
+CREATE TABLE asignacion (
+    id           INT         NOT NULL AUTO_INCREMENT,
+    tutor_id     INT         NOT NULL,
+    carrera_id   INT         NOT NULL,
+    periodo_id   INT         NOT NULL,
+    grupo        VARCHAR(20) NOT NULL,
+    aula         VARCHAR(30) NOT NULL,
+    dia_horario  VARCHAR(30) NOT NULL COMMENT 'Ej: Viernes',
+    hora_horario TIME        NOT NULL COMMENT 'Hora de inicio de la sesión semanal',
+    CONSTRAINT pk_asignacion PRIMARY KEY (id),
+    CONSTRAINT uq_asignacion UNIQUE (tutor_id, grupo, hora_horario, periodo_id)
+                             COMMENT 'Impide duplicar tutor+grupo+horario en el mismo periodo',
+    CONSTRAINT fk_asignacion_tutor
+        FOREIGN KEY (tutor_id)   REFERENCES usuario (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_asignacion_carrera
+        FOREIGN KEY (carrera_id) REFERENCES carrera (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_asignacion_periodo
+        FOREIGN KEY (periodo_id) REFERENCES periodo_semestral (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Asignación de tutor a un grupo de carrera en un periodo';
+
+CREATE TABLE asignacion_tutorado (
+    id            INT NOT NULL AUTO_INCREMENT,
+    asignacion_id INT NOT NULL,
+    tutorado_id   INT NOT NULL,
+    CONSTRAINT pk_asignacion_tutorado PRIMARY KEY (id),
+    CONSTRAINT uq_asig_tutorado UNIQUE (asignacion_id, tutorado_id),
+    CONSTRAINT fk_asig_tut_asignacion
+        FOREIGN KEY (asignacion_id) REFERENCES asignacion (id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_asig_tut_tutorado
+        FOREIGN KEY (tutorado_id) REFERENCES usuario (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Relación muchos-a-muchos entre asignacion y tutorado';
+
+-- ============================================================
+--  BLOQUE 3 — SESIONES Y ASISTENCIA
+-- ============================================================
+
+CREATE TABLE sesion (
+    id            INT          NOT NULL AUTO_INCREMENT,
+    asignacion_id INT          NOT NULL,
+    fecha         DATE         NOT NULL,
+    hora_inicio   TIME         NOT NULL,
+    hora_fin      TIME         NULL,
+    evidencia     VARCHAR(255) NULL COMMENT 'Ruta relativa a foto o documento de evidencia (JPG/PNG/PDF)',
+    CONSTRAINT pk_sesion PRIMARY KEY (id),
+    CONSTRAINT uq_sesion UNIQUE (asignacion_id, fecha)
+                         COMMENT 'Solo una sesión por asignación por fecha',
+    CONSTRAINT chk_sesion_horas CHECK (hora_fin IS NULL OR hora_fin > hora_inicio),
+    CONSTRAINT fk_sesion_asignacion
+        FOREIGN KEY (asignacion_id) REFERENCES asignacion (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Sesiones de tutoría realizadas para una asignación';
+
+CREATE TABLE registro_asistencia (
+    id                INT  NOT NULL AUTO_INCREMENT,
+    sesion_id         INT  NOT NULL,
+    tutorado_id       INT  NOT NULL,
+    estado_asistencia ENUM('presente','ausente','justificado') NOT NULL,
+    CONSTRAINT pk_registro_asistencia PRIMARY KEY (id),
+    CONSTRAINT uq_registro_asistencia UNIQUE (sesion_id, tutorado_id)
+                                      COMMENT 'Impide asistencia duplicada',
+    CONSTRAINT fk_reg_asist_sesion
+        FOREIGN KEY (sesion_id)   REFERENCES sesion (id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_reg_asist_tutorado
+        FOREIGN KEY (tutorado_id) REFERENCES usuario (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Registro de asistencia de cada tutorado por sesión';
+
+-- ============================================================
+--  BLOQUE 4 — PLAN DE ACCIÓN TUTORIAL (PAT)
+-- ============================================================
+
+CREATE TABLE actividad_pat (
+    id             INT          NOT NULL AUTO_INCREMENT,
+    sesion_id      INT          NOT NULL,
+    tipo_actividad ENUM('taller','asesoria_academica','sesion_informativa','otra') NOT NULL,
+    titulo         VARCHAR(200) NOT NULL,
+    descripcion    TEXT         NULL,
+    observaciones  TEXT         NULL,
+    evidencia      VARCHAR(255) NULL COMMENT 'Ruta relativa a foto o documento de evidencia (JPG/PNG/PDF)',
+    fecha_registro DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_actividad_pat PRIMARY KEY (id),
+    CONSTRAINT fk_actividad_sesion
+        FOREIGN KEY (sesion_id) REFERENCES sesion (id)
+        ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='Actividades del Plan de Acción Tutorial registradas por sesión';
+
+-- ============================================================
+--  ÍNDICES DE RENDIMIENTO
+-- ============================================================
+
+CREATE INDEX idx_asignacion_periodo  ON asignacion (periodo_id);
+CREATE INDEX idx_asignacion_tutor    ON asignacion (tutor_id);
+CREATE INDEX idx_asignacion_carrera  ON asignacion (carrera_id);
+CREATE INDEX idx_asig_tutorado_asig  ON asignacion_tutorado (asignacion_id);
+CREATE INDEX idx_asig_tutorado_tut   ON asignacion_tutorado (tutorado_id);
+CREATE INDEX idx_sesion_asignacion   ON sesion (asignacion_id);
+CREATE INDEX idx_sesion_fecha        ON sesion (fecha);
+CREATE INDEX idx_registro_sesion     ON registro_asistencia (sesion_id);
+CREATE INDEX idx_registro_tutorado   ON registro_asistencia (tutorado_id);
+CREATE INDEX idx_actividad_sesion    ON actividad_pat (sesion_id);
+CREATE INDEX idx_actividad_fecha     ON actividad_pat (fecha_registro);
+CREATE INDEX idx_usuario_rol         ON usuario (rol);
+CREATE INDEX idx_usuario_estado      ON usuario (estado);
+CREATE INDEX idx_usuario_carrera     ON usuario (carrera_id);
+CREATE INDEX idx_periodo_estado      ON periodo_semestral (estado);
+
+-- ============================================================
+--  DATOS INICIALES
+-- ============================================================
+
+-- Contraseña: 'Admin2025'
+INSERT INTO usuario (numero_identificacion, nombre_completo, correo,
+                     contrasena_hash, rol, carrera_id, estado)
+VALUES ('ADMIN001', 'Administrador del Sistema', 'admin@itch.edu.mx',
+        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        'admin', NULL, 'activo');

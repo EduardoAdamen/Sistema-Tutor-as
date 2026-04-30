@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-mortarboard"></i> Detalle de Carrera
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th class="text-end" style="width: 40%;">ID:</th>
+                                <td th:text="${carrera.id}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Nombre:</th>
+                                <td th:text="${carrera.nombre}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Clave:</th>
+                                <td th:text="${carrera.clave}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end">Estatus:</th>
+                                <td>
+                                    <span th:if="${carrera.estado.name() == 'activa'}"
+                                          class="badge bg-success">Activa</span>
+                                    <span th:if="${carrera.estado.name() == 'inactiva'}"
+                                          class="badge bg-secondary">Inactiva</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a th:href="@{/carrera/carreras}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver al listado
+                        </a>
+                        <a th:href="@{/carrera/editar/{id}(id=${carrera.id})}" class="btn btn-encabezado">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

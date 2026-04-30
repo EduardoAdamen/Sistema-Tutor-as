@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+
+        <!-- Mensaje flash de éxito -->
+        <div th:if="${msg}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${msg}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Mensaje flash de error -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mi-titulo mb-0">
+                Gestión de Periodos Semestrales
+            </h2>
+            <a th:href="@{/periodo/nuevo}" class="btn btn-encabezado">
+                <i class="bi bi-plus-circle"></i> Nuevo Periodo
+            </a>
+        </div>
+
+        <!-- Tabla de periodos -->
+        <div class="table-responsive">
+            <table class="table table-hover bordes-fuertes align-middle">
+                <thead>
+                    <tr class="mi-etiqueta">
+                        <th>ID</th>
+                        <th>Clave</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="periodo : ${periodos}">
+                        <td th:text="${periodo.id}"></td>
+                        <td th:text="${periodo.clave}"></td>
+                        <td th:text="${periodo.fechaInicio}"></td>
+                        <td th:text="${periodo.fechaFin}"></td>
+                        <td>
+                            <span th:if="${periodo.estatus.name() == 'activo'}"
+                                  class="badge bg-success">Activo</span>
+                            <span th:if="${periodo.estatus.name() == 'cerrado'}"
+                                  class="badge bg-secondary">Cerrado</span>
+                        </td>
+                        <td class="text-center">
+                            <a th:href="@{/periodo/ver/{id}(id=${periodo.id})}"
+                               class="btn-crud btn-ver" title="Ver">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a th:href="@{/periodo/editar/{id}(id=${periodo.id})}"
+                               class="btn-crud btn-editar" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <!-- Botón Cerrar solo si está activo -->
+                            <a th:if="${periodo.estatus.name() == 'activo'}"
+                               th:href="@{/periodo/cerrar/{id}(id=${periodo.id})}"
+                               class="btn-crud btn-eliminar" title="Cerrar Periodo"
+                               onclick="return confirm('¿Está seguro de cerrar este periodo? Esta acción no se puede deshacer.');">
+                                <i class="bi bi-lock"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(periodos)}">
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="bi bi-info-circle"></i> No hay periodos registrados.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

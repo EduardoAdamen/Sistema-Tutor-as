@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <h2 class="mi-titulo mb-2">
+            Actividades
+        </h2>
+        <h5 class="text-muted" th:if="${tutor != null}">Tutor: <span th:text="${tutor.nombreCompleto}"></span></h5>
+        <hr>
+
+        <div th:if="${msg}" class="alert alert-success mt-3" th:text="${msg}"></div>
+        <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
+
+        <!-- Botón para regresar al dashboard central o inicio, y un aviso de que para crear nueva se entra por Asignación -> Sesión -->
+        <div class="mb-3 d-flex justify-content-between">
+            <a th:href="@{/}" class="btn btn-secondary">Regresar al Inicio</a>
+            <div class="alert alert-info py-2 mb-0 d-inline-block">
+                Para registrar una <strong>Nueva Actividad</strong>, ingrese al detalle de una sesión en <em>Mis Asignaciones</em>.
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover mt-3 align-middle">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Asignación / Grupo</th>
+                            <th>Fecha de Sesión</th>
+                            <th>Evidencia</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="a : ${actividades}">
+                            <td th:text="${a.id}">1</td>
+                            <td th:text="${a.titulo}">Taller de estudio</td>
+                            <td th:text="${a.tipoActividad}">Taller</td>
+                            <td>
+                                Carrera: <strong th:text="${a.sesion.asignacion.carrera.nombre}"></strong><br>
+                                Grupo: <span th:text="${a.sesion.asignacion.grupo}"></span>
+                            </td>
+                            <td th:text="${#temporals.format(a.sesion.fecha, 'dd/MM/yyyy')}">10/10/2023</td>
+                            <td>
+                                <span th:if="${a.evidencia != null}">
+                                    <a th:href="@{'/uploads/actividades/' + ${a.evidencia}}" target="_blank" class="btn btn-sm btn-outline-info">Ver Archivo</a>
+                                </span>
+                                <span th:if="${a.evidencia == null}" class="text-muted">Sin evidencia</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/pat/editar/{id}(id=${a.id})}" class="btn-crud btn-editar" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{/pat/eliminar/{id}(id=${a.id})}" class="btn-crud btn-eliminar" title="Eliminar"
+                                   onclick="return confirm('¿Está seguro de eliminar esta actividad?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${actividades == null or actividades.isEmpty()}">
+                            <td colspan="7" class="text-center text-muted py-4">No existen actividades en el periodo activo.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>
