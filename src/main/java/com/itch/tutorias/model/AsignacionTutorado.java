@@ -24,19 +24,19 @@ public class AsignacionTutorado {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutorado_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_asig_tut_tutorado"))
-    private Usuario tutorado;
+    private Tutorado tutorado;
 
     public AsignacionTutorado() {}
 
     //Getters
     public Integer getId() { return id; }
     public Asignacion getAsignacion() { return asignacion; }
-    public Usuario getTutorado() { return tutorado; }
+    public Tutorado getTutorado() { return tutorado; }
 
     //Setters
     public void setId(Integer id) { this.id = id; }
     public void setAsignacion(Asignacion asignacion) { this.asignacion = asignacion; }
-    public void setTutorado(Usuario tutorado) { this.tutorado = tutorado; }
+    public void setTutorado(Tutorado tutorado) { this.tutorado = tutorado; }
 
     @Override
     public String toString() {

@@ -60,9 +60,9 @@
                 <tbody>
                     <tr th:each="a : ${asignaciones}">
                         <td th:text="${a.id}"></td>
-                        <td th:text="${a.tutor.nombreCompleto}"></td>
-                        <td th:text="${a.carrera.nombre}"></td>
-                        <td th:text="${a.grupo}"></td>
+                        <td th:text="${a.tutor.usuario.nombreCompleto}"></td>
+                        <td th:text="${a.grupo.carrera.nombre}"></td>
+                        <td th:text="${a.grupo.nombre}"></td>
                         <td th:text="${a.aula}"></td>
                         <td>
                             <span th:text="${a.diaHorario}"></span> <br>

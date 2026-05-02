@@ -35,16 +35,9 @@
                             <tr>
                                 <th class="text-end">Rol en Sistema:</th>
                                 <td>
-                                    <span th:if="${usuario.rol.name() == 'admin'}" class="badge bg-primary">Administrador</span>
-                                    <span th:if="${usuario.rol.name() == 'tutor'}" class="badge bg-success">Tutor</span>
-                                    <span th:if="${usuario.rol.name() == 'tutorado'}" class="badge bg-info text-dark">Tutorado</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-end">Carrera Asignada:</th>
-                                <td>
-                                    <span th:if="${usuario.carrera != null}" th:text="${usuario.carrera.nombre}"></span>
-                                    <span th:if="${usuario.carrera == null}" class="text-muted fst-italic">Sin Carrera Asignada</span>
+                                    <span th:if="${usuario.hasPerfil('ADMINISTRADOR')}" class="badge bg-primary">Administrador</span>
+                                    <span th:if="${usuario.hasPerfil('TUTOR')}" class="badge bg-success">Tutor</span>
+                                    <span th:if="${usuario.hasPerfil('TUTORADO')}" class="badge bg-info text-dark">Tutorado</span>
                                 </td>
                             </tr>
                             <tr>

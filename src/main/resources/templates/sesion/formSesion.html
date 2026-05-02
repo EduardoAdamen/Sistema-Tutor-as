@@ -23,6 +23,7 @@
                     <form th:action="@{/sesion/guardar}" method="post" enctype="multipart/form-data">
                         <!-- Campos ocultos -->
                         <input type="hidden" name="id" th:value="${sesion.id}">
+                        <input type="hidden" name="asignacion.id" th:value="${sesion.asignacion.id}">
 
                         <!-- Fila 1: Fecha -->
                         <div class="mb-4">
@@ -61,7 +62,7 @@
 
                         <!-- Botones -->
                         <div class="d-flex justify-content-end gap-2">
-                            <a th:href="@{/sesion/mis-sesiones}" class="btn btn-outline-secondary">Cancelar</a>
+                            <a th:href="@{/sesion/grupo/{id}(id=${sesion.asignacion.id})}" class="btn btn-outline-secondary px-4">Cancelar</a>
                             <button type="submit" class="btn btn-encabezado px-4">
                                 <i class="bi bi-save me-1"></i> Guardar
                             </button>

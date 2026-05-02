@@ -41,21 +41,31 @@
             <div th:if="${msg}" class="alert alert-success p-2" role="alert" th:text="${msg}"></div>
 
             <div class="form-floating mb-2">
-                <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required autofocus>
-                <label for="username">Usuario (No. Control/Empleado)</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="No. Control" required autofocus>
+                <label for="username">Número de Control</label>
+            </div>
+            <div class="form-floating mb-2">
+                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre Completo" required>
+                <label for="nombre">Nombre Completo</label>
+            </div>
+            <div class="form-floating mb-2">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Correo Institucional" required>
+                <label for="email">Correo Institucional</label>
+            </div>
+            <div class="form-floating mb-2">
+                <select class="form-select" id="carreraId" name="carreraId" required>
+                    <option value="" disabled selected>Selecciona tu carrera</option>
+                    <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}"></option>
+                </select>
+                <label for="carreraId">Carrera</label>
+            </div>
+            <div class="form-floating mb-2">
+                <input type="number" class="form-control" id="semestre" name="semestre" placeholder="Semestre" min="1" max="14" required>
+                <label for="semestre">Semestre</label>
             </div>
             <div class="form-floating mb-3">
                 <input type="password" class="form-control" id="password" name="password" placeholder="Password" required pattern="^(?=.*[A-Za-z])(?=.*\d).*$" title="Mínimo 8 caracteres, letras y números" minlength="8">
                 <label for="password">Contraseña</label>
-            </div>
-            
-            <div class="form-floating mb-3">
-                <select class="form-select" id="role" name="role" required>
-                    <option value="" disabled selected>Selecciona un rol</option>
-                    <option value="ROLE_USER">Tutorado</option>
-                    <option value="ROLE_TUTOR">Tutor</option>
-                </select>
-                <label for="role">Rol</label>
             </div>
 
             <button class="w-100 btn btn-lg btn-primary mb-2" type="submit" style="background-color: #1e3c72; border-color: #1e3c72;">Registrarse</button>

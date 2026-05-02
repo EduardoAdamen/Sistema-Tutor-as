@@ -6,8 +6,8 @@ import java.util.Optional;
 
 public interface IUsuario {
     List<Usuario> buscarTodos();
-    List<Usuario> buscarPorRol(Usuario.Rol rol);
-    List<Usuario> buscarPorRolYEstado(Usuario.Rol rol, Usuario.EstadoUsuario estado);
+    List<Usuario> buscarPorPerfil(String nombrePerfil);
+    List<Usuario> buscarPorPerfilYEstado(String nombrePerfil, Usuario.EstadoUsuario estado);
     Usuario buscarPorId(Integer id);
     Optional<Usuario> buscarPorNumeroIdentificacion(String numeroIdentificacion);
     Optional<Usuario> buscarPorCorreo(String correo);

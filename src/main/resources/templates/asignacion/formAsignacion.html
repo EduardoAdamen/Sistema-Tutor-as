@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/fragment :: head}"></head>
 <body class="d-flex flex-column min-vh-100">
@@ -25,21 +25,16 @@
                                 <label for="tutor" class="form-label text-end fw-bold">Tutor:</label>
                                 <select id="tutor" th:field="*{tutor}" class="form-select" required>
                                     <option value="" disabled selected>-- Seleccione Tutor --</option>
-                                    <option th:each="t : ${tutores}" th:value="${t.id}" th:text="|${t.nombreCompleto} (${t.numeroIdentificacion})|"></option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="carrera" class="form-label fw-bold">Carrera:</label>
-                                <select id="carrera" th:field="*{carrera}" class="form-select" required>
-                                    <option value="" disabled selected>-- Seleccione Carrera --</option>
-                                    <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}"></option>
+                                    <option th:each="t : ${tutores}" th:value="${t.id}" th:text="|${t.usuario.nombreCompleto} (${t.usuario.numeroIdentificacion})|"></option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
                                 <label for="grupo" class="form-label fw-bold">Grupo:</label>
-                                <input type="text" id="grupo" th:field="*{grupo}" class="form-control" required maxlength="50" />
+                                <select id="grupo" th:field="*{grupo}" class="form-select" required>
+                                    <option value="" disabled selected>-- Seleccione Grupo --</option>
+                                    <option th:each="g : ${grupos}" th:value="${g.id}" th:text="|${g.nombre} - ${g.carrera.nombre}|"></option>
+                                </select>
                             </div>
 
                             <div class="mb-3">
@@ -50,12 +45,7 @@
                             <div class="mb-3">
                                 <label for="diaHorario" class="form-label fw-bold">Día de la semana:</label>
                                 <select id="diaHorario" th:field="*{diaHorario}" class="form-select" required>
-                                    <option value="" disabled selected>-- Día --</option>
-                                    <option value="Lunes">Lunes</option>
-                                    <option value="Martes">Martes</option>
-                                    <option value="Miércoles">Miércoles</option>
-                                    <option value="Jueves">Jueves</option>
-                                    <option value="Viernes">Viernes</option>
+                                    <option value="Viernes" selected>Viernes</option>
                                 </select>
                             </div>
 

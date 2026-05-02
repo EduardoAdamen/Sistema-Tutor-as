@@ -25,7 +25,7 @@
             <div class="row text-muted small fw-semibold">
                 <div class="col-md-3"><i class="bi bi-calendar-event me-1"></i> Fecha: <span class="text-dark" th:text="${sesion.fecha}"></span></div>
                 <div class="col-md-3"><i class="bi bi-clock me-1"></i> Horario: <span class="text-dark" th:text="${sesion.horaInicio} + ' - ' + ${sesion.horaFin}"></span></div>
-                <div class="col-md-3"><i class="bi bi-people me-1"></i> Grupo: <span class="text-dark" th:text="${sesion.asignacion.grupo}"></span></div>
+                <div class="col-md-3"><i class="bi bi-people me-1"></i> Grupo: <span class="text-dark" th:text="${sesion.asignacion.grupo.nombre}"></span></div>
             </div>
         </div>
     </div>
@@ -55,25 +55,23 @@
                                 </td>
                             </tr>
                             <tr th:each="at : ${tutorados}">
-                                <td class="ps-4 fw-semibold" th:text="${at.tutorado.numeroIdentificacion}">12345678</td>
-                                <td th:text="${at.tutorado.nombreCompleto}">Juan Pérez</td>
+                                <td class="ps-4 fw-semibold" th:text="${at.tutorado.usuario.numeroIdentificacion}">12345678</td>
+                                <td th:text="${at.tutorado.usuario.nombreCompleto}">Juan Pérez</td>
                                 <td class="text-center pe-4">
                                     <div class="btn-group" role="group" aria-label="Asistencia">
-                                        <!-- Encontrar el estado actual (si existe) -->
-                                        <!-- Utilizamos `#lists.toList(...)` e iteración simulando findFirst si usaramos utilidades. Vamos a configurar `checked` chequeando en asistenciasPrevias -->
                                         <!-- Presente -->
                                         <input type="radio" class="btn-check" th:name="'estado_' + ${at.tutorado.id}" th:id="'presente_' + ${at.tutorado.id}" value="presente"
-                                            th:checked="${asistenciasPrevias.stream().anyMatch(a -> a.tutorado.id == at.tutorado.id and a.estatusAsistencia.name() == 'presente')}" autocomplete="off" required>
+                                            th:checked="${estadosPrevios[at.tutorado.id] == 'presente'}" autocomplete="off" required>
                                         <label class="btn btn-outline-success btn-sm px-3" th:for="'presente_' + ${at.tutorado.id}">Presente</label>
 
                                         <!-- Ausente -->
                                         <input type="radio" class="btn-check" th:name="'estado_' + ${at.tutorado.id}" th:id="'ausente_' + ${at.tutorado.id}" value="ausente"
-                                            th:checked="${asistenciasPrevias.stream().anyMatch(a -> a.tutorado.id == at.tutorado.id and a.estatusAsistencia.name() == 'ausente')}" autocomplete="off">
+                                            th:checked="${estadosPrevios[at.tutorado.id] == 'ausente'}" autocomplete="off">
                                         <label class="btn btn-outline-danger btn-sm px-3" th:for="'ausente_' + ${at.tutorado.id}">Ausente</label>
 
                                         <!-- Justificado -->
                                         <input type="radio" class="btn-check" th:name="'estado_' + ${at.tutorado.id}" th:id="'justificado_' + ${at.tutorado.id}" value="justificado"
-                                            th:checked="${asistenciasPrevias.stream().anyMatch(a -> a.tutorado.id == at.tutorado.id and a.estatusAsistencia.name() == 'justificado')}" autocomplete="off">
+                                            th:checked="${estadosPrevios[at.tutorado.id] == 'justificado'}" autocomplete="off">
                                         <label class="btn btn-outline-warning btn-sm px-3" th:for="'justificado_' + ${at.tutorado.id}">Justificado</label>
                                     </div>
                                 </td>

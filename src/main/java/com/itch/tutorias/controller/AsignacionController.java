@@ -22,7 +22,7 @@ public class AsignacionController {
     private IPeriodoSemestral periodoService;
 
     @Autowired
-    private ICarrera carreraService;
+    private IGrupo grupoService;
 
     @Autowired
     private IUsuario usuarioService;
@@ -35,6 +35,12 @@ public class AsignacionController {
 
     @Autowired
     private IRegistroAsistencia registroAsistenciaService;
+
+    @Autowired
+    private ITutor tutorService;
+
+    @Autowired
+    private ITutorado tutoradoService;
 
     @GetMapping("/asignacion/asignaciones")
     public String listaAsignaciones(@RequestParam(required = false) Integer periodoId, Model model) {
@@ -70,8 +76,8 @@ public class AsignacionController {
         }
 
         model.addAttribute("asignacion", new Asignacion());
-        model.addAttribute("tutores", usuarioService.buscarPorRolYEstado(Usuario.Rol.tutor, Usuario.EstadoUsuario.activo));
-        model.addAttribute("carreras", carreraService.buscarTodas());
+        model.addAttribute("tutores", tutorService.buscarTodos().stream().filter(t -> t.getUsuario().getEstado() == Usuario.EstadoUsuario.activo).collect(java.util.stream.Collectors.toList()));
+        model.addAttribute("grupos", grupoService.buscarTodos());
         model.addAttribute("periodoActivo", periodoActivoOpt.get());
 
         return "asignacion/formAsignacion";
@@ -144,8 +150,8 @@ public class AsignacionController {
         }
 
         model.addAttribute("asignacion", asignacion);
-        model.addAttribute("tutores", usuarioService.buscarPorRolYEstado(Usuario.Rol.tutor, Usuario.EstadoUsuario.activo));
-        model.addAttribute("carreras", carreraService.buscarTodas());
+        model.addAttribute("tutores", tutorService.buscarTodos().stream().filter(t -> t.getUsuario().getEstado() == Usuario.EstadoUsuario.activo).collect(java.util.stream.Collectors.toList()));
+        model.addAttribute("grupos", grupoService.buscarTodos());
         model.addAttribute("periodoActivo", asignacion.getPeriodo());
 
         return "asignacion/formAsignacion";
@@ -164,12 +170,19 @@ public class AsignacionController {
         Asignacion asignacion = asignacionService.buscarPorId(id);
         Optional<Usuario> tutoradoOpt = usuarioService.buscarPorNumeroIdentificacion(numId);
 
-        if (tutoradoOpt.isEmpty() || tutoradoOpt.get().getRol() != Usuario.Rol.tutorado || tutoradoOpt.get().getEstado() != Usuario.EstadoUsuario.activo) {
-            attributes.addFlashAttribute("error", "El alumno con número de control no fue encontrado, no es tutorado o está inactivo.");
+        if (tutoradoOpt.isEmpty() || tutoradoOpt.get().getEstado() != Usuario.EstadoUsuario.activo) {
+            attributes.addFlashAttribute("error", "El alumno con número de control no fue encontrado o está inactivo.");
             return "redirect:/asignacion/ver/" + id;
         }
 
-        Usuario tutorado = tutoradoOpt.get();
+        Usuario usuarioTutorado = tutoradoOpt.get();
+        Optional<Tutorado> tutoradoRealOpt = tutoradoService.buscarPorUsuario(usuarioTutorado);
+        if (tutoradoRealOpt.isEmpty()) {
+            attributes.addFlashAttribute("error", "El usuario no es un tutorado.");
+            return "redirect:/asignacion/ver/" + id;
+        }
+
+        Tutorado tutorado = tutoradoRealOpt.get();
         if (asignacionTutoradoService.existeRelacion(asignacion, tutorado)) {
             attributes.addFlashAttribute("error", "El alumno ya se encuentra asignado a este grupo.");
             return "redirect:/asignacion/ver/" + id;
@@ -187,7 +200,7 @@ public class AsignacionController {
     @GetMapping("/asignacion/{id}/quitar-tutorado/{tutoradoId}")
     public String quitarTutorado(@PathVariable Integer id, @PathVariable Integer tutoradoId, RedirectAttributes attributes) {
         Asignacion asignacion = asignacionService.buscarPorId(id);
-        Usuario tutorado = usuarioService.buscarPorId(tutoradoId);
+        Tutorado tutorado = tutoradoService.buscarPorId(tutoradoId);
         
         // RF-21: Solo si no tiene asistencias asociadas a esta asignacion
         List<Sesion> sesiones = sesionService.buscarPorAsignacion(asignacion);

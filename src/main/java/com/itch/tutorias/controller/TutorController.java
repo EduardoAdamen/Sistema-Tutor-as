@@ -19,7 +19,8 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
-import com.itch.tutorias.service.IUsuario;
+import com.itch.tutorias.service.ITutor;
+import com.itch.tutorias.model.Tutor;
 
 @Controller
 @RequestMapping("/tutor")
@@ -32,10 +33,19 @@ public class TutorController {
     private IPeriodoSemestral periodoService;
     
     @Autowired
-    private IUsuario usuarioService;
+    private ITutor tutorService;
+    
+    @Autowired
+    private com.itch.tutorias.service.IUsuario usuarioService;
 
-    @GetMapping("/mis-tutorados")
-    public String misTutorados(Principal principal, RedirectAttributes attributes) {
+    @Autowired
+    private IAsignacionTutorado asignacionTutoradoService;
+
+    @Autowired
+    private com.itch.tutorias.service.IRegistroAsistencia registroAsistenciaService;
+
+    @GetMapping("/mis-grupos")
+    public String misGrupos(Principal principal, Model model, RedirectAttributes attributes) {
         if (principal == null) {
             return "redirect:/login";
         }
@@ -48,27 +58,40 @@ public class TutorController {
         
         Usuario tutor = tutorOpt.get();
 
-        PeriodoSemestral periodoActivo = periodoService.buscarActivo().orElse(null);
-        if (periodoActivo == null) {
-            attributes.addFlashAttribute("error", "No hay un periodo escolar activo en este momento.");
-            return "redirect:/";
-        }
-
-        // Buscar asignaciones del tutor y filtrar por el periodo activo
         List<Asignacion> asignaciones = new java.util.ArrayList<>();
         if (tutor != null) {
-            asignaciones = asignacionService.buscarPorTutor(tutor);
-        }
-        Asignacion asignacionActiva = asignaciones.stream()
-                .filter(a -> a.getPeriodo().getId().equals(periodoActivo.getId()))
-                .findFirst()
-                .orElse(null);
-
-        if (asignacionActiva == null) {
-            attributes.addFlashAttribute("error", "No tienes ning?n grupo asignado para el periodo actual.");
-            return "redirect:/";
+            Optional<Tutor> tOpt = tutorService.buscarPorUsuario(tutor);
+            if (tOpt.isPresent()) {
+                asignaciones = asignacionService.buscarPorTutor(tOpt.get());
+            }
         }
 
-        return "redirect:/asignacion/ver/" + asignacionActiva.getId();
+        model.addAttribute("asignaciones", asignaciones);
+        return "tutor/misGrupos";
+    }
+
+    @GetMapping("/grupo/{id}")
+    public String detalleGrupoTutor(@org.springframework.web.bind.annotation.PathVariable Integer id, Principal principal, Model model, RedirectAttributes attributes) {
+        if (principal == null) return "redirect:/login";
+
+        Asignacion asignacion = asignacionService.buscarPorId(id);
+        if (asignacion == null) {
+            attributes.addFlashAttribute("error", "Grupo no encontrado.");
+            return "redirect:/tutor/mis-grupos";
+        }
+
+        List<AsignacionTutorado> tutorados = asignacionTutoradoService.buscarPorAsignacion(asignacion);
+        
+        java.util.Map<Integer, Double> porcentajesAsistencia = new java.util.HashMap<>();
+        for (AsignacionTutorado at : tutorados) {
+            double porcentaje = registroAsistenciaService.calcularPorcentajeAsistencia(asignacion.getId(), at.getTutorado().getId());
+            porcentajesAsistencia.put(at.getTutorado().getId(), porcentaje);
+        }
+
+        model.addAttribute("asignacion", asignacion);
+        model.addAttribute("tutorados", tutorados);
+        model.addAttribute("porcentajes", porcentajesAsistencia);
+
+        return "tutor/detalleGrupo";
     }
 }

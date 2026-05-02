@@ -20,13 +20,13 @@ public class UsuarioServiceImpl implements IUsuario {
     }
 
     @Override
-    public List<Usuario> buscarPorRol(Usuario.Rol rol) {
-        return usuarioRepository.findByRol(rol);
+    public List<Usuario> buscarPorPerfil(String nombrePerfil) {
+        return usuarioRepository.findByPerfilesNombre(nombrePerfil);
     }
 
     @Override
-    public List<Usuario> buscarPorRolYEstado(Usuario.Rol rol, Usuario.EstadoUsuario estado) {
-        return usuarioRepository.findByRolAndEstado(rol, estado);
+    public List<Usuario> buscarPorPerfilYEstado(String nombrePerfil, Usuario.EstadoUsuario estado) {
+        return usuarioRepository.findByPerfilesNombreAndEstado(nombrePerfil, estado);
     }
 
     @Override

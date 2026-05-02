@@ -19,6 +19,12 @@ public class BusquedaController {
     private IUsuario usuarioService;
 
     @Autowired
+    private ITutor tutorService;
+
+    @Autowired
+    private ITutorado tutoradoService;
+
+    @Autowired
     private IPeriodoSemestral periodoService;
 
     @Autowired
@@ -60,23 +66,28 @@ public class BusquedaController {
 
         if (numeroControl != null && !numeroControl.trim().isEmpty()) {
             Optional<Usuario> uOpt = usuarioService.buscarPorNumeroIdentificacion(numeroControl);
-            if (uOpt.isPresent() && uOpt.get().getRol() == Usuario.Rol.tutorado) {
-                Usuario tutorado = uOpt.get();
-                model.addAttribute("tutorado", tutorado);
-                
-                List<AsignacionTutorado> historico = asignacionTutoradoService.buscarPorTutorado(tutorado);
-                
-                // Mapear cada asignación con su porcentaje de asistencia
-                java.util.Map<Integer, Double> promedios = new java.util.HashMap<>();
-                for (AsignacionTutorado at : historico) {
-                    double pct = registroAsistenciaService.calcularPorcentajeAsistencia(at.getAsignacion().getId(), tutorado.getId());
-                    promedios.put(at.getAsignacion().getId(), pct);
+            if (uOpt.isPresent()) {
+                Optional<Tutorado> tutoradoOpt = tutoradoService.buscarPorUsuario(uOpt.get());
+                if (tutoradoOpt.isPresent()) {
+                    Tutorado tutorado = tutoradoOpt.get();
+                    model.addAttribute("tutorado", tutorado.getUsuario());
+                    
+                    List<AsignacionTutorado> historico = asignacionTutoradoService.buscarPorTutorado(tutorado);
+                    
+                    // Mapear cada asignación con su porcentaje de asistencia
+                    java.util.Map<Integer, Double> promedios = new java.util.HashMap<>();
+                    for (AsignacionTutorado at : historico) {
+                        double pct = registroAsistenciaService.calcularPorcentajeAsistencia(at.getAsignacion().getId(), tutorado.getId());
+                        promedios.put(at.getAsignacion().getId(), pct);
+                    }
+                    
+                    model.addAttribute("historialAsignaciones", historico);
+                    model.addAttribute("porcentajes", promedios);
+                } else {
+                    model.addAttribute("error", "No se encontró un tutorado con ese número de control.");
                 }
-                
-                model.addAttribute("historialAsignaciones", historico);
-                model.addAttribute("porcentajes", promedios);
             } else {
-                model.addAttribute("error", "No se encontró un tutorado con ese número de control.");
+                model.addAttribute("error", "No se encontró un usuario con ese número de control.");
             }
         }
 
@@ -94,7 +105,7 @@ public class BusquedaController {
             
         model.addAttribute("tiposActividad", ActividadPat.TipoActividad.values());
         model.addAttribute("carreras", carreraService.buscarTodas());
-        model.addAttribute("tutores", usuarioService.buscarPorRol(Usuario.Rol.tutor));
+        model.addAttribute("tutores", tutorService.buscarTodos());
         
         model.addAttribute("filtroInicio", inicio);
         model.addAttribute("filtroFin", fin);
@@ -117,7 +128,7 @@ public class BusquedaController {
         }
         if (carreraId != null) {
             resultados = resultados.stream().filter(a -> 
-                a.getSesion().getAsignacion().getCarrera().getId().equals(carreraId)).collect(Collectors.toList());
+                a.getSesion().getAsignacion().getGrupo().getCarrera().getId().equals(carreraId)).collect(Collectors.toList());
         }
         if (tutorId != null) {
             resultados = resultados.stream().filter(a -> 

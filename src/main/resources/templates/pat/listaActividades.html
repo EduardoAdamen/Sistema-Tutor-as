@@ -21,7 +21,7 @@
         <div class="mb-3 d-flex justify-content-between">
             <a th:href="@{/}" class="btn btn-secondary">Regresar al Inicio</a>
             <div class="alert alert-info py-2 mb-0 d-inline-block">
-                Para registrar una <strong>Nueva Actividad</strong>, ingrese al detalle de una sesión en <em>Mis Asignaciones</em>.
+                Para registrar una <strong>Nueva Actividad</strong>, ingrese al detalle de una sesión en <em>Mis Sesiones</em>.
             </div>
         </div>
 
@@ -46,8 +46,8 @@
                             <td th:text="${a.titulo}">Taller de estudio</td>
                             <td th:text="${a.tipoActividad}">Taller</td>
                             <td>
-                                Carrera: <strong th:text="${a.sesion.asignacion.carrera.nombre}"></strong><br>
-                                Grupo: <span th:text="${a.sesion.asignacion.grupo}"></span>
+                                Carrera: <strong th:text="${a.sesion.asignacion.grupo.carrera.nombre}"></strong><br>
+                                Grupo: <span th:text="${a.sesion.asignacion.grupo.nombre}"></span>
                             </td>
                             <td th:text="${#temporals.format(a.sesion.fecha, 'dd/MM/yyyy')}">10/10/2023</td>
                             <td>

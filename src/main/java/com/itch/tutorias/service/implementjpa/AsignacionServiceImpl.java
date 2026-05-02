@@ -2,7 +2,7 @@ package com.itch.tutorias.service.implementjpa;
 
 import com.itch.tutorias.model.Asignacion;
 import com.itch.tutorias.model.PeriodoSemestral;
-import com.itch.tutorias.model.Usuario;
+import com.itch.tutorias.model.Tutor;
 import com.itch.tutorias.repository.AsignacionRepository;
 import com.itch.tutorias.service.IAsignacion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class AsignacionServiceImpl implements IAsignacion {
     }
 
     @Override
-    public List<Asignacion> buscarPorTutor(Usuario tutor) {
+    public List<Asignacion> buscarPorTutor(Tutor tutor) {
         return asignacionRepository.findByTutor(tutor);
     }
 
@@ -48,7 +48,7 @@ public class AsignacionServiceImpl implements IAsignacion {
     }
 
     @Override
-    public boolean existeDuplicado(Usuario tutor, String grupo, LocalTime hora, PeriodoSemestral periodo) {
+    public boolean existeDuplicado(Tutor tutor, com.itch.tutorias.model.Grupo grupo, LocalTime hora, PeriodoSemestral periodo) {
         return asignacionRepository.existsByTutorAndGrupoAndHoraHorarioAndPeriodo(tutor, grupo, hora, periodo);
     }
 }

@@ -31,16 +31,24 @@ public class ActividadPatController {
     @Autowired
     private IUsuario usuarioService;
 
+    @Autowired
+    private ITutor tutorService;
+
     @GetMapping("/pat/actividades")
     public String listaActividades(Principal principal, Model model, RedirectAttributes attributes) {
         if (principal == null) return "redirect:/login";
         
-        Optional<Usuario> tutorOpt = usuarioService.buscarPorNumeroIdentificacion(principal.getName());
-        Usuario tutor = tutorOpt.orElse(null);
+        Optional<Usuario> usuarioOpt = usuarioService.buscarPorNumeroIdentificacion(principal.getName());
+        Usuario usuarioLogueado = usuarioOpt.orElse(null);
+        
+        Tutor tutorReal = null;
+        if (usuarioLogueado != null) {
+             tutorReal = tutorService.buscarPorUsuario(usuarioLogueado).orElse(null);
+        }
         
         List<ActividadPat> actividades = new java.util.ArrayList<>();
-        if (tutor != null) {
-            actividades = actividadPatService.buscarPorTutor(tutor.getId());
+        if (tutorReal != null) {
+            actividades = actividadPatService.buscarPorTutor(tutorReal.getId());
             
             // Filtramos para asegurar que sean actividades del periodo activo
             Optional<PeriodoSemestral> periodoOpt = periodoService.buscarActivo();
@@ -53,7 +61,7 @@ public class ActividadPatController {
         }
 
         model.addAttribute("actividades", actividades);
-        model.addAttribute("tutor", tutor);
+        model.addAttribute("tutor", usuarioLogueado);
         return "pat/listaActividades";
     }
 

@@ -55,7 +55,7 @@
                             <option value="">Cualquier Tutor</option>
                             <option th:each="tut : ${tutores}"
                                     th:value="${tut.id}"
-                                    th:text="${tut.nombreCompleto}"
+                                    th:text="${tut.usuario.nombreCompleto}"
                                     th:selected="${tut.id == filtroTutorId}">
                             </option>
                         </select>
@@ -99,10 +99,10 @@
                             <span th:text="${#temporals.format(act.sesion.fecha, 'dd/MM/yyyy')}"></span><br>
                             <span th:text="${act.sesion.horaInicio}"></span>
                         </td>
-                        <td th:text="${act.sesion.asignacion.tutor.nombreCompleto}">Juan Pérez</td>
+                        <td th:text="${act.sesion.asignacion.tutor.usuario.nombreCompleto}">Juan Pérez</td>
                         <td>
-                            <span th:text="${act.sesion.asignacion.carrera.nombre}"></span><br>
-                            Grupo: <strong th:text="${act.sesion.asignacion.grupo}"></strong>
+                            <span th:text="${act.sesion.asignacion.grupo.carrera.nombre}"></span><br>
+                            Grupo: <strong th:text="${act.sesion.asignacion.grupo.nombre}"></strong>
                         </td>
                         <td>
                             <span th:if="${act.evidencia != null}">

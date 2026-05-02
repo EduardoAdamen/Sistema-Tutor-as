@@ -32,7 +32,11 @@ public class DatabaseWebSecurity {
             "SELECT numero_identificacion AS username, contrasena_hash AS password, CASE WHEN estado = 'activo' THEN 1 ELSE 0 END AS enabled FROM usuario WHERE numero_identificacion = ?"
         );
         dbUsers.setAuthoritiesByUsernameQuery(
-            "SELECT numero_identificacion AS username, UPPER(rol) AS authority FROM usuario WHERE numero_identificacion = ?"
+            "SELECT u.numero_identificacion AS username, UPPER(p.nombre) AS authority " +
+            "FROM usuario u " +
+            "JOIN usuario_perfil up ON u.id = up.usuario_id " +
+            "JOIN perfil p ON up.perfil_id = p.id " +
+            "WHERE u.numero_identificacion = ?"
         );
 
         return new UserDetailsManager() {
@@ -44,7 +48,7 @@ public class DatabaseWebSecurity {
                     return User.builder()
                             .username(adminUsername)
                             .password("{noop}" + adminPassword)
-                            .authorities("ADMIN")
+                            .authorities("ADMINISTRADOR")
                             .build();
                 }
                 return dbUsers.loadUserByUsername(username);
@@ -70,9 +74,9 @@ public class DatabaseWebSecurity {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/", "/login", "/registro", "/usuario/guardar", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
-            .requestMatchers("/asignacion/ver/**").hasAnyAuthority("ADMIN", "TUTOR", "TUTORADO")
-            .requestMatchers("/usuario/**", "/carrera/**", "/periodo/**", "/asignacion/**").hasAuthority("ADMIN")
-            .requestMatchers("/pat/**", "/tutor/**", "/sesion/**").hasAnyAuthority("TUTOR", "ADMIN")
+            .requestMatchers("/asignacion/ver/**").hasAnyAuthority("ADMINISTRADOR", "TUTOR", "TUTORADO")
+            .requestMatchers("/usuario/**", "/carrera/**", "/grupo/**", "/periodo/**", "/asignacion/**").hasAuthority("ADMINISTRADOR")
+            .requestMatchers("/pat/**", "/tutor/**", "/sesion/**").hasAuthority("TUTOR")
             .requestMatchers("/tutorado/**").hasAuthority("TUTORADO")
             .anyRequest().authenticated()
         );

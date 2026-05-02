@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/fragment :: head}"></head>
 <body class="d-flex flex-column min-vh-100">
@@ -29,7 +29,7 @@
                             </tr>
                             <tr>
                                 <th class="text-end">Tutor:</th>
-                                <td th:text="${asignacion.tutor.nombreCompleto}"></td>
+                                <td th:text="${asignacion.tutor.usuario.nombreCompleto}"></td>
                             </tr>
                             <tr>
                                 <th class="text-end">Periodo:</th>
@@ -37,11 +37,11 @@
                             </tr>
                             <tr>
                                 <th class="text-end">Carrera:</th>
-                                <td th:text="${asignacion.carrera.nombre}"></td>
+                                <td th:text="${asignacion.grupo.carrera.nombre}"></td>
                             </tr>
                             <tr>
                                 <th class="text-end">Grupo:</th>
-                                <td th:text="${asignacion.grupo}"></td>
+                                <td th:text="${asignacion.grupo.nombre}"></td>
                             </tr>
                             <tr>
                                 <th class="text-end">Aula:</th>
@@ -92,7 +92,7 @@
                          <span class="badge bg-light text-dark border">Total: <span th:text="${#lists.size(asigTutorados)}"></span></span>
                      </div>
                      
-                     <div class="card-body bg-light border-bottom p-3" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin'}">
+                     <div class="card-body bg-light border-bottom p-3" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('ADMINISTRADOR')}">
                          <!-- El formulario se muestra para probar el Sprint 1 (sin sesión). En el Sprint 2 se debe volver a proteger con sec:authorize o th:if -->
                          <form th:action="@{/asignacion/{id}/agregar-tutorado(id=${asignacion.id})}" method="post" class="row g-2 align-items-center">
                               <div class="col">
@@ -111,13 +111,13 @@
                                        <th class="ps-4">Tutorado</th>
                                        <th>Matrícula</th>
                                        <th class="text-center" style="width: 25%">Asistencia</th>
-                                       <th th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin'}" class="text-center pe-4">Acción</th>
+                                       <th th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('ADMINISTRADOR')}" class="text-center pe-4">Acción</th>
                                    </tr>
                                </thead>
                                <tbody>
                                    <tr th:each="at : ${asigTutorados}">
-                                       <td class="ps-4" th:text="${at.tutorado.nombreCompleto}"></td>
-                                       <td th:text="${at.tutorado.numeroIdentificacion}"></td>
+                                       <td class="ps-4" th:text="${at.tutorado.usuario.nombreCompleto}"></td>
+                                       <td th:text="${at.tutorado.usuario.numeroIdentificacion}"></td>
                                        <td class="text-center">
                                             <div class="progress" style="height: 20px;">
                                                 <div class="progress-bar bg-secondary"
@@ -127,7 +127,7 @@
                                                 </div>
                                             </div>
                                        </td>
-                                       <td th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin'}" class="text-center pe-4">
+                                       <td th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('ADMINISTRADOR')}" class="text-center pe-4">
                                             <a th:href="@{/asignacion/{id}/quitar-tutorado/{tId}(id=${asignacion.id}, tId=${at.tutorado.id})}" 
                                                class="btn btn-sm btn-outline-danger"
                                                onclick="return confirm('¿Remover este alumno de la asignación?')">
@@ -136,7 +136,7 @@
                                        </td>
                                    </tr>
                                    <tr th:if="${asigTutorados.empty}">
-                                       <td th:colspan="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin' ? 4 : 3}" class="text-center py-4 text-muted">
+                                       <td th:colspan="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('ADMINISTRADOR') ? 4 : 3}" class="text-center py-4 text-muted">
                                            No hay tutorados asignados a este grupo.
                                        </td>
                                    </tr>

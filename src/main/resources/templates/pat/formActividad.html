@@ -25,9 +25,9 @@
                     <!-- Información de la Sesión / Asignación -->
                     <div class="alert alert-secondary mb-4">
                         <strong>Datos de la Asignación:</strong><br/>
-                        Carrera: <span th:text="${actividad.sesion.asignacion.carrera.nombre}"></span> - 
-                        Grupo: <span th:text="${actividad.sesion.asignacion.grupo}"></span> | 
-                        Tutor: <span th:text="${actividad.sesion.asignacion.tutor.nombreCompleto}"></span>
+                        Carrera: <span th:text="${actividad.sesion.asignacion.grupo.carrera.nombre}"></span> - 
+                        Grupo: <span th:text="${actividad.sesion.asignacion.grupo.nombre}"></span> | 
+                        Tutor: <span th:text="${actividad.sesion.asignacion.tutor.usuario.nombreCompleto}"></span>
                         <br/>
                         <strong>Sesión Correspondiente:</strong> 
                         Fecha: <span th:text="${#temporals.format(actividad.sesion.fecha, 'dd/MM/yyyy')}"></span>

@@ -22,7 +22,7 @@
                             <option value="">-- Seleccione un periodo --</option>
                             <option th:each="p : ${periodos}"
                                     th:value="${p.id}"
-                                    th:text="${p.nombrePeriodo}"
+                                    th:text="${p.clave}"
                                     th:selected="${p.id == filtroPeriodoId}">
                             </option>
                         </select>
@@ -55,12 +55,12 @@
                     </thead>
                     <tbody>
                     <tr th:each="asig : ${asignaciones}">
-                        <td th:text="${asig.tutor.nombreCompleto}">Juan Pérez</td>
-                        <td th:text="${asig.carrera.nombre}">Ing. Sistemas</td>
-                        <td th:text="${asig.grupo}">A</td>
+                        <td th:text="${asig.tutor.usuario.nombreCompleto}">Juan Pérez</td>
+                        <td th:text="${asig.grupo.carrera.nombre}">Ing. Sistemas</td>
+                        <td th:text="${asig.grupo.nombre}">A</td>
                         <td th:text="${asig.aula}">Aula 10</td>
-                        <td th:text="${asig.diaSemanal}">Lunes</td>
-                        <td th:text="${#temporals.format(asig.hora, 'HH:mm')}">10:00</td>
+                        <td th:text="${asig.diaHorario}">Lunes</td>
+                        <td th:text="${#temporals.format(asig.horaHorario, 'HH:mm')}">10:00</td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(asignaciones)}">
                         <td colspan="6" class="text-center text-muted py-4">No se encontraron tutores asignados en el periodo seleccionado.</td>

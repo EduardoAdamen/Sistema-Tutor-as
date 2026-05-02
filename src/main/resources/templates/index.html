@@ -21,16 +21,16 @@
                 <h1 class="display-5 fw-bold text-dark mb-3">Programa de Acción Tutorial</h1>
                 <p class="lead text-muted mb-4">
                     Bienvenido, <strong th:text="${session.usuarioLogueado != null ? session.usuarioLogueado.nombreCompleto : 'Usuario'}" class="text-primary"></strong>.<br>
-                    <span th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin'}">Utilice el menú superior para administrar Catálogos, Asignaciones, Usuarios y Tutores.</span>
-                    <span th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'tutor'}">Acceda de forma rápida a sus grupos de asignación y al registro de sus actividades.</span>
-                    <span th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'tutorado'}">En este portal podrá consultar el detalle de su historial de avance como tutorado registrado.</span>
+                    <span th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('ADMINISTRADOR')}">Utilice el menú superior para administrar Catálogos, Asignaciones, Usuarios y Tutores.</span>
+                    <span th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('TUTOR')}">Acceda de forma rápida a sus grupos de asignación y al registro de sus actividades.</span>
+                    <span th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('TUTORADO')}">Consulte su historial de tutorías y manténgase al tanto de su progreso.</span>
                 </p>
-                <div class="mt-4" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'tutor'}">
+                <div class="mt-4" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('TUTOR')}">
                     <a th:href="@{/pat/actividades}" class="btn btn-primary btn-lg rounded-pill shadow-sm px-4">
                         <i class="bi bi-journal-text me-2"></i> Mis Actividades
                     </a>
                 </div>
-                <div class="mt-4" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.rol.name() == 'admin'}">
+                <div class="mt-4" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('ADMINISTRADOR')}">
                     <a th:href="@{/usuario/usuarios}" class="btn btn-primary btn-lg rounded-pill shadow-sm px-4">
                         <i class="bi bi-people me-2"></i> Gestión de Usuarios
                     </a>

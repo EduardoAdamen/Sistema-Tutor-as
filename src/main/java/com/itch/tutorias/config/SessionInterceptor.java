@@ -1,5 +1,6 @@
 package com.itch.tutorias.config;
 
+import com.itch.tutorias.model.Perfil;
 import com.itch.tutorias.model.Usuario;
 import com.itch.tutorias.service.IUsuario;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ public class SessionInterceptor implements HandlerInterceptor {
                     Usuario admin = new Usuario();
                     admin.setNombreCompleto("Administrador DDA");
                     admin.setNumeroIdentificacion("ADMIN001");
-                    admin.setRol(Usuario.Rol.admin);
+                    admin.setPerfiles(java.util.Set.of(new Perfil("ADMINISTRADOR")));
                     session.setAttribute("usuarioLogueado", admin);
                 }
             }

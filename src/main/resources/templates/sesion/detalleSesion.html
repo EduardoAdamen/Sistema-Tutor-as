@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/fragment :: head}"></head>
 <body class="d-flex flex-column min-vh-100">
@@ -16,7 +16,7 @@
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
         <div class="mb-3">
-            <a th:href="@{/sesion/mis-sesiones}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Regresar a Mis Sesiones</a>
+            <a th:href="@{/sesion/grupo/{id}(id=${sesion.asignacion.id})}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Regresar a Mis Sesiones</a>
         </div>
 
         <div class="row">
@@ -62,8 +62,8 @@
                             </thead>
                             <tbody>
                                 <tr th:each="at : ${tutorados}">
-                                    <td class="text-start ps-3 fw-bold text-secondary" th:text="${at.tutorado.numeroIdentificacion}">123456</td>
-                                    <td class="text-start" th:text="${at.tutorado.nombreCompleto}">Juan Pérez</td>
+                                    <td class="text-start ps-3 fw-bold text-secondary" th:text="${at.tutorado.usuario.numeroIdentificacion}">123456</td>
+                                    <td class="text-start" th:text="${at.tutorado.usuario.nombreCompleto}">Juan Pérez</td>
                                     <td>
                                         <!-- Buscamos el estado en la lista de asistencias -->
                                         <th:block th:each="asist : ${asistencias}">

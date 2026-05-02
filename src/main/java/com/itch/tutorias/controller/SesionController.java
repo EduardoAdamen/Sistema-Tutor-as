@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/sesion")
@@ -35,6 +36,9 @@ public class SesionController {
     private IUsuario usuarioService;
 
     @Autowired
+    private ITutor tutorService;
+
+    @Autowired
     private IAsignacion asignacionService;
 
     @Autowired
@@ -43,44 +47,30 @@ public class SesionController {
     @Autowired
     private IServicioAlmacenamiento servicioAlmacenamiento;
 
-    private Asignacion obtenerAsignacionActiva(Usuario tutor, RedirectAttributes attributes) {
-        PeriodoSemestral periodoActivo = periodoService.buscarActivo().orElse(null);
-        if (periodoActivo == null) {
-            if(attributes != null) attributes.addFlashAttribute("error", "No hay un periodo escolar activo.");
-            return null;
-        }
-
-        List<Asignacion> asignaciones = asignacionService.buscarPorTutor(tutor);
-        return asignaciones.stream()
-                .filter(a -> a.getPeriodo().getId().equals(periodoActivo.getId()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @GetMapping("/mis-sesiones")
-    public String misSesiones(Principal principal, Model model, RedirectAttributes attributes) {
+    @GetMapping("/grupo/{asignacionId}")
+    public String sesionesPorGrupo(@PathVariable Integer asignacionId, Principal principal, Model model, RedirectAttributes attributes) {
         if (principal == null) return "redirect:/login";
-        Usuario tutor = usuarioService.buscarPorNumeroIdentificacion(principal.getName()).orElse(null);
-        Asignacion asignacionActiva = obtenerAsignacionActiva(tutor, attributes);
-
-        if (asignacionActiva == null) {
-            return "redirect:/";
+        
+        Asignacion asignacion = asignacionService.buscarPorId(asignacionId);
+        if (asignacion == null) {
+            attributes.addFlashAttribute("error", "Grupo no encontrado.");
+            return "redirect:/tutor/mis-grupos";
         }
 
-        List<Sesion> sesiones = sesionService.buscarPorAsignacion(asignacionActiva);
+        List<Sesion> sesiones = sesionService.buscarPorAsignacion(asignacion);
         model.addAttribute("sesiones", sesiones);
-        model.addAttribute("asignacion", asignacionActiva);
+        model.addAttribute("asignacion", asignacion);
         return "sesion/listaSesiones";
     }
 
-    @GetMapping("/nueva")
-    public String nuevaSesion(Principal principal, Model model, RedirectAttributes attributes) {
+    @GetMapping("/nueva/{asignacionId}")
+    public String nuevaSesion(@PathVariable Integer asignacionId, Principal principal, Model model, RedirectAttributes attributes) {
         if (principal == null) return "redirect:/login";
-        Usuario tutor = usuarioService.buscarPorNumeroIdentificacion(principal.getName()).orElse(null);
-        Asignacion asignacionActiva = obtenerAsignacionActiva(tutor, attributes);
 
-        if (asignacionActiva == null) {
-            return "redirect:/";
+        Asignacion asignacionActiva = asignacionService.buscarPorId(asignacionId);
+        if (asignacionActiva == null || asignacionActiva.getPeriodo().getEstatus() != PeriodoSemestral.EstatusPeriodo.activo) {
+            attributes.addFlashAttribute("error", "No se pueden crear sesiones para este grupo o periodo cerrado.");
+            return "redirect:/tutor/mis-grupos";
         }
 
         Sesion sesion = new Sesion();
@@ -96,18 +86,17 @@ public class SesionController {
                                 RedirectAttributes attributes) {
                                 
         if (principal == null) return "redirect:/login";
-        Usuario tutor = usuarioService.buscarPorNumeroIdentificacion(principal.getName()).orElse(null);
-        Asignacion asignacionActiva = obtenerAsignacionActiva(tutor, attributes);
+        Asignacion asignacionActiva = asignacionService.buscarPorId(sesion.getAsignacion().getId());
 
         if (asignacionActiva == null) {
-            return "redirect:/";
+            return "redirect:/tutor/mis-grupos";
         }
 
         // Validar RF-26: La fecha de la sesión no puede ser posterior a la fecha fin del periodo
         if (sesion.getFecha().isAfter(asignacionActiva.getPeriodo().getFechaFin()) || sesion.getFecha().isBefore(asignacionActiva.getPeriodo().getFechaInicio())) {
             attributes.addFlashAttribute("error", "La fecha de la sesión debe estar dentro del periodo escolar activo (" 
                     + asignacionActiva.getPeriodo().getFechaInicio() + " a " + asignacionActiva.getPeriodo().getFechaFin() + ").");
-            return "redirect:/sesion/nueva";
+            return "redirect:/sesion/nueva/" + asignacionActiva.getId();
         }
 
         sesion.setAsignacion(asignacionActiva);
@@ -123,7 +112,7 @@ public class SesionController {
 
         sesionService.guardar(sesion);
         attributes.addFlashAttribute("msg", "Sesión guardada exitosamente.");
-        return "redirect:/sesion/mis-sesiones";
+        return "redirect:/sesion/grupo/" + asignacionActiva.getId();
     }
 
     @GetMapping("/editar/{id}")
@@ -140,14 +129,16 @@ public class SesionController {
     @GetMapping("/eliminar/{id}")
     public String eliminarSesion(@PathVariable Integer id, RedirectAttributes attributes) {
         Sesion sesion = sesionService.buscarPorId(id);
+        Integer asignacionId = null;
         if (sesion != null) {
+            asignacionId = sesion.getAsignacion().getId();
             if (sesion.getEvidencia() != null && !sesion.getEvidencia().isEmpty()) {
                 servicioAlmacenamiento.eliminar(sesion.getEvidencia(), "sesiones");
             }
             sesionService.eliminar(id);
             attributes.addFlashAttribute("msg", "Sesión eliminada correctamente.");
         }
-        return "redirect:/sesion/mis-sesiones";
+        return asignacionId != null ? "redirect:/sesion/grupo/" + asignacionId : "redirect:/tutor/mis-grupos";
     }
 
     @GetMapping("/ver/{id}")

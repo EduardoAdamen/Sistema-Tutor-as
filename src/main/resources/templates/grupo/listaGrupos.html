@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+
+        <div th:if="${msg}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><span th:text="${msg}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mi-titulo mb-0">Gestión de Grupos</h2>
+            <a th:href="@{/grupo/nuevo}" class="btn btn-encabezado">
+                <i class="bi bi-plus-circle"></i> Nuevo Grupo
+            </a>
+        </div>
+
+        <div class="table-responsive bg-white rounded shadow-sm p-3">
+            <table class="table table-hover bordes-fuertes align-middle mb-0">
+                <thead>
+                    <tr class="mi-etiqueta">
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Carrera</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="g : ${grupos}">
+                        <td th:text="${g.id}"></td>
+                        <td th:text="${g.nombre}"></td>
+                        <td th:text="${g.carrera.nombre}"></td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a th:href="@{/grupo/editar/{id}(id=${g.id})}" class="btn-crud btn-editar" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{/grupo/eliminar/{id}(id=${g.id})}" class="btn-crud btn-eliminar" title="Eliminar"
+                                   onclick="return confirm('¿Confirma eliminar este grupo?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(grupos)}">
+                        <td colspan="4" class="text-center text-muted py-4">
+                            <i class="bi bi-info-circle"></i> No hay grupos registrados en el sistema.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+</body>
+</html>

@@ -2,7 +2,7 @@ package com.itch.tutorias.service.implementjpa;
 
 import com.itch.tutorias.model.Asignacion;
 import com.itch.tutorias.model.AsignacionTutorado;
-import com.itch.tutorias.model.Usuario;
+import com.itch.tutorias.model.Tutorado;
 import com.itch.tutorias.repository.AsignacionTutoradoRepository;
 import com.itch.tutorias.service.IAsignacionTutorado;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class AsignacionTutoradoServiceImpl implements IAsignacionTutorado {
     }
 
     @Override
-    public List<AsignacionTutorado> buscarPorTutorado(Usuario tutorado) {
+    public List<AsignacionTutorado> buscarPorTutorado(Tutorado tutorado) {
         return asignacionTutoradoRepository.findByTutorado(tutorado);
     }
 
@@ -36,7 +36,7 @@ public class AsignacionTutoradoServiceImpl implements IAsignacionTutorado {
     }
 
     @Override
-    public boolean existeRelacion(Asignacion asignacion, Usuario tutorado) {
+    public boolean existeRelacion(Asignacion asignacion, Tutorado tutorado) {
         return asignacionTutoradoRepository.existsByAsignacionAndTutorado(asignacion, tutorado);
     }
 }

@@ -35,10 +35,15 @@ public class AsistenciaController {
 
         List<AsignacionTutorado> asignacionTutorados = asignacionTutoradoService.buscarPorAsignacion(sesion.getAsignacion());
         List<RegistroAsistencia> asistenciasPrevias = registroAsistenciaService.buscarPorSesion(sesion);
+        
+        java.util.Map<Integer, String> estadosPrevios = new java.util.HashMap<>();
+        for (RegistroAsistencia r : asistenciasPrevias) {
+            estadosPrevios.put(r.getTutorado().getId(), r.getEstatusAsistencia().name());
+        }
 
         model.addAttribute("sesion", sesion);
         model.addAttribute("tutorados", asignacionTutorados);
-        model.addAttribute("asistenciasPrevias", asistenciasPrevias);
+        model.addAttribute("estadosPrevios", estadosPrevios);
 
         return "asistencia/registrarAsistencia";
     }
@@ -54,7 +59,7 @@ public class AsistenciaController {
         List<AsignacionTutorado> asignacionTutorados = asignacionTutoradoService.buscarPorAsignacion(sesion.getAsignacion());
 
         for (AsignacionTutorado at : asignacionTutorados) {
-            Usuario tutorado = at.getTutorado();
+            Tutorado tutorado = at.getTutorado();
             String estadoStr = request.getParameter("estado_" + tutorado.getId());
             
             if (estadoStr != null && !estadoStr.isEmpty()) {

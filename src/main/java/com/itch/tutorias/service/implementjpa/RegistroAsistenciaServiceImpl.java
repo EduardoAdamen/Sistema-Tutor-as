@@ -2,7 +2,7 @@ package com.itch.tutorias.service.implementjpa;
 
 import com.itch.tutorias.model.RegistroAsistencia;
 import com.itch.tutorias.model.Sesion;
-import com.itch.tutorias.model.Usuario;
+import com.itch.tutorias.model.Tutorado;
 import com.itch.tutorias.repository.RegistroAsistenciaRepository;
 import com.itch.tutorias.repository.SesionRepository;
 import com.itch.tutorias.service.IRegistroAsistencia;
@@ -25,7 +25,7 @@ public class RegistroAsistenciaServiceImpl implements IRegistroAsistencia {
     }
 
     @Override
-    public List<RegistroAsistencia> buscarPorTutorado(Usuario tutorado) {
+    public List<RegistroAsistencia> buscarPorTutorado(Tutorado tutorado) {
         return registroRepository.findByTutorado(tutorado);
     }
 
@@ -35,7 +35,7 @@ public class RegistroAsistenciaServiceImpl implements IRegistroAsistencia {
     }
 
     @Override
-    public boolean existeRegistro(Sesion sesion, Usuario tutorado) {
+    public boolean existeRegistro(Sesion sesion, Tutorado tutorado) {
         return registroRepository.existsBySesionAndTutorado(sesion, tutorado);
     }
 

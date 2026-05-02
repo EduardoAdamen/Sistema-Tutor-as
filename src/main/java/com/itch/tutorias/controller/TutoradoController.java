@@ -17,7 +17,8 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
-import com.itch.tutorias.service.IUsuario;
+import com.itch.tutorias.service.ITutorado;
+import com.itch.tutorias.model.Tutorado;
 
 @Controller
 @RequestMapping("/tutorado")
@@ -30,7 +31,10 @@ public class TutoradoController {
     private IAsignacionTutorado asignacionTutoradoService;
 
     @Autowired
-    private IUsuario usuarioService;
+    private ITutorado tutoradoService;
+    
+    @Autowired
+    private com.itch.tutorias.service.IUsuario usuarioService;
 
     @GetMapping("/mi-tutoria")
     public String miTutoria(Principal principal, RedirectAttributes attributes) {
@@ -54,7 +58,10 @@ public class TutoradoController {
 
         List<AsignacionTutorado> relaciones = new java.util.ArrayList<>();
         if (tutorado != null) {
-            relaciones = asignacionTutoradoService.buscarPorTutorado(tutorado);
+            Optional<Tutorado> tOpt = tutoradoService.buscarPorUsuario(tutorado);
+            if (tOpt.isPresent()) {
+                relaciones = asignacionTutoradoService.buscarPorTutorado(tOpt.get());
+            }
         }
         Asignacion asignacionActiva = relaciones.stream()
                 .map(AsignacionTutorado::getAsignacion)

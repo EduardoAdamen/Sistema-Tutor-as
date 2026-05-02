@@ -14,7 +14,7 @@
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
         <h2 class="mi-titulo m-0">Mis Sesiones</h2>
-        <a th:href="@{/sesion/nueva}" class="btn btn-encabezado shadow-sm">
+        <a th:href="@{/sesion/nueva/{id}(id=${asignacion.id})}" class="btn btn-encabezado shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Registrar Sesión
         </a>
     </div>

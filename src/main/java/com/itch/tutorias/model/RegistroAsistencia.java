@@ -24,7 +24,7 @@ public class RegistroAsistencia {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutorado_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_reg_asist_tutorado"))
-    private Usuario tutorado;
+    private Tutorado tutorado;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_asistencia", nullable = false)
@@ -40,13 +40,13 @@ public class RegistroAsistencia {
     //Getters
     public Integer getId() { return id; }
     public Sesion getSesion() { return sesion; }
-    public Usuario getTutorado() { return tutorado; }
+    public Tutorado getTutorado() { return tutorado; }
     public EstatusAsistencia getEstatusAsistencia() { return estatusAsistencia; }
 
     //Setters
     public void setId(Integer id) { this.id = id; }
     public void setSesion(Sesion sesion) { this.sesion = sesion; }
-    public void setTutorado(Usuario tutorado) { this.tutorado = tutorado; }
+    public void setTutorado(Tutorado tutorado) { this.tutorado = tutorado; }
     public void setEstatusAsistencia(EstatusAsistencia estatusAsistencia) { this.estatusAsistencia = estatusAsistencia; }
 
     @Override

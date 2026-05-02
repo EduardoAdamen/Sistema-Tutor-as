@@ -63,18 +63,19 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    <label for="rol" class="form-label fw-semibold">Rol</label>
-                                    <select id="rol" th:field="*{rol}" class="form-select" required>
-                                        <option value="" disabled selected>-- Seleccionar --</option>
-                                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+                                    <label for="perfilesIds" class="form-label fw-semibold">Perfil</label>
+                                    <select id="perfilesIds" name="perfilesIds" class="form-select" required>
+                                        <option value="" disabled selected>Seleccione un perfil</option>
+                                        <option th:each="p : ${perfiles}" th:value="${p.id}" th:text="${p.nombre}"
+                                                th:selected="${usuario.perfiles != null and !usuario.perfiles.isEmpty() and usuario.perfiles.iterator().next().id == p.id}"></option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="carrera" class="form-label fw-semibold">Carrera</label>
-                                    <select id="carrera" th:field="*{carrera}" class="form-select" required>
-                                        <option value="" disabled selected>-- Seleccionar --</option>
-                                        <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}">
-                                        </option>
+                                    <label for="carreraId" class="form-label fw-semibold">Carrera</label>
+                                    <select id="carreraId" name="carreraId" class="form-select">
+                                        <option value="">Ninguna</option>
+                                        <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}"
+                                                th:selected="${carreraId != null and c.id == carreraId}"></option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
@@ -142,11 +143,11 @@
                 if (datosUsuarioInactivo) {
                     document.getElementById("nombreCompleto").value = datosUsuarioInactivo.nombreCompleto || "";
                     document.getElementById("correo").value = datosUsuarioInactivo.correo || "";
-                    if (datosUsuarioInactivo.rol) {
-                        document.getElementById("rol").value = datosUsuarioInactivo.rol;
+                    if (datosUsuarioInactivo.perfil) {
+                        // Podrías seleccionar el perfil basándote en el nombre si fuera necesario
                     }
                     if (datosUsuarioInactivo.carrera) {
-                        document.getElementById("carrera").value = datosUsuarioInactivo.carrera;
+                        document.getElementById("carreraId").value = datosUsuarioInactivo.carrera;
                     }
 
                     // Hacer la contraseña opcional al restaurar un usuario inactivo

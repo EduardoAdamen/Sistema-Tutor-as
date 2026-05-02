@@ -69,12 +69,12 @@
                     </thead>
                     <tbody>
                     <tr th:each="hist : ${historialAsignaciones}">
-                        <td th:text="${hist.asignacion.periodo.nombrePeriodo}">Ene-Jun 2023</td>
-                        <td th:text="${hist.semestreCursado}">1</td>
-                        <td th:text="${hist.asignacion.tutor.nombreCompleto}">Juan Pérez</td>
+                        <td th:text="${hist.asignacion.periodo.clave}">Ene-Jun 2023</td>
+                        <td th:text="${hist.tutorado.semestre}">1</td>
+                        <td th:text="${hist.asignacion.tutor.usuario.nombreCompleto}">Juan Pérez</td>
                         <td>
-                            Carrera: <strong th:text="${hist.asignacion.carrera.nombre}"></strong><br>
-                            Grupo: <span th:text="${hist.asignacion.grupo}"></span>
+                            Carrera: <strong th:text="${hist.asignacion.grupo.carrera.nombre}"></strong><br>
+                            Grupo: <span th:text="${hist.asignacion.grupo.nombre}"></span>
                         </td>
                         <td>
                             <div class="progress">

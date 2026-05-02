@@ -3,6 +3,8 @@ package com.itch.tutorias.model;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "usuario")
@@ -24,14 +26,13 @@ public class Usuario {
     @Column(name = "contrasena_hash", nullable = false, length = 255)
     private String contrasenaHash;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "rol", nullable = false)
-    private Rol rol;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "carrera_id", nullable = true,
-            foreignKey = @ForeignKey(name = "fk_usuario_carrera"))
-    private Carrera carrera;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "usuario_perfil",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "perfil_id")
+    )
+    private Set<Perfil> perfiles = new HashSet<>();
 
     @Column(name = "foto_perfil", length = 255)
     private String fotoPerfil;
@@ -44,8 +45,15 @@ public class Usuario {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public enum Rol {
-        admin, tutor, tutorado
+    public boolean hasPerfil(String nombrePerfil) {
+        return perfiles.stream().anyMatch(p -> p.getNombre().equalsIgnoreCase(nombrePerfil));
+    }
+
+    public String getPrimerPerfil() {
+        if (perfiles != null && !perfiles.isEmpty()) {
+            return perfiles.iterator().next().getNombre();
+        }
+        return "";
     }
 
     public enum EstadoUsuario {
@@ -60,8 +68,7 @@ public class Usuario {
     public String getNombreCompleto() { return nombreCompleto; }
     public String getCorreo() { return correo; }
     public String getContrasenaHash() { return contrasenaHash; }
-    public Rol getRol() { return rol; }
-    public Carrera getCarrera() { return carrera; }
+    public Set<Perfil> getPerfiles() { return perfiles; }
     public String getFotoPerfil() { return fotoPerfil; }
     public EstadoUsuario getEstado() { return estado; }
     public LocalDateTime getCreatedAt() { return createdAt; }
@@ -72,8 +79,7 @@ public class Usuario {
     public void setNombreCompleto(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }
     public void setCorreo(String correo) { this.correo = correo; }
     public void setContrasenaHash(String contrasenaHash) { this.contrasenaHash = contrasenaHash; }
-    public void setRol(Rol rol) { this.rol = rol; }
-    public void setCarrera(Carrera carrera) { this.carrera = carrera; }
+    public void setPerfiles(Set<Perfil> perfiles) { this.perfiles = perfiles; }
     public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
     public void setEstado(EstadoUsuario estado) { this.estado = estado; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
