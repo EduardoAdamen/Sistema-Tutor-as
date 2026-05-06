@@ -73,6 +73,12 @@ public class SesionController {
             return "redirect:/tutor/mis-grupos";
         }
 
+        List<Sesion> sesionesActuales = sesionService.buscarPorAsignacion(asignacionActiva);
+        if (sesionesActuales.size() >= 10) {
+            attributes.addFlashAttribute("error", "Se ha alcanzado el límite de 10 sesiones para este grupo.");
+            return "redirect:/sesion/grupo/" + asignacionActiva.getId();
+        }
+
         Sesion sesion = new Sesion();
         sesion.setAsignacion(asignacionActiva);
         model.addAttribute("sesion", sesion);
@@ -90,6 +96,15 @@ public class SesionController {
 
         if (asignacionActiva == null) {
             return "redirect:/tutor/mis-grupos";
+        }
+
+        // Validar límite de 10 sesiones si es una nueva
+        if (sesion.getId() == null) {
+            List<Sesion> sesionesActuales = sesionService.buscarPorAsignacion(asignacionActiva);
+            if (sesionesActuales.size() >= 10) {
+                attributes.addFlashAttribute("error", "Se ha alcanzado el límite de 10 sesiones para este grupo.");
+                return "redirect:/sesion/grupo/" + asignacionActiva.getId();
+            }
         }
 
         // Validar RF-26: La fecha de la sesión no puede ser posterior a la fecha fin del periodo

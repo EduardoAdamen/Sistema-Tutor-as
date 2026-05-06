@@ -1,149 +1,152 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/fragment :: head}"></head>
-<body class="d-flex flex-column min-vh-100">
-
-    <!-- Navbar -->
-    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-    <main class="container my-4 flex-grow-1">
-        <h2 class="mi-titulo mb-2">
-            <i class="bi bi-calendar-event"></i> Detalle de Sesión
-        </h2>
-        <hr>
-
-        <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
-        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
-        <div class="mb-3">
-            <a th:href="@{/sesion/grupo/{id}(id=${sesion.asignacion.id})}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Regresar a Mis Sesiones</a>
-        </div>
-
-        <div class="row">
-            <!-- Datos de la Sesión -->
-            <div class="col-md-5 mb-4">
-                <div class="card shadow-sm h-100 border-0 border-top border-5 border-info">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0 text-info fw-bold"><i class="bi bi-info-circle"></i> Información de la Sesión</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-2"><strong>Fecha:</strong> <span th:text="${#temporals.format(sesion.fecha, 'dd/MM/yyyy')}"></span></p>
-                        <p class="mb-2"><strong>Horario:</strong> <span th:text="${sesion.horaInicio}"></span> - <span th:text="${sesion.horaFin}"></span></p>
-                        <p class="mb-2">
-                            <strong>Evidencia Sesi&oacute;n:</strong>
-                            <span th:if="${sesion.evidencia != null}">
-                                <a th:href="@{'/uploads/sesiones/' + ${sesion.evidencia}}" target="_blank" class="badge bg-info text-decoration-none">
-                                    <i class="bi bi-file-earmark-check"></i> Ver Archivo Adjunto
-                                </a>
-                            </span>
-                            <span th:if="${sesion.evidencia == null}" class="text-muted"><i class="bi bi-x-circle"></i> Sin evidencia</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Asistencia -->
-            <div class="col-md-7 mb-4">
-                <div class="card shadow-sm h-100 border-0 border-top border-5 border-primary">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-primary fw-bold"><i class="bi bi-check2-all"></i> Asistencia Registrada</h5>
-                        <a th:href="@{/asistencia/registrar/{id}(id=${sesion.id})}" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-pencil-square"></i> Modificar Asistencia
-                        </a>
-                    </div>
-                    <div class="card-body p-0 table-responsive">
-                        <table class="table table-hover table-striped mb-0 text-center align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="text-start ps-3">No. Control</th>
-                                    <th class="text-start">Tutorado</th>
-                                    <th>Estado Asistencia</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="at : ${tutorados}">
-                                    <td class="text-start ps-3 fw-bold text-secondary" th:text="${at.tutorado.usuario.numeroIdentificacion}">123456</td>
-                                    <td class="text-start" th:text="${at.tutorado.usuario.nombreCompleto}">Juan Pérez</td>
-                                    <td>
-                                        <!-- Buscamos el estado en la lista de asistencias -->
-                                        <th:block th:each="asist : ${asistencias}">
-                                            <th:block th:if="${asist.tutorado.id == at.tutorado.id}">
-                                                <span th:if="${asist.estatusAsistencia.name() == 'presente'}" class="badge bg-success w-75 py-2"><i class="bi bi-check-circle"></i> Presente</span>
-                                                <span th:if="${asist.estatusAsistencia.name() == 'ausente'}" class="badge bg-danger w-75 py-2"><i class="bi bi-x-circle"></i> Ausente</span>
-                                                <span th:if="${asist.estatusAsistencia.name() == 'justificado'}" class="badge bg-warning text-dark w-75 py-2"><i class="bi bi-exclamation-circle"></i> Justificado</span>
-                                            </th:block>
-                                        </th:block>
-                                        
-                                        <!-- Si no tiene asistencia -->
-                                        <span th:if="${asistencias == null or asistencias.isEmpty()}" class="badge bg-secondary w-75 py-2">Sin Registro</span>
-                                    </td>
-                                </tr>
-                                <tr th:if="${tutorados.isEmpty()}">
-                                    <td colspan="3" class="text-muted p-4">No hay tutorados asignados a este grupo.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Actividades PAT -->
-        <div class="row">
-            <div class="col-12 mb-4">
-                <div class="card shadow-sm border-0 border-top border-5 border-success">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-success fw-bold"><i class="bi bi-journal-check"></i> Actividades PAT Registradas</h5>
-                        <a th:href="@{/pat/nueva/{id}(id=${sesion.id})}" class="btn btn-sm btn-outline-success">
-                            <i class="bi bi-plus-lg"></i> Agregar Nueva Actividad PAT
-                        </a>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive" th:if="${!actividades.isEmpty()}">
-                            <table class="table table-bordered table-striped align-middle text-center mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Tipo de Actividad</th>
-                                        <th class="text-start">Título</th>
-                                        <th class="text-start w-50">Descripción</th>
-                                        <th>Evidencia Adjunta</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="act : ${actividades}">
-                                        <td><span class="badge bg-secondary px-3 py-2" th:text="${act.tipoActividad}">Taller</span></td>
-                                        <td class="text-start fw-bold" th:text="${act.titulo}">Taller de Matemáticas</td>
-                                        <td class="text-start text-muted text-break" th:text="${act.descripcion}">Ejercicios</td>
-                                        <td>
-                                            <span th:if="${act.evidencia != null}">
-                                                <a th:href="@{'/uploads/actividades/' + ${act.evidencia}}" target="_blank" class="btn btn-sm btn-outline-info">
-                                                    <i class="bi bi-download"></i> Ver Archivo
-                                                </a>
-                                            </span>
-                                            <span th:if="${act.evidencia == null}" class="text-muted small">
-                                                <i class="bi bi-dash-circle"></i> S/E
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="text-center py-4" th:if="${actividades.isEmpty()}">
-                            <i class="bi bi-clipboard-x display-4 text-muted border-0"></i>
-                            <p class="text-muted mt-3 mb-0">No se ha registrado ninguna Actividad PAT durante esta sesión.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Footer -->
-    <footer th:replace="~{fragments/fragment :: footer}"></footer>
-
-    <!-- Scripts -->
-    <div th:replace="~{fragments/fragment :: scripts}"></div>
-
-</body>
-</html>
+??<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <h2 class="mi-titulo mb-2">
+            <i class="bi bi-calendar-event"></i> Detalle de Sesión
+        </h2>
+        <hr>
+
+        <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="mb-3">
+            <a th:href="@{/sesion/grupo/{id}(id=${sesion.asignacion.id})}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Regresar a Mis Sesiones</a>
+        </div>
+
+        <div class="row">
+            <!-- Datos de la Sesión -->
+            <div class="col-md-5 mb-4">
+                <div class="card shadow-sm rounded-4 overflow-hidden h-100">
+                    <div class="card-header bg-transparent border-bottom pt-3 pb-3">
+                        <h5 class="mb-0 text-info fw-bold"><i class="bi bi-info-circle"></i> Información de la Sesión</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong>Fecha:</strong> <span th:text="${#temporals.format(sesion.fecha, 'dd/MM/yyyy')}"></span></p>
+                        <p class="mb-2"><strong>Horario:</strong> <span th:text="${sesion.horaInicio}"></span> - <span th:text="${sesion.horaFin}"></span></p>
+                        <p class="mb-2">
+                            <strong>Evidencia Sesi&oacute;n:</strong>
+                            <span th:if="${sesion.evidencia != null}">
+                                <a th:href="@{'/uploads/sesiones/' + ${sesion.evidencia}}" target="_blank" class="badge bg-info text-decoration-none">
+                                    <i class="bi bi-file-earmark-check"></i> Ver Archivo Adjunto
+                                </a>
+                            </span>
+                            <span th:if="${sesion.evidencia == null}" class="text-muted"><i class="bi bi-x-circle"></i> Sin evidencia</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asistencia -->
+            <div class="col-md-7 mb-4">
+                <div class="card shadow-sm rounded-4 overflow-hidden h-100">
+                    <div class="card-header bg-transparent border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center">
+                        <span class="fs-5 fw-bold text-dark">Asistencia Registrada</span>
+                        <a th:href="@{/asistencia/registrar/{id}(id=${sesion.id})}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="bi bi-pencil-square"></i> Modificar Asistencia
+                        </a>
+                    </div>
+                    <div class="card-body p-0 table-responsive m-0">
+                        <table class="table table-hover mb-0 text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-start ps-3">No. Control</th>
+                                    <th class="text-start">Tutorado</th>
+                                    <th>Estado Asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="at : ${tutorados}">
+                                    <td class="text-start ps-3 fw-bold text-secondary" th:text="${at.tutorado.usuario.numeroIdentificacion}">123456</td>
+                                    <td class="text-start" th:text="${at.tutorado.usuario.nombreCompleto}">Juan Pérez</td>
+                                    <td>
+                                        <!-- Buscamos el estado en la lista de asistencias -->
+                                        <th:block th:each="asist : ${asistencias}">
+                                            <th:block th:if="${asist.tutorado.id == at.tutorado.id}">
+                                                <span th:if="${asist.estatusAsistencia.name() == 'presente'}" class="badge bg-success w-75 py-2"><i class="bi bi-check-circle"></i> Presente</span>
+                                                <span th:if="${asist.estatusAsistencia.name() == 'ausente'}" class="badge bg-danger w-75 py-2"><i class="bi bi-x-circle"></i> Ausente</span>
+                                                <span th:if="${asist.estatusAsistencia.name() == 'justificado'}" class="badge bg-warning text-dark w-75 py-2"><i class="bi bi-exclamation-circle"></i> Justificado</span>
+                                            </th:block>
+                                        </th:block>
+                                        
+                                        <!-- Si no tiene asistencia -->
+                                        <span th:if="${asistencias == null or asistencias.isEmpty()}" class="badge bg-secondary w-75 py-2">Sin Registro</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${tutorados.isEmpty()}">
+                                    <td colspan="3" class="text-muted p-4">No hay tutorados asignados a este grupo.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actividades PAT -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-transparent border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center">
+                        <span class="fs-5 fw-bold text-dark">Actividades PAT Registradas</span>
+                        <a th:href="@{/pat/nueva/{id}(id=${sesion.id})}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                            <i class="bi bi-plus-lg"></i> Agregar Nueva Actividad PAT
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive m-0" th:if="${!actividades.isEmpty()}">
+                            <table class="table table-hover align-middle text-center mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tipo de Actividad</th>
+                                        <th class="text-start">Título</th>
+                                        <th class="text-start w-50">Descripción</th>
+                                        <th>Evidencia Adjunta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="act : ${actividades}">
+                                        <td><span class="badge bg-secondary px-3 py-2" th:text="${act.tipoActividad}">Taller</span></td>
+                                        <td class="text-start fw-bold" th:text="${act.titulo}">Taller de Matemáticas</td>
+                                        <td class="text-start text-muted text-break" th:text="${act.descripcion}">Ejercicios</td>
+                                        <td>
+                                            <span th:if="${act.evidencia != null}">
+                                                <a th:href="@{'/uploads/actividades/' + ${act.evidencia}}" target="_blank" class="btn btn-sm btn-outline-info">
+                                                    <i class="bi bi-download"></i> Ver Archivo
+                                                </a>
+                                            </span>
+                                            <span th:if="${act.evidencia == null}" class="text-muted small">
+                                                <i class="bi bi-dash-circle"></i> S/E
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center py-4" th:if="${actividades.isEmpty()}">
+                            <i class="bi bi-clipboard-x display-4 text-muted "></i>
+                            <p class="text-muted mt-3 mb-0">No se ha registrado ninguna Actividad PAT durante esta sesión.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>
+
+
+

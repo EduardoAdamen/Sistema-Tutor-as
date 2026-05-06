@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/fragment :: head}"></head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100 bg-light">
 
     <!-- Navbar -->
     <nav th:replace="~{fragments/fragment :: navbar}"></nav>
@@ -10,58 +10,62 @@
     <main class="container my-4 flex-grow-1">
         <div class="row justify-content-center">
             <div class="col-lg-6 col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header mi-etiqueta">
-                        Detalle de Usuario
+                <div class="card shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-transparent border-bottom pt-3 pb-3">
+                        <span class="fs-5 fw-bold text-dark">Detalle de Usuario</span>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-borderless">
+                    <div class="card-body p-4">
+                        <table class="table table-borderless mb-0">
                             <tr>
-                                <th class="text-end" style="width: 40%;">ID:</th>
-                                <td th:text="${usuario.id}"></td>
+                                <th class="text-end fw-bold text-dark" style="width: 45%;">ID:</th>
+                                <td class="text-secondary" th:text="${usuario.id}"></td>
                             </tr>
                             <tr>
-                                <th class="text-end">Identificación:</th>
-                                <td th:text="${usuario.numeroIdentificacion}"></td>
+                                <th class="text-end fw-bold text-dark">Identificación:</th>
+                                <td class="text-secondary" th:text="${usuario.numeroIdentificacion}"></td>
                             </tr>
                             <tr>
-                                <th class="text-end">Nombre Completo:</th>
-                                <td th:text="${usuario.nombreCompleto}"></td>
+                                <th class="text-end fw-bold text-dark">Nombre Completo:</th>
+                                <td class="text-secondary fw-bold" th:text="${usuario.nombreCompleto}"></td>
                             </tr>
                             <tr>
-                                <th class="text-end">Correo Electrónico:</th>
-                                <td th:text="${usuario.correo}"></td>
+                                <th class="text-end fw-bold text-dark">Correo Electrónico:</th>
+                                <td class="text-secondary" th:text="${usuario.correo}"></td>
                             </tr>
                             <tr>
-                                <th class="text-end">Rol en Sistema:</th>
+                                <th class="text-end fw-bold text-dark">Rol en Sistema:</th>
                                 <td>
-                                    <span th:if="${usuario.hasPerfil('ADMINISTRADOR')}" class="badge bg-primary">Administrador</span>
-                                    <span th:if="${usuario.hasPerfil('TUTOR')}" class="badge bg-success">Tutor</span>
-                                    <span th:if="${usuario.hasPerfil('TUTORADO')}" class="badge bg-info text-dark">Tutorado</span>
+                                    <span th:if="${usuario.hasPerfil('ADMINISTRADOR')}" class="badge bg-primary rounded-pill px-3 py-2">Administrador</span>
+                                    <span th:if="${usuario.hasPerfil('TUTOR')}" class="badge bg-success rounded-pill px-3 py-2">Tutor</span>
+                                    <span th:if="${usuario.hasPerfil('TUTORADO')}" class="badge bg-info text-dark rounded-pill px-3 py-2">Tutorado</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${usuario.hasPerfil('TUTORADO')}">
+                                <th class="text-end fw-bold text-dark">Carrera:</th>
+                                <td class="text-secondary" th:text="${carreraNombre != null ? carreraNombre : 'Sin carrera asignada'}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Fecha de Registro:</th>
+                                <td class="text-secondary" th:text="${#temporals.format(usuario.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Estado:</th>
+                                <td>
+                                    <span th:if="${usuario.estado.name() == 'activo'}" class="badge bg-success rounded-pill px-3 py-2">Activo</span>
+                                    <span th:if="${usuario.estado.name() == 'inactivo'}" class="badge bg-secondary rounded-pill px-3 py-2">Inactivo</span>
                                 </td>
                             </tr>
                             <tr>
-                                <th class="text-end">Fecha de Registro:</th>
-                                <td th:text="${#temporals.format(usuario.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-end">Estado:</th>
+                                <th class="text-end fw-bold text-dark align-middle">Foto de Perfil:</th>
                                 <td>
-                                    <span th:if="${usuario.estado.name() == 'activo'}" class="badge bg-success">Activo</span>
-                                    <span th:if="${usuario.estado.name() == 'inactivo'}" class="badge bg-secondary">Inactivo</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-end align-middle">Foto de Perfil:</th>
-                                <td>
-                                    <img th:if="${usuario.fotoPerfil != null}" th:src="@{'/uploads/usuarios/' + ${usuario.fotoPerfil}}" alt="Foto de Perfil" class="rounded shadow-sm object-fit-cover" style="width: 80px; height: 80px;">
-                                    <img th:if="${usuario.fotoPerfil == null}" src="/img/sin-imagen.png" alt="Sin foto" class="rounded shadow-sm opacity-50 object-fit-cover" style="width: 80px; height: 80px;">
+                                    <img th:if="${usuario.fotoPerfil != null}" th:src="@{'/uploads/usuarios/' + ${usuario.fotoPerfil}}" alt="Foto de Perfil" class="rounded-circle shadow-sm object-fit-cover" style="width: 80px; height: 80px; border: 3px solid white;">
+                                    <img th:if="${usuario.fotoPerfil == null}" src="/img/sin-imagen.png" alt="Sin foto" class="rounded-circle shadow-sm opacity-50 object-fit-cover" style="width: 80px; height: 80px; border: 3px solid white;">
                                 </td>
                             </tr>
                         </table>
                     </div>
-                    <div class="card-footer d-flex justify-content-between">
-                        <a th:href="@{/usuario/usuarios}" class="btn btn-outline-secondary">
+                    <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-between">
+                        <a th:href="@{/usuario/usuarios}" class="btn btn-outline-secondary rounded-pill px-4">
                             Volver al listado
                         </a>
                     </div>
@@ -72,8 +76,6 @@
 
     <!-- Footer -->
     <footer th:replace="~{fragments/fragment :: footer}"></footer>
-
-    <!-- Scripts -->
     <div th:replace="~{fragments/fragment :: scripts}"></div>
 
 </body>

@@ -1,84 +1,86 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/fragment :: head}"></head>
-<body class="d-flex flex-column min-vh-100">
-
-    <!-- Navbar -->
-    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-    <!-- Contenido principal -->
-    <main class="container my-4 flex-grow-1">
-        <h2 class="mi-titulo mb-4">
-            Reporte: Tutores con Asignación de Grupo Tuto-re-ado
-        </h2>
-        <hr>
-
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <form th:action="@{/busqueda/tutores}" method="get" class="row g-3 align-items-end">
-                    <div class="col-md-5">
-                        <label for="periodoId" class="form-label">Periodo Semestral</label>
-                        <select name="periodoId" id="periodoId" class="form-select" required>
-                            <option value="">-- Seleccione un periodo --</option>
-                            <option th:each="p : ${periodos}"
-                                    th:value="${p.id}"
-                                    th:text="${p.clave}"
-                                    th:selected="${p.id == filtroPeriodoId}">
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-search"></i> Buscar
-                        </button>
-                    </div>
-                    <div class="col-md-2">
-                        <a th:href="@{/busqueda/tutores}" class="btn btn-secondary w-100">Limpiar</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div th:if="${asignaciones != null}">
-            <h4 class="mt-4 mb-3">Resultados</h4>
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped align-middle">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>Nombre del Tutor(a)</th>
-                        <th>Carrera</th>
-                        <th>Grupo</th>
-                        <th>Aula</th>
-                        <th>Día Semanal</th>
-                        <th>Hora</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="asig : ${asignaciones}">
-                        <td th:text="${asig.tutor.usuario.nombreCompleto}">Juan Pérez</td>
-                        <td th:text="${asig.grupo.carrera.nombre}">Ing. Sistemas</td>
-                        <td th:text="${asig.grupo.nombre}">A</td>
-                        <td th:text="${asig.aula}">Aula 10</td>
-                        <td th:text="${asig.diaHorario}">Lunes</td>
-                        <td th:text="${#temporals.format(asig.horaHorario, 'HH:mm')}">10:00</td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(asignaciones)}">
-                        <td colspan="6" class="text-center text-muted py-4">No se encontraron tutores asignados en el periodo seleccionado.</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div th:unless="${asignaciones != null}" class="text-center text-muted mt-5 py-4">
-            <p>Seleccione un periodo para visualizar a los tutores y su asignación de grupos tutorados.</p>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer th:replace="~{fragments/fragment :: footer}"></footer>
-
-    <!-- Scripts -->
-    <div th:replace="~{fragments/fragment :: scripts}"></div>
-
-</body>
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <h2 class="mi-titulo mb-4">
+            Reporte: Tutores con Asignación de Grupo Tuto-re-ado
+        </h2>
+        <hr>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form th:action="@{/busqueda/tutores}" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="periodoId" class="form-label">Periodo Semestral</label>
+                        <select name="periodoId" id="periodoId" class="form-select" required>
+                            <option value="">-- Seleccione un periodo --</option>
+                            <option th:each="p : ${periodos}"
+                                    th:value="${p.id}"
+                                    th:text="${p.clave}"
+                                    th:selected="${p.id == filtroPeriodoId}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a th:href="@{/busqueda/tutores}" class="btn btn-secondary w-100">Limpiar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${asignaciones != null}">
+            <h4 class="mt-4 mb-3">Resultados</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Nombre del Tutor(a)</th>
+                        <th>Carrera</th>
+                        <th>Grupo</th>
+                        <th>Aula</th>
+                        <th>Día Semanal</th>
+                        <th>Hora</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="asig : ${asignaciones}">
+                        <td th:text="${asig.tutor.usuario.nombreCompleto}">Juan Pérez</td>
+                        <td th:text="${asig.grupo.carrera.nombre}">Ing. Sistemas</td>
+                        <td th:text="${asig.grupo.nombre}">A</td>
+                        <td th:text="${asig.aula}">Aula 10</td>
+                        <td th:text="${asig.diaHorario}">Lunes</td>
+                        <td th:text="${#temporals.format(asig.horaHorario, 'HH:mm')}">10:00</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(asignaciones)}">
+                        <td colspan="6" class="text-center text-muted py-4">No se encontraron tutores asignados en el periodo seleccionado.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+        </div>
+        <div th:unless="${asignaciones != null}" class="text-center text-muted mt-5 py-4">
+            <p>Seleccione un periodo para visualizar a los tutores y su asignación de grupos tutorados.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

@@ -165,6 +165,21 @@ public class AsignacionController {
         return "redirect:/asignacion/asignaciones";
     }
 
+    @GetMapping("/asignacion/inscripcion/{id}")
+    public String vistaInscripcion(@PathVariable Integer id, Model model, Principal principal) {
+        if (principal == null) return "redirect:/login";
+        Usuario usuarioLogueado = usuarioService.buscarPorNumeroIdentificacion(principal.getName()).orElse(null);
+
+        Asignacion asignacion = asignacionService.buscarPorId(id);
+        List<AsignacionTutorado> tutorados = asignacionTutoradoService.buscarPorAsignacion(asignacion);
+
+        model.addAttribute("usuarioLogueado", usuarioLogueado);
+        model.addAttribute("asignacion", asignacion);
+        model.addAttribute("asigTutorados", tutorados);
+
+        return "asignacion/inscripcionTutorados";
+    }
+
     @PostMapping("/asignacion/{id}/agregar-tutorado")
     public String agregarTutorado(@PathVariable Integer id, @RequestParam("numeroIdentificacion") String numId, RedirectAttributes attributes) {
         Asignacion asignacion = asignacionService.buscarPorId(id);
@@ -172,20 +187,20 @@ public class AsignacionController {
 
         if (tutoradoOpt.isEmpty() || tutoradoOpt.get().getEstado() != Usuario.EstadoUsuario.activo) {
             attributes.addFlashAttribute("error", "El alumno con número de control no fue encontrado o está inactivo.");
-            return "redirect:/asignacion/ver/" + id;
+            return "redirect:/asignacion/inscripcion/" + id;
         }
 
         Usuario usuarioTutorado = tutoradoOpt.get();
         Optional<Tutorado> tutoradoRealOpt = tutoradoService.buscarPorUsuario(usuarioTutorado);
         if (tutoradoRealOpt.isEmpty()) {
             attributes.addFlashAttribute("error", "El usuario no es un tutorado.");
-            return "redirect:/asignacion/ver/" + id;
+            return "redirect:/asignacion/inscripcion/" + id;
         }
 
         Tutorado tutorado = tutoradoRealOpt.get();
         if (asignacionTutoradoService.existeRelacion(asignacion, tutorado)) {
             attributes.addFlashAttribute("error", "El alumno ya se encuentra asignado a este grupo.");
-            return "redirect:/asignacion/ver/" + id;
+            return "redirect:/asignacion/inscripcion/" + id;
         }
 
         AsignacionTutorado relacion = new AsignacionTutorado();
@@ -194,7 +209,7 @@ public class AsignacionController {
         asignacionTutoradoService.guardar(relacion);
         
         attributes.addFlashAttribute("msg", "Tutorado agregado exitosamente.");
-        return "redirect:/asignacion/ver/" + id;
+        return "redirect:/asignacion/inscripcion/" + id;
     }
 
     @GetMapping("/asignacion/{id}/quitar-tutorado/{tutoradoId}")
@@ -215,7 +230,7 @@ public class AsignacionController {
         
         if (tieneAsistencias) {
             attributes.addFlashAttribute("error", "No se puede eliminar al tutorado porque ya tiene registros de asistencia en esta asignación.");
-            return "redirect:/asignacion/ver/" + id;
+            return "redirect:/asignacion/inscripcion/" + id;
         }
 
         // Buscar la relacion exacta
@@ -228,6 +243,6 @@ public class AsignacionController {
         }
 
         attributes.addFlashAttribute("msg", "Tutorado retirado del grupo.");
-        return "redirect:/asignacion/ver/" + id;
+        return "redirect:/asignacion/inscripcion/" + id;
     }
 }

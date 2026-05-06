@@ -12,38 +12,29 @@
             <div class="col-lg-6 col-md-8">
                 <div class="card shadow-sm rounded-4 overflow-hidden">
                     <div class="card-header bg-transparent border-bottom pt-3 pb-3">
-                        <span class="fs-5 fw-bold text-dark">Detalle de Carrera</span>
+                        <span class="fs-5 fw-bold text-secondary">Detalle de Grupo</span>
                     </div>
                     <div class="card-body p-4">
                         <table class="table table-borderless mb-0">
                             <tr>
                                 <th class="text-end fw-bold text-dark" style="width: 40%;">ID:</th>
-                                <td class="text-secondary" th:text="${carrera.id}"></td>
+                                <td class="text-secondary" th:text="${grupo.id}"></td>
                             </tr>
                             <tr>
-                                <th class="text-end fw-bold text-dark">Nombre:</th>
-                                <td class="text-secondary" th:text="${carrera.nombre}"></td>
+                                <th class="text-end fw-bold text-dark">Nombre del Grupo:</th>
+                                <td class="text-secondary" th:text="${grupo.nombre}"></td>
                             </tr>
                             <tr>
-                                <th class="text-end fw-bold text-dark">Clave:</th>
-                                <td class="text-secondary" th:text="${carrera.clave}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Estatus:</th>
-                                <td>
-                                    <span th:if="${carrera.estado.name() == 'activa'}"
-                                          class="badge bg-success rounded-pill px-3 py-2">Activa</span>
-                                    <span th:if="${carrera.estado.name() == 'inactiva'}"
-                                          class="badge bg-secondary rounded-pill px-3 py-2">Inactiva</span>
-                                </td>
+                                <th class="text-end fw-bold text-dark">Carrera Asignada:</th>
+                                <td class="text-secondary" th:text="${grupo.carrera.nombre}"></td>
                             </tr>
                         </table>
                     </div>
                     <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-between">
-                        <a th:href="@{/carrera/carreras}" class="btn btn-outline-secondary rounded-pill px-4">
+                        <a th:href="@{/grupo/grupos}" class="btn btn-outline-secondary rounded-pill px-4">
                             Volver al listado
                         </a>
-                        <a th:href="@{/carrera/editar/{id}(id=${carrera.id})}" class="btn btn-primary rounded-pill px-4" style="background-color: #1b396a; border-color: #1b396a;">
+                        <a th:href="@{/grupo/editar/{id}(id=${grupo.id})}" class="btn btn-primary rounded-pill px-4" style="background-color: #1b396a; border-color: #1b396a;">
                             Editar
                         </a>
                     </div>

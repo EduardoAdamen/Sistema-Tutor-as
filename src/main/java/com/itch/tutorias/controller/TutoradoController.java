@@ -36,8 +36,14 @@ public class TutoradoController {
     @Autowired
     private com.itch.tutorias.service.IUsuario usuarioService;
 
+    @Autowired
+    private com.itch.tutorias.service.ISesion sesionService;
+
+    @Autowired
+    private com.itch.tutorias.service.IRegistroAsistencia registroAsistenciaService;
+
     @GetMapping("/mi-tutoria")
-    public String miTutoria(Principal principal, RedirectAttributes attributes) {
+    public String miTutoria(Principal principal, org.springframework.ui.Model model, RedirectAttributes attributes) {
         if (principal == null) {
             return "redirect:/login";
         }
@@ -70,10 +76,30 @@ public class TutoradoController {
                 .orElse(null);
 
         if (asignacionActiva == null) {
-            attributes.addFlashAttribute("error", "No tienes grupo de tutor?a asignado en el periodo actual.");
+            attributes.addFlashAttribute("error", "No tienes grupo de tutoría asignado en el periodo actual.");
             return "redirect:/";
         }
 
-        return "redirect:/asignacion/ver/" + asignacionActiva.getId();
+        List<com.itch.tutorias.model.Sesion> sesiones = sesionService.buscarPorAsignacion(asignacionActiva);
+        java.util.Map<Integer, String> estadosAsistencia = new java.util.HashMap<>();
+        
+        for (com.itch.tutorias.model.Sesion s : sesiones) {
+            java.util.List<com.itch.tutorias.model.RegistroAsistencia> asistenciasSesion = registroAsistenciaService.buscarPorSesion(s);
+            for (com.itch.tutorias.model.RegistroAsistencia ra : asistenciasSesion) {
+                if (ra.getTutorado().getId().equals(tutoradoOpt.flatMap(u -> tutoradoService.buscarPorUsuario(u)).get().getId())) {
+                    estadosAsistencia.put(s.getId(), ra.getEstatusAsistencia().name());
+                }
+            }
+        }
+        
+        double porcentaje = registroAsistenciaService.calcularPorcentajeAsistencia(asignacionActiva.getId(), tutoradoOpt.flatMap(u -> tutoradoService.buscarPorUsuario(u)).get().getId());
+
+        model.addAttribute("asignacion", asignacionActiva);
+        model.addAttribute("tutorado", tutoradoOpt.flatMap(u -> tutoradoService.buscarPorUsuario(u)).get());
+        model.addAttribute("sesiones", sesiones);
+        model.addAttribute("estadosAsistencia", estadosAsistencia);
+        model.addAttribute("porcentaje", porcentaje);
+
+        return "tutorado/miTutoria";
     }
 }

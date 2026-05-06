@@ -31,6 +31,9 @@ public class Sesion {
     @Column(name = "hora_fin")
     private LocalTime horaFin;
 
+    @Column(name = "horas_formativas")
+    private Double horasFormativas;
+
     //Ruta del archivo de evidencia guardado en C:/Evidencias/sesiones/
     @Column(name = "evidencia", length = 255)
     private String evidencia;
@@ -43,6 +46,7 @@ public class Sesion {
     public LocalDate getFecha() { return fecha; }
     public LocalTime getHoraInicio() { return horaInicio; }
     public LocalTime getHoraFin() { return horaFin; }
+    public Double getHorasFormativas() { return horasFormativas; }
     public String getEvidencia() { return evidencia; }
 
     //Setters
@@ -51,10 +55,11 @@ public class Sesion {
     public void setFecha(LocalDate fecha) { this.fecha = fecha; }
     public void setHoraInicio(LocalTime horaInicio) { this.horaInicio = horaInicio; }
     public void setHoraFin(LocalTime horaFin) { this.horaFin = horaFin; }
+    public void setHorasFormativas(Double horasFormativas) { this.horasFormativas = horasFormativas; }
     public void setEvidencia(String evidencia) { this.evidencia = evidencia; }
 
     @Override
     public String toString() {
-        return "Sesion{id=" + id + ", fecha=" + fecha + ", horaInicio=" + horaInicio + "}";
+        return "Sesion{id=" + id + ", fecha=" + fecha + ", horaInicio=" + horaInicio + ", horasFormativas=" + horasFormativas + "}";
     }
 }

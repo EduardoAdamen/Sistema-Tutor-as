@@ -26,49 +26,45 @@
         </div>
 
         <!-- Barra de filtros -->
-        <div class="card mb-4 shadow-sm border-0 bg-light">
-            <div class="card-body py-3">
-                <form th:action="@{/usuario/usuarios}" method="get" class="row g-3 align-items-center">
-                    <div class="col-md-3">
-                        <label class="visually-hidden" for="perfilNombre">Perfil</label>
-                        <select name="perfilNombre" id="perfilNombre" class="form-select border-0 shadow-sm">
-                            <option value="">-- Todos los Perfiles --</option>
-                            <option th:each="p : ${perfiles}" th:value="${p.nombre}" th:text="${p.nombre}" th:selected="${p.nombre == filtroPerfilNombre}"></option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="visually-hidden" for="carreraId">Carrera</label>
-                        <select name="carreraId" id="carreraId" class="form-select border-0 shadow-sm">
-                            <option value="">TODAS LAS CARRERAS</option>
-                            <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}" th:selected="${c.id == filtroCarreraId}"></option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="visually-hidden" for="estado">Estado</label>
-                        <select name="estado" id="estado" class="form-select border-0 shadow-sm">
-                            <option value="">TODOS LOS ESTADOS</option>
-                            <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == filtroEstado}"></option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 text-end">
-                        <button type="submit" class="btn btn-secondary w-100 rounded-pill shadow-sm">
-                            <i class="bi bi-funnel"></i> Filtrar
-                        </button>
-                    </div>
-                </form>
+        <form th:action="@{/usuario/usuarios}" method="get" class="d-flex flex-wrap gap-3 mb-4 align-items-center">
+            <div class="card shadow-sm rounded-4 border-0 flex-grow-1" style="min-width: 200px;">
+                <label class="visually-hidden" for="perfilNombre">Perfil</label>
+                <select name="perfilNombre" id="perfilNombre" class="form-select border-0 px-3 py-2 bg-transparent rounded-4">
+                    <option value="">-- Todos los Perfiles --</option>
+                    <option th:each="p : ${perfiles}" th:value="${p.nombre}" th:text="${p.nombre}" th:selected="${p.nombre == filtroPerfilNombre}"></option>
+                </select>
             </div>
-        </div>
+            <div class="card shadow-sm rounded-4 border-0 flex-grow-1" style="min-width: 250px;">
+                <label class="visually-hidden" for="carreraId">Carrera</label>
+                <select name="carreraId" id="carreraId" class="form-select border-0 px-3 py-2 bg-transparent rounded-4">
+                    <option value="">TODAS LAS CARRERAS</option>
+                    <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}" th:selected="${c.id == filtroCarreraId}"></option>
+                </select>
+            </div>
+            <div class="card shadow-sm rounded-4 border-0 flex-grow-1" style="min-width: 200px;">
+                <label class="visually-hidden" for="estado">Estado</label>
+                <select name="estado" id="estado" class="form-select border-0 px-3 py-2 bg-transparent rounded-4">
+                    <option value="">TODOS LOS ESTADOS</option>
+                    <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == filtroEstado}"></option>
+                </select>
+            </div>
+            <div class="flex-shrink-0">
+                <button type="submit" class="btn btn-secondary rounded-4 px-4 py-2 shadow-sm d-flex align-items-center justify-content-center border-0">
+                    <i class="bi bi-funnel me-2"></i> Filtrar
+                </button>
+            </div>
+        </form>
 
-        <div class="table-responsive bg-white rounded-3 shadow-sm">
-            <table class="table table-hover bordes-fuertes align-middle mb-0">
+        <div class="card shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive m-0">
+                <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
-                    <tr class="mi-etiqueta">
+                    <tr>
                         <th class="ps-4">Foto</th>
                         <th>Identificación</th>
                         <th>Nombre</th>
                         <th>Correo</th>
                         <th>Rol</th>
-                        <th>Carrera</th>
                         <th>Estado</th>
                         <th class="text-center pe-4">Acciones</th>
                     </tr>
@@ -87,10 +83,6 @@
                             <span class="badge rounded-pill bg-success" th:if="${u.hasPerfil('TUTOR')}">Tutor</span>
                             <span class="badge rounded-pill bg-info text-dark" th:if="${u.hasPerfil('TUTORADO')}">Tutorado</span>
                             <span th:if="${!u.hasPerfil('ADMINISTRADOR') and !u.hasPerfil('TUTOR') and !u.hasPerfil('TUTORADO')}">Sin Perfil</span>
-                        </td>
-                        <td class="text-secondary small">
-                            <span th:if="${u.hasPerfil('TUTORADO')}" class="text-muted fst-italic">Ver en Detalle</span>
-                            <span th:if="${!u.hasPerfil('TUTORADO')}" class="text-muted fst-italic">N/A</span>
                         </td>
                         <td>
                             <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25" th:if="${u.estado.name() == 'activo'}"><i class="bi bi-check-circle me-1"></i>Activo</span>
@@ -118,6 +110,8 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
+        </div>
         </div>
 
     </main>
@@ -126,3 +120,5 @@
     <div th:replace="~{fragments/fragment :: scripts}"></div>
 </body>
 </html>
+
+

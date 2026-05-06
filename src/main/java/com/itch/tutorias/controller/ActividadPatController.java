@@ -35,33 +35,65 @@ public class ActividadPatController {
     private ITutor tutorService;
 
     @GetMapping("/pat/actividades")
-    public String listaActividades(Principal principal, Model model, RedirectAttributes attributes) {
+    public String listaActividades(
+            @RequestParam(name = "periodoId", required = false) Integer periodoId,
+            @RequestParam(name = "tutorId", required = false) Integer tutorId,
+            @RequestParam(name = "tipoActividad", required = false) String tipoActividad,
+            Principal principal, Model model, RedirectAttributes attributes) {
         if (principal == null) return "redirect:/login";
         
         Optional<Usuario> usuarioOpt = usuarioService.buscarPorNumeroIdentificacion(principal.getName());
         Usuario usuarioLogueado = usuarioOpt.orElse(null);
         
         Tutor tutorReal = null;
+        boolean esAdmin = false;
+        
         if (usuarioLogueado != null) {
              tutorReal = tutorService.buscarPorUsuario(usuarioLogueado).orElse(null);
+             esAdmin = usuarioLogueado.getPerfiles().stream().anyMatch(p -> p.getNombre().equalsIgnoreCase("ADMINISTRADOR"));
         }
         
         List<ActividadPat> actividades = new java.util.ArrayList<>();
-        if (tutorReal != null) {
+        if (esAdmin) {
+            actividades = actividadPatService.buscarTodas();
+        } else if (tutorReal != null) {
             actividades = actividadPatService.buscarPorTutor(tutorReal.getId());
+        }
+        
+        if (esAdmin || tutorReal != null) {
+            Integer filterPeriodoId = periodoId;
+            if (filterPeriodoId == null) {
+                Optional<PeriodoSemestral> periodoOpt = periodoService.buscarActivo();
+                if (periodoOpt.isPresent()) {
+                    filterPeriodoId = periodoOpt.get().getId();
+                }
+            }
             
-            // Filtramos para asegurar que sean actividades del periodo activo
-            Optional<PeriodoSemestral> periodoOpt = periodoService.buscarActivo();
-            if (periodoOpt.isPresent()) {
-                PeriodoSemestral activo = periodoOpt.get();
-                actividades.removeIf(a -> !a.getSesion().getAsignacion().getPeriodo().getId().equals(activo.getId()));
+            Integer finalPeriodoId = filterPeriodoId;
+            if (finalPeriodoId != null) {
+                actividades.removeIf(a -> !a.getSesion().getAsignacion().getPeriodo().getId().equals(finalPeriodoId));
             } else {
                 actividades.clear();
             }
         }
 
+        if (tutorId != null && esAdmin) {
+            actividades.removeIf(a -> !a.getSesion().getAsignacion().getTutor().getId().equals(tutorId));
+        }
+
+        if (tipoActividad != null && !tipoActividad.isEmpty()) {
+            actividades.removeIf(a -> !a.getTipoActividad().name().equals(tipoActividad));
+        }
+
+        model.addAttribute("periodos", periodoService.buscarTodos());
+        model.addAttribute("tutores", esAdmin ? tutorService.buscarTodos() : null);
+        model.addAttribute("tiposActividad", ActividadPat.TipoActividad.values());
+        model.addAttribute("filtroPeriodoId", periodoId == null && periodoService.buscarActivo().isPresent() ? periodoService.buscarActivo().get().getId() : periodoId);
+        model.addAttribute("filtroTutorId", tutorId);
+        model.addAttribute("filtroTipoActividad", tipoActividad);
+
         model.addAttribute("actividades", actividades);
-        model.addAttribute("tutor", usuarioLogueado);
+        model.addAttribute("tutor", esAdmin ? null : usuarioLogueado);
         return "pat/listaActividades";
     }
 
@@ -113,6 +145,16 @@ public class ActividadPatController {
         attributes.addFlashAttribute("msg", "Actividad del PAT guardada exitosamente.");
         
         return "redirect:/pat/actividades";
+    }
+
+    @GetMapping("/pat/detalle/{id}")
+    public String detalleActividad(@PathVariable Integer id, Model model) {
+        ActividadPat actividad = actividadPatService.buscarPorId(id);
+        if (actividad == null) {
+            return "redirect:/pat/actividades";
+        }
+        model.addAttribute("actividad", actividad);
+        return "pat/detalleActividad";
     }
 
     @GetMapping("/pat/editar/{id}")

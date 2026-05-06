@@ -42,18 +42,12 @@ public class RegistroAsistenciaServiceImpl implements IRegistroAsistencia {
     @Override
     public double calcularPorcentajeAsistencia(Integer asignacionId, Integer tutoradoId) {
         Sesion ejemplo = new Sesion();
-        //Contar total de sesiones de la asignación
-        com.itch.tutorias.model.Asignacion asig = new com.itch.tutorias.model.Asignacion();
-        asig.setId(asignacionId);
-        long totalSesiones = sesionRepository.countByAsignacion(asig);
-
-        if (totalSesiones == 0) return 0.0;
-
         long presentes = registroRepository.countByAsignacionIdAndTutoradoIdAndEstatus(
             asignacionId, tutoradoId, RegistroAsistencia.EstatusAsistencia.presente);
         long justificados = registroRepository.countByAsignacionIdAndTutoradoIdAndEstatus(
             asignacionId, tutoradoId, RegistroAsistencia.EstatusAsistencia.justificado);
 
-        return Math.round(((presentes + justificados) * 100.0 / totalSesiones) * 100.0) / 100.0;
+        double porcentaje = ((presentes + justificados) * 100.0) / 10.0;
+        return Math.min(100.0, Math.round(porcentaje * 100.0) / 100.0);
     }
 }

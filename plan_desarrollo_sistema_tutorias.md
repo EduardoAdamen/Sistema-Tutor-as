@@ -41,16 +41,21 @@ com.itch.tutorias
 │   └── SecurityConfig.java           ← Configuración Spring Security (Sprint 2)
 ├── controller/
 │   ├── CarreraController.java
+│   ├── GrupoController.java          ← Nuevo (Normalización 3FN)
 │   ├── UsuarioController.java
 │   ├── PeriodoController.java
 │   ├── AsignacionController.java
 │   ├── SesionController.java
 │   ├── AsistenciaController.java
 │   ├── ActividadPatController.java
+│   ├── TutorController.java          ← Nuevo (Flujo Tutor)
+│   ├── TutoradoController.java       ← Nuevo (Flujo Tutorado)
 │   └── BusquedaController.java
 ├── model/
 │   ├── Carrera.java
+│   ├── Grupo.java                    ← Nuevo (Normalización 3FN)
 │   ├── Usuario.java
+│   ├── Perfil.java                   ← Relación ManyToMany
 │   ├── PeriodoSemestral.java
 │   ├── Asignacion.java
 │   ├── AsignacionTutorado.java
@@ -59,7 +64,9 @@ com.itch.tutorias
 │   └── ActividadPat.java
 ├── repository/
 │   ├── CarreraRepository.java
+│   ├── GrupoRepository.java
 │   ├── UsuarioRepository.java
+│   ├── PerfilRepository.java
 │   ├── PeriodoSemestralRepository.java
 │   ├── AsignacionRepository.java
 │   ├── AsignacionTutoradoRepository.java
@@ -68,6 +75,7 @@ com.itch.tutorias
 │   └── ActividadPatRepository.java
 └── service/
     ├── ICarrera.java
+    ├── IGrupo.java
     ├── IUsuario.java
     ├── IPeriodoSemestral.java
     ├── IAsignacion.java
@@ -78,6 +86,7 @@ com.itch.tutorias
     ├── IServicioAlmacenamiento.java
     └── implementjpa/
         ├── CarreraServiceImpl.java
+        ├── GrupoServiceImpl.java
         ├── UsuarioServiceImpl.java
         ├── PeriodoSemestralServiceImpl.java
         ├── AsignacionServiceImpl.java
@@ -108,6 +117,10 @@ templates/
 │   ├── listaPeriodos.html
 │   ├── formPeriodo.html
 │   └── detallePeriodo.html
+├── grupo/
+│   ├── listaGrupos.html
+│   ├── formGrupo.html
+│   └── detalleGrupo.html
 ├── asignacion/
 │   ├── listaAsignaciones.html
 │   ├── formAsignacion.html
@@ -180,11 +193,14 @@ La base de datos **`sistema_tutorias`** en MySQL contiene las siguientes tablas 
 | Tabla | Descripción |
 |-------|-------------|
 | `carrera` | Catálogo de carreras del instituto |
-| `usuario` | Usuarios del sistema (admin/tutor/tutorado) |
+| `grupo` | Catálogo de grupos (normalizado 3FN) |
+| `perfil` | Catálogo de roles (ADMINISTRADOR, TUTOR, TUTORADO) |
+| `usuario` | Usuarios del sistema |
+| `usuario_perfil` | Relación M:N usuarios ↔ perfiles |
 | `periodo_semestral` | Periodos semestrales del programa |
-| `asignacion` | Asignación tutor → carrera/grupo/periodo |
+| `asignacion` | Asignación Tutor → Carrera/Grupo/Periodo |
 | `asignacion_tutorado` | Relación M:N asignacion ↔ tutorado |
-| `sesion` | Sesiones de tutoría registradas |
+| `sesion` | Sesiones de tutoría (Max. 10 por grupo) |
 | `registro_asistencia` | Asistencia por tutorado por sesión |
 | `actividad_pat` | Actividades del Plan de Acción Tutorial |
 
@@ -343,6 +359,9 @@ public class Usuario {
     @Column(name = "contrasena_hash", nullable = false, length = 255)
     private String contrasenaHash;
 
+    @Column(name = "contrasena_hash", nullable = false, length = 255)
+    private String contrasenaHash;
+
     @Column(name = "debe_cambiar_contrasena", nullable = false)
     private Boolean debeCambiarContrasena = false;
 
@@ -494,9 +513,8 @@ public class Asignacion {
      * ManyToOne hacia Usuario (tutor).
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tutor_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_asignacion_tutor"))
-    private Usuario tutor;
+    @JoinColumn(name = "tutor_id", nullable = false)
+    private Tutor tutor;
 
     /**
      * ManyToOne hacia Carrera.
@@ -510,12 +528,12 @@ public class Asignacion {
      * ManyToOne hacia PeriodoSemestral.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "periodo_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_asignacion_periodo"))
+    @JoinColumn(name = "periodo_id", nullable = false)
     private PeriodoSemestral periodo;
 
-    @Column(name = "grupo", nullable = false, length = 20)
-    private String grupo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grupo_id", nullable = false)
+    private Grupo grupo;
 
     @Column(name = "aula", nullable = false, length = 30)
     private String aula;

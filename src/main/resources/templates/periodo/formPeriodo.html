@@ -1,98 +1,98 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/fragment :: head}"></head>
-<body class="d-flex flex-column min-vh-100">
-
-    <!-- Navbar -->
-    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-    <!-- Contenido principal -->
-    <main class="container my-4 flex-grow-1">
-        <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header mi-etiqueta">
-                        <i class="bi bi-calendar3"></i>
-                        <span th:if="${periodoSemestral.id == null}">Nuevo Periodo Semestral</span>
-                        <span th:if="${periodoSemestral.id != null}">Editar Periodo Semestral</span>
-                    </div>
-                    <div class="card-body">
-
-                        <!-- Mensaje de error -->
-                        <div th:if="${error}" class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            <span th:text="${error}"></span>
-                        </div>
-
-                        <form th:action="@{/periodo/guardar}" method="post" th:object="${periodoSemestral}">
-
-                            <!-- ID oculto para edición -->
-                            <input type="hidden" th:field="*{id}">
-
-                            <!-- Clave -->
-                            <div class="mb-3">
-                                <label for="clave" class="form-label fw-semibold">Clave del Periodo</label>
-                                <input type="text" class="form-control" id="clave"
-                                       th:field="*{clave}" required
-                                       placeholder="Ej: ENE-JUN-2025" maxlength="20">
-                            </div>
-
-                            <!-- Fecha Inicio -->
-                            <div class="mb-3">
-                                <label for="fechaInicio" class="form-label fw-semibold">Fecha de Inicio</label>
-                                <input type="date" class="form-control" id="fechaInicio"
-                                       th:field="*{fechaInicio}" required>
-                            </div>
-
-                            <!-- Fecha Fin -->
-                            <div class="mb-3">
-                                <label for="fechaFin" class="form-label fw-semibold">Fecha de Fin</label>
-                                <input type="date" class="form-control" id="fechaFin"
-                                       th:field="*{fechaFin}" required>
-                            </div>
-
-                            <!-- Estado -->
-                            <div class="mb-3">
-                                <label for="estatus" class="form-label fw-semibold">Estado</label>
-                                <select class="form-select" id="estatus" th:field="*{estatus}" required>
-                                    <option value="activo">Activo</option>
-                                    <option value="cerrado">Cerrado</option>
-                                </select>
-                            </div>
-
-                            <!-- Botones -->
-                            <div class="d-flex justify-content-between">
-                                <a th:href="@{/periodo/periodos}" class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-left"></i> Cancelar
-                                </a>
-                                <button type="submit" class="btn btn-encabezado">
-                                    <i class="bi bi-save"></i> Guardar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer th:replace="~{fragments/fragment :: footer}"></footer>
-
-    <!-- Scripts -->
-    <div th:replace="~{fragments/fragment :: scripts}"></div>
-
-    <!-- Validación de fechas en frontend -->
-    <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
-            var inicio = document.getElementById('fechaInicio').value;
-            var fin = document.getElementById('fechaFin').value;
-            if (inicio && fin && fin <= inicio) {
-                e.preventDefault();
-                alert('La fecha de fin debe ser posterior a la fecha de inicio.');
-            }
-        });
-    </script>
-
-</body>
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-calendar3"></i>
+                        <span th:if="${periodoSemestral.id == null}">Nuevo Periodo Semestral</span>
+                        <span th:if="${periodoSemestral.id != null}">Editar Periodo Semestral</span>
+                    </div>
+                    <div class="card-body">
+
+                        <!-- Mensaje de error -->
+                        <div th:if="${error}" class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span th:text="${error}"></span>
+                        </div>
+
+                        <form th:action="@{/periodo/guardar}" method="post" th:object="${periodoSemestral}">
+
+                            <!-- ID oculto para edición -->
+                            <input type="hidden" th:field="*{id}">
+
+                            <!-- Clave -->
+                            <div class="mb-3">
+                                <label for="clave" class="form-label fw-semibold">Clave del Periodo</label>
+                                <input type="text" class="form-control" id="clave"
+                                       th:field="*{clave}" required
+                                       placeholder="Ej: ENE-JUN-2025" maxlength="20">
+                            </div>
+
+                            <!-- Fecha Inicio -->
+                            <div class="mb-3">
+                                <label for="fechaInicio" class="form-label fw-semibold">Fecha de Inicio</label>
+                                <input type="date" class="form-control" id="fechaInicio"
+                                       th:field="*{fechaInicio}" required>
+                            </div>
+
+                            <!-- Fecha Fin -->
+                            <div class="mb-3">
+                                <label for="fechaFin" class="form-label fw-semibold">Fecha de Fin</label>
+                                <input type="date" class="form-control" id="fechaFin"
+                                       th:field="*{fechaFin}" required>
+                            </div>
+
+                            <!-- Estado -->
+                            <div class="mb-3">
+                                <label for="estatus" class="form-label fw-semibold">Estado</label>
+                                <select class="form-select" id="estatus" th:field="*{estatus}" required>
+                                    <option value="activo">Activo</option>
+                                    <option value="cerrado">Cerrado</option>
+                                </select>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/periodo/periodos}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-encabezado">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+    <!-- Validación de fechas en frontend -->
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var inicio = document.getElementById('fechaInicio').value;
+            var fin = document.getElementById('fechaFin').value;
+            if (inicio && fin && fin <= inicio) {
+                e.preventDefault();
+                alert('La fecha de fin debe ser posterior a la fecha de inicio.');
+            }
+        });
+    </script>
+
+</body>
+</html>

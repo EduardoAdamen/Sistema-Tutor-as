@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-transparent border-bottom pt-3 pb-3">
+                        <span class="fs-5 fw-bold text-dark">Detalle de Actividad PAT</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <table class="table table-borderless mb-0">
+                            <tr>
+                                <th class="text-end fw-bold text-dark" style="width: 35%;">ID de Actividad:</th>
+                                <td class="text-secondary" th:text="${actividad.id}"></td>
+                            </tr>
+                            <th:block sec:authorize="hasAuthority('ADMINISTRADOR')">
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Tutor de la Actividad:</th>
+                                <td class="text-secondary" th:text="${actividad.sesion.asignacion.tutor.usuario.nombreCompleto}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Carrera:</th>
+                                <td class="text-secondary" th:text="${actividad.sesion.asignacion.grupo.carrera.nombre}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Grupo:</th>
+                                <td class="text-secondary" th:text="${actividad.sesion.asignacion.grupo.nombre}"></td>
+                            </tr>
+                            </th:block>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Sesión (Fecha):</th>
+                                <td class="text-secondary" th:text="${#temporals.format(actividad.sesion.fecha, 'dd/MM/yyyy')}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Tipo de Actividad:</th>
+                                <td class="text-secondary" th:text="${actividad.tipoActividad.name()}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Título:</th>
+                                <td class="text-secondary fw-bold" th:text="${actividad.titulo}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Descripción:</th>
+                                <td class="text-secondary" th:text="${actividad.descripcion}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-end fw-bold text-dark">Evidencia:</th>
+                                <td class="text-secondary">
+                                    <span th:if="${actividad.evidencia != null}">
+                                        <a th:href="@{'/uploads/actividades/' + ${actividad.evidencia}}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3">
+                                            Ver Documento
+                                        </a>
+                                    </span>
+                                    <span th:if="${actividad.evidencia == null}" class="text-muted fst-italic">Sin evidencia adjunta</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-between">
+                        <a th:href="@{/pat/actividades}" class="btn btn-outline-secondary rounded-pill px-4">
+                            Volver al listado
+                        </a>
+                        <a th:href="@{/pat/editar/{id}(id=${actividad.id})}" class="btn btn-primary rounded-pill px-4" style="background-color: #1b396a; border-color: #1b396a;">
+                            Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

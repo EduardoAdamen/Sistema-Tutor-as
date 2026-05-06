@@ -1,82 +1,82 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
-<!-- ===================== HEAD ===================== -->
-<head th:replace="~{fragments/fragment :: head}"></head>
-
-<body>
-
-<!-- ===================== NAVBAR ===================== -->
-<nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-<!-- ===================== CONTENIDO ===================== -->
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <h2 class="mi-titulo mb-4" th:text="${sesion.id != null ? 'Editar Sesión' : 'Nueva Sesión'}">Nueva Sesión</h2>
-
-            <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
-
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <form th:action="@{/sesion/guardar}" method="post" enctype="multipart/form-data">
-                        <!-- Campos ocultos -->
-                        <input type="hidden" name="id" th:value="${sesion.id}">
-                        <input type="hidden" name="asignacion.id" th:value="${sesion.asignacion.id}">
-
-                        <!-- Fila 1: Fecha -->
-                        <div class="mb-4">
-                            <label for="fecha" class="form-label fw-semibold text-secondary">Fecha de la Sesión *</label>
-                            <input type="date" id="fecha" name="fecha" class="form-control" th:value="${sesion.fecha}" required>
-                        </div>
-
-                        <!-- Fila 2: Horarios -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label for="horaInicio" class="form-label fw-semibold text-secondary">Hora de Inicio *</label>
-                                <input type="time" id="horaInicio" name="horaInicio" class="form-control" th:value="${sesion.horaInicio}" required>
-                            </div>
-                            <div class="col-md-6 mt-3 mt-md-0">
-                                <label for="horaFin" class="form-label fw-semibold text-secondary">Hora de Fin</label>
-                                <input type="time" id="horaFin" name="horaFin" class="form-control" th:value="${sesion.horaFin}">
-                            </div>
-                        </div>
-
-                        <!-- Fila 3: Evidencia -->
-                        <div class="mb-4">
-                            <label for="archivoEvidencia" class="form-label fw-semibold text-secondary">Evidencia (Opcional)</label>
-                            
-                            <div th:if="${sesion.evidencia != null and !sesion.evidencia.isEmpty()}" class="mb-2 p-3 bg-light rounded border">
-                                <p class="mb-1 small text-muted">Archivo actual:</p>
-                                <a th:href="@{'/uploads/sesiones/' + ${sesion.evidencia}}" target="_blank" class="text-decoration-none">
-                                    <i class="bi bi-file-earmark-text me-1"></i> <span th:text="${sesion.evidencia}"></span>
-                                </a>
-                            </div>
-
-                            <input class="form-control" type="file" id="archivoEvidencia" name="archivoEvidencia" accept=".jpg,.jpeg,.png,.pdf">
-                            <div class="form-text">Si subes un archivo y ya existe uno anterior, éste será reemplazado. Tamaño máximo: 5 MB.</div>
-                        </div>
-
-                        <hr class="text-muted opacity-25 my-4">
-
-                        <!-- Botones -->
-                        <div class="d-flex justify-content-end gap-2">
-                            <a th:href="@{/sesion/grupo/{id}(id=${sesion.asignacion.id})}" class="btn btn-outline-secondary px-4">Cancelar</a>
-                            <button type="submit" class="btn btn-encabezado px-4">
-                                <i class="bi bi-save me-1"></i> Guardar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ===================== FOOTER ===================== -->
-<footer th:replace="~{fragments/fragment :: footer}"></footer>
-<div th:replace="~{fragments/fragment :: scripts}"></div>
-
-</body>
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- ===================== HEAD ===================== -->
+<head th:replace="~{fragments/fragment :: head}"></head>
+
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+<!-- ===================== CONTENIDO ===================== -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mi-titulo mb-4" th:text="${sesion.id != null ? 'Editar Sesión' : 'Nueva Sesión'}">Nueva Sesión</h2>
+
+            <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+            <div class="card shadow-sm ">
+                <div class="card-body p-4">
+                    <form th:action="@{/sesion/guardar}" method="post" enctype="multipart/form-data">
+                        <!-- Campos ocultos -->
+                        <input type="hidden" name="id" th:value="${sesion.id}">
+                        <input type="hidden" name="asignacion.id" th:value="${sesion.asignacion.id}">
+
+                        <!-- Fila 1: Fecha -->
+                        <div class="mb-4">
+                            <label for="fecha" class="form-label fw-semibold text-secondary">Fecha de la Sesión *</label>
+                            <input type="date" id="fecha" name="fecha" class="form-control" th:value="${sesion.fecha}" required>
+                        </div>
+
+                        <!-- Fila 2: Horarios -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="horaInicio" class="form-label fw-semibold text-secondary">Hora de Inicio *</label>
+                                <input type="time" id="horaInicio" name="horaInicio" class="form-control" th:value="${sesion.horaInicio}" required>
+                            </div>
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <label for="horaFin" class="form-label fw-semibold text-secondary">Hora de Fin</label>
+                                <input type="time" id="horaFin" name="horaFin" class="form-control" th:value="${sesion.horaFin}">
+                            </div>
+                        </div>
+
+                        <!-- Fila 3: Evidencia -->
+                        <div class="mb-4">
+                            <label for="archivoEvidencia" class="form-label fw-semibold text-secondary">Evidencia (Opcional)</label>
+                            
+                            <div th:if="${sesion.evidencia != null and !sesion.evidencia.isEmpty()}" class="mb-2 p-3 bg-light rounded border">
+                                <p class="mb-1 small text-muted">Archivo actual:</p>
+                                <a th:href="@{'/uploads/sesiones/' + ${sesion.evidencia}}" target="_blank" class="text-decoration-none">
+                                    <i class="bi bi-file-earmark-text me-1"></i> <span th:text="${sesion.evidencia}"></span>
+                                </a>
+                            </div>
+
+                            <input class="form-control" type="file" id="archivoEvidencia" name="archivoEvidencia" accept=".jpg,.jpeg,.png,.pdf">
+                            <div class="form-text">Si subes un archivo y ya existe uno anterior, éste será reemplazado. Tamaño máximo: 5 MB.</div>
+                        </div>
+
+                        <hr class="text-muted opacity-25 my-4">
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/sesion/grupo/{id}(id=${sesion.asignacion.id})}" class="btn btn-outline-secondary px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-encabezado px-4">
+                                <i class="bi bi-save me-1"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer th:replace="~{fragments/fragment :: footer}"></footer>
+<div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

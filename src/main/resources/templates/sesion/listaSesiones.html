@@ -1,102 +1,142 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
-<!-- ===================== HEAD ===================== -->
-<head th:replace="~{fragments/fragment :: head}"></head>
-
-<body>
-
-<!-- ===================== NAVBAR ===================== -->
-<nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-<!-- ===================== CONTENIDO ===================== -->
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="mi-titulo m-0">Mis Sesiones</h2>
-        <a th:href="@{/sesion/nueva/{id}(id=${asignacion.id})}" class="btn btn-encabezado shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> Registrar Sesión
-        </a>
-    </div>
-
-    <!-- Mensajes Flash -->
-    <div th:if="${msg}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${msg}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover bordes-fuertes mb-0 align-middle">
-                    <thead class="mi-etiqueta">
-                        <tr>
-                            <th class="ps-4">Fecha</th>
-                            <th>H. Inicio</th>
-                            <th>H. Fin</th>
-                            <th class="text-center">Evidencia</th>
-                            <th class="text-center">Total Tutorados</th>
-                            <th class="text-center pe-4">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:if="${#lists.isEmpty(sesiones)}">
-                            <td colspan="6" class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                                No hay sesiones registradas en este periodo.
-                            </td>
-                        </tr>
-                        <tr th:each="sesion : ${sesiones}">
-                            <td class="ps-4 fw-semibold" th:text="${sesion.fecha}">2026-04-26</td>
-                            <td th:text="${sesion.horaInicio}">10:00</td>
-                            <td th:text="${sesion.horaFin}">12:00</td>
-                            <td class="text-center">
-                                <a th:if="${sesion.evidencia != null and !sesion.evidencia.isEmpty()}" 
-                                   th:href="@{'/uploads/sesiones/' + ${sesion.evidencia}}" 
-                                   target="_blank" class="btn btn-sm btn-outline-primary" title="Ver Evidencia">
-                                    <i class="bi bi-file-earmark-text"></i> Archivo
-                                </a>
-                                <span th:unless="${sesion.evidencia != null and !sesion.evidencia.isEmpty()}" class="text-muted small">N/A</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge bg-secondary rounded-pill form-text text-white">
-                                    <i class="bi bi-people-fill me-1"></i> <span th:text="${asignacion.tutor.id > 0 ? 'Grupo' : '0'}">Grupo</span>
-                                </span>
-                            </td>
-                            <td class="text-center pe-4">
-                                <!-- Detalle -->
-                                <a th:href="@{/sesion/ver/{id}(id=${sesion.id})}" class="btn-crud btn-ver" title="Ver Detalle / Asistencia">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <!-- Registrar Asistencia Directo-->
-                                <a th:href="@{/asistencia/registrar/{id}(id=${sesion.id})}" class="btn-crud bg-success text-white" title="Registrar Asistencia">
-                                    <i class="bi bi-clipboard2-check"></i>
-                                </a>
-                                <!-- Editar -->
-                                <a th:href="@{/sesion/editar/{id}(id=${sesion.id})}" class="btn-crud btn-editar ms-1" title="Editar Sesión">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <!-- Eliminar -->
-                                <a th:href="@{/sesion/eliminar/{id}(id=${sesion.id})}" class="btn-crud btn-eliminar ms-1" 
-                                   title="Eliminar Sesión" onclick="return confirm('¿Está seguro de eliminar esta sesión?');">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ===================== FOOTER ===================== -->
-<footer th:replace="~{fragments/fragment :: footer}"></footer>
-<div th:replace="~{fragments/fragment :: scripts}"></div>
-
-</body>
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- ===================== HEAD ===================== -->
+<head th:replace="~{fragments/fragment :: head}"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<!-- ===================== NAVBAR ===================== -->
+<nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+<!-- ===================== CONTENIDO ===================== -->
+<div class="container my-5 flex-grow-1">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2">
+        <div>
+            <h2 class="mi-titulo m-0 d-inline-block me-3">Mis Sesiones</h2>
+            <span class="badge bg-info fs-6">
+                <i class="bi bi-calendar2-check"></i> 
+                Sesiones: <span th:text="${#lists.size(sesiones)}">0</span> / 10
+            </span>
+        </div>
+        <div>
+            <a th:href="@{/tutor/mis-grupos}" class="btn btn-outline-secondary shadow-sm me-2">
+                <i class="bi bi-arrow-left me-1"></i> Volver a Mis Grupos
+            </a>
+            <a th:if="${#lists.size(sesiones) < 10}" th:href="@{/sesion/nueva/{id}(id=${asignacion.id})}" class="btn btn-encabezado shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> Registrar Sesión
+            </a>
+            <button th:if="${#lists.size(sesiones) >= 10}" class="btn btn-secondary shadow-sm" disabled title="Se ha alcanzado el límite de 10 sesiones">
+                <i class="bi bi-plus-lg me-1"></i> Límite Alcanzado
+            </button>
+        </div>
+    </div>
+
+    <!-- Ficha de contexto del Grupo para el Tutor -->
+    <div class="card shadow-sm  mb-4 bg-light rounded-4 overflow-hidden">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="text-dark mb-1 fs-6 fw-bold">
+                        Carrera: <span class="fw-normal" th:text="${asignacion.grupo.carrera.nombre}"></span>
+                    </div>
+                    <div class="text-dark mb-2 fs-6 fw-bold">
+                        Grupo: <span class="fw-normal" th:text="${asignacion.grupo.nombre}"></span>
+                    </div>
+                    <div class="text-dark mb-0 fs-6 fw-bold">
+                        Periodo: <span class="fw-normal" th:text="${asignacion.periodo.clave}"></span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="d-inline-block text-start border-start border-3 border-secondary ps-4">
+                        <div class="mb-2 text-muted fw-semibold fs-6"><i class="bi bi-calendar-event-fill text-secondary me-2"></i>Día: <span class="text-dark" th:text="${asignacion.diaHorario}"></span></div>
+                        <div class="mb-2 text-muted fw-semibold fs-6"><i class="bi bi-clock-fill text-secondary me-2"></i>Hora: <span class="text-dark" th:text="${asignacion.horaHorario}"></span></div>
+                        <div class="text-muted fw-semibold fs-6"><i class="bi bi-door-open-fill text-secondary me-2"></i>Aula: <span class="text-dark" th:text="${asignacion.aula}"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash -->
+    <div th:if="${msg}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${msg}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card shadow-sm  rounded-4 overflow-hidden mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive m-0">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Fecha</th>
+                            <th>H. Inicio</th>
+                            <th>H. Fin</th>
+                            <th class="text-center">Evidencia</th>
+                            <th class="text-center">Total Tutorados</th>
+                            <th class="text-center pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(sesiones)}">
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                No hay sesiones registradas en este periodo.
+                            </td>
+                        </tr>
+                        <tr th:each="sesion : ${sesiones}">
+                            <td class="ps-4 fw-semibold" th:text="${sesion.fecha}">2026-04-26</td>
+                            <td th:text="${sesion.horaInicio}">10:00</td>
+                            <td th:text="${sesion.horaFin}">12:00</td>
+                            <td class="text-center">
+                                <a th:if="${sesion.evidencia != null and !sesion.evidencia.isEmpty()}" 
+                                   th:href="@{'/uploads/sesiones/' + ${sesion.evidencia}}" 
+                                   target="_blank" class="btn btn-sm btn-outline-primary" title="Ver Evidencia">
+                                    <i class="bi bi-file-earmark-text"></i> Archivo
+                                </a>
+                                <span th:unless="${sesion.evidencia != null and !sesion.evidencia.isEmpty()}" class="text-muted small">N/A</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary rounded-pill form-text text-white">
+                                    <i class="bi bi-people-fill me-1"></i> <span th:text="${asignacion.tutor.id > 0 ? 'Grupo' : '0'}">Grupo</span>
+                                </span>
+                            </td>
+                            <td class="text-center pe-4">
+                                <!-- Detalle -->
+                                <a th:href="@{/sesion/ver/{id}(id=${sesion.id})}" class="btn-crud btn-ver" title="Ver Detalle / Asistencia">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <!-- Registrar Asistencia Directo-->
+                                <a th:href="@{/asistencia/registrar/{id}(id=${sesion.id})}" class="btn-crud bg-success text-white" title="Registrar Asistencia">
+                                    <i class="bi bi-clipboard2-check"></i>
+                                </a>
+                                <!-- Editar -->
+                                <a th:href="@{/sesion/editar/{id}(id=${sesion.id})}" class="btn-crud btn-editar ms-1" title="Editar Sesión">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <!-- Eliminar -->
+                                <a th:href="@{/sesion/eliminar/{id}(id=${sesion.id})}" class="btn-crud btn-eliminar ms-1" 
+                                   title="Eliminar Sesión" onclick="return confirm('¿Está seguro de eliminar esta sesión?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer th:replace="~{fragments/fragment :: footer}"></footer>
+<div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

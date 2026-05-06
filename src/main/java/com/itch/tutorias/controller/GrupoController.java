@@ -25,6 +25,15 @@ public class GrupoController {
         return "grupo/listaGrupos";
     }
 
+    @GetMapping("/detalle/{id}")
+    public String detalleGrupo(@PathVariable Integer id, Model model) {
+        Grupo grupo = grupoService.buscarPorId(id).orElse(null);
+        if (grupo == null) return "redirect:/grupo/grupos";
+        
+        model.addAttribute("grupo", grupo);
+        return "grupo/detalleGrupo";
+    }
+
     @GetMapping("/nuevo")
     public String nuevoGrupo(Model model) {
         model.addAttribute("grupo", new Grupo());

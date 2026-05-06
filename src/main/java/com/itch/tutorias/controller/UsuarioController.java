@@ -292,6 +292,12 @@ public class UsuarioController {
     public String detalleUsuario(@PathVariable("id") Integer id, Model model) {
         Usuario usuario = usuarioService.buscarPorId(id);
         model.addAttribute("usuario", usuario);
+        if (usuario.hasPerfil("TUTORADO")) {
+            Optional<Tutorado> tutoradoOpt = tutoradoService.buscarPorUsuario(usuario);
+            if (tutoradoOpt.isPresent() && tutoradoOpt.get().getCarrera() != null) {
+                model.addAttribute("carreraNombre", tutoradoOpt.get().getCarrera().getNombre());
+            }
+        }
         return "usuario/detalleUsuario";
     }
 

@@ -1,71 +1,71 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/fragment :: head}"></head>
-<body class="d-flex flex-column min-vh-100">
-
-    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-    <main class="container my-4 flex-grow-1">
-        <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header mi-etiqueta pt-3 pb-3">
-                        <span th:text="${asignacion.id == null ? 'Nueva Asignación' : 'Editar Asignación'}"></span>
-                    </div>
-                    <div class="card-body">
-                        
-                        <div th:if="${error}" class="alert alert-danger fade show shadow-sm" role="alert">
-                            <span th:text="${error}"></span>
-                        </div>
-
-                        <form th:action="@{/asignacion/guardar}" th:object="${asignacion}" method="post">
-                            <input type="hidden" th:field="*{id}" />
-
-                            <div class="mb-3">
-                                <label for="tutor" class="form-label text-end fw-bold">Tutor:</label>
-                                <select id="tutor" th:field="*{tutor}" class="form-select" required>
-                                    <option value="" disabled selected>-- Seleccione Tutor --</option>
-                                    <option th:each="t : ${tutores}" th:value="${t.id}" th:text="|${t.usuario.nombreCompleto} (${t.usuario.numeroIdentificacion})|"></option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="grupo" class="form-label fw-bold">Grupo:</label>
-                                <select id="grupo" th:field="*{grupo}" class="form-select" required>
-                                    <option value="" disabled selected>-- Seleccione Grupo --</option>
-                                    <option th:each="g : ${grupos}" th:value="${g.id}" th:text="|${g.nombre} - ${g.carrera.nombre}|"></option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="aula" class="form-label fw-bold">Aula:</label>
-                                <input type="text" id="aula" th:field="*{aula}" class="form-control" required maxlength="100" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="diaHorario" class="form-label fw-bold">Día de la semana:</label>
-                                <select id="diaHorario" th:field="*{diaHorario}" class="form-select" required>
-                                    <option value="Viernes" selected>Viernes</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="horaHorario" class="form-label fw-bold">Hora:</label>
-                                <input type="time" id="horaHorario" th:field="*{horaHorario}" class="form-control" required />
-                            </div>
-
-                            <div class="d-flex justify-content-between mt-4">
-                                <a th:href="@{/asignacion/asignaciones}" class="btn btn-outline-secondary">Cancelar</a>
-                                <button type="submit" class="btn btn-encabezado">Guardar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer th:replace="~{fragments/fragment :: footer}"></footer>
-    <div th:replace="~{fragments/fragment :: scripts}"></div>
-</body>
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta pt-3 pb-3">
+                        <span th:text="${asignacion.id == null ? 'Nueva Asignación' : 'Editar Asignación'}"></span>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div th:if="${error}" class="alert alert-danger fade show shadow-sm" role="alert">
+                            <span th:text="${error}"></span>
+                        </div>
+
+                        <form th:action="@{/asignacion/guardar}" th:object="${asignacion}" method="post">
+                            <input type="hidden" th:field="*{id}" />
+
+                            <div class="mb-3">
+                                <label for="tutor" class="form-label text-end fw-bold">Tutor:</label>
+                                <select id="tutor" th:field="*{tutor}" class="form-select" required>
+                                    <option value="" disabled selected>-- Seleccione Tutor --</option>
+                                    <option th:each="t : ${tutores}" th:value="${t.id}" th:text="|${t.usuario.nombreCompleto} (${t.usuario.numeroIdentificacion})|"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="grupo" class="form-label fw-bold">Grupo:</label>
+                                <select id="grupo" th:field="*{grupo}" class="form-select" required>
+                                    <option value="" disabled selected>-- Seleccione Grupo --</option>
+                                    <option th:each="g : ${grupos}" th:value="${g.id}" th:text="|${g.nombre} - ${g.carrera.nombre}|"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="aula" class="form-label fw-bold">Aula:</label>
+                                <input type="text" id="aula" th:field="*{aula}" class="form-control" required maxlength="100" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="diaHorario" class="form-label fw-bold">Día de la semana:</label>
+                                <select id="diaHorario" th:field="*{diaHorario}" class="form-select" required>
+                                    <option value="Viernes" selected>Viernes</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="horaHorario" class="form-label fw-bold">Hora:</label>
+                                <input type="time" id="horaHorario" th:field="*{horaHorario}" class="form-control" required />
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a th:href="@{/asignacion/asignaciones}" class="btn btn-outline-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-encabezado">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+</body>
+</html>
