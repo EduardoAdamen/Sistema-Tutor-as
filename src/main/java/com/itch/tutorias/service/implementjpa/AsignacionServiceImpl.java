@@ -1,6 +1,7 @@
 package com.itch.tutorias.service.implementjpa;
 
 import com.itch.tutorias.model.Asignacion;
+import com.itch.tutorias.model.Grupo;
 import com.itch.tutorias.model.PeriodoSemestral;
 import com.itch.tutorias.model.Tutor;
 import com.itch.tutorias.repository.AsignacionRepository;
@@ -48,7 +49,7 @@ public class AsignacionServiceImpl implements IAsignacion {
     }
 
     @Override
-    public boolean existeDuplicado(Tutor tutor, com.itch.tutorias.model.Grupo grupo, LocalTime hora, PeriodoSemestral periodo) {
+    public boolean existeDuplicado(Tutor tutor, Grupo grupo, LocalTime hora, PeriodoSemestral periodo) {
         return asignacionRepository.existsByTutorAndGrupoAndHoraHorarioAndPeriodo(tutor, grupo, hora, periodo);
     }
 }

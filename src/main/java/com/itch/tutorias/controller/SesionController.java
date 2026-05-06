@@ -98,7 +98,7 @@ public class SesionController {
             return "redirect:/tutor/mis-grupos";
         }
 
-        // Validar límite de 10 sesiones si es una nueva
+        // Validar límite de 10 sesiones 
         if (sesion.getId() == null) {
             List<Sesion> sesionesActuales = sesionService.buscarPorAsignacion(asignacionActiva);
             if (sesionesActuales.size() >= 10) {
@@ -107,7 +107,7 @@ public class SesionController {
             }
         }
 
-        // Validar RF-26: La fecha de la sesión no puede ser posterior a la fecha fin del periodo
+        // Validar la fecha de la sesión no puede ser posterior a la fecha fin del periodo
         if (sesion.getFecha().isAfter(asignacionActiva.getPeriodo().getFechaFin()) || sesion.getFecha().isBefore(asignacionActiva.getPeriodo().getFechaInicio())) {
             attributes.addFlashAttribute("error", "La fecha de la sesión debe estar dentro del periodo escolar activo (" 
                     + asignacionActiva.getPeriodo().getFechaInicio() + " a " + asignacionActiva.getPeriodo().getFechaFin() + ").");

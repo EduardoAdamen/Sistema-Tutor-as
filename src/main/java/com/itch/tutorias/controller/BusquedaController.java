@@ -42,7 +42,7 @@ public class BusquedaController {
     @Autowired
     private IRegistroAsistencia registroAsistenciaService;
 
-    @GetMapping("/busqueda/tutores") // RF-37
+    @GetMapping("/busqueda/tutores") 
     public String buscarTutores(@RequestParam(required = false) Integer periodoId, Model model) {
         model.addAttribute("periodos", periodoService.buscarTodos());
         model.addAttribute("filtroPeriodoId", periodoId);
@@ -51,16 +51,13 @@ public class BusquedaController {
             PeriodoSemestral p = periodoService.buscarPorId(periodoId);
             List<Asignacion> asignaciones = asignacionService.buscarPorPeriodo(p);
             
-            // Filtro único por tutor ya que una asignación tiene un tutor, mapeamos asignaciones
-            // pero el request dice "nombre tutor, carrera, grupo, aula, día, hora", así que la
-            // lista final en la tabla será realmente la lista de asignaciones
             model.addAttribute("asignaciones", asignaciones);
         }
 
         return "busqueda/busquedaTutores";
     }
 
-    @GetMapping("/busqueda/tutorado") // RF-38
+    @GetMapping("/busqueda/tutorado") 
     public String buscarTutorado(@RequestParam(required = false) String numeroControl, Model model) {
         model.addAttribute("filtroNumeroControl", numeroControl);
 
@@ -94,7 +91,7 @@ public class BusquedaController {
         return "busqueda/busquedaTutorado";
     }
 
-    @GetMapping("/busqueda/pat") // RF-39
+    @GetMapping("/busqueda/pat") 
     public String buscarPat(
             @RequestParam(required = false) LocalDate inicio,
             @RequestParam(required = false) LocalDate fin,
@@ -115,14 +112,14 @@ public class BusquedaController {
         
         List<ActividadPat> resultados;
         
-        // Si hay fechas buscamos por rango, sino traemos todas
+        
         if (inicio != null && fin != null) {
             resultados = actividadPatService.buscarPorRangoFechas(inicio, fin);
         } else {
             resultados = actividadPatService.buscarTodas(); 
         }
 
-        // Filtros en memoria
+    
         if (tipo != null) {
             resultados = resultados.stream().filter(a -> a.getTipoActividad() == tipo).collect(Collectors.toList());
         }

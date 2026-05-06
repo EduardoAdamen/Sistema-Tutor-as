@@ -10,14 +10,14 @@
             Mis Tutorados
         </h2>
 
-        <!-- Mensajes -->
+       
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         <div th:if="${msgInfo}" class="alert alert-info">
             <i class="bi bi-info-circle me-1"></i> <span th:text="${msgInfo}"></span>
         </div>
 
         <div th:if="${asignacion != null}">
-            <!-- Detalle de la asignación del tutor -->
+            
             <div class="card shadow-sm mb-4">
                 <div class="card-header mi-etiqueta pt-3 pb-3">Detalles de Mi Grupo</div>
                 <div class="card-body">
@@ -51,7 +51,7 @@
                                <tr>
                                    <th class="ps-4">No.</th>
                                    <th>Nombre del Tutorado</th>
-                                   <th>Matrícula / No. Control</th>
+                                   <th>No. Control</th>
                                    <th>Correo Electrónico</th>
                                </tr>
                            </thead>

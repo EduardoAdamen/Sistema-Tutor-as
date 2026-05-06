@@ -178,8 +178,7 @@ public class UsuarioController {
         if (perfilesIds != null && !perfilesIds.isEmpty()) {
             Set<Perfil> pSet = new HashSet<>();
             for (Integer pId : perfilesIds) {
-                // Here we could find by id from a real implementation, 
-                // but let's assume we find it from service
+                
                 perfilService.buscarTodos().stream().filter(p -> p.getId().equals(pId)).findFirst().ifPresent(pSet::add);
             }
             usuario.setPerfiles(pSet);
