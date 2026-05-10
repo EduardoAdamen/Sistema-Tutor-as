@@ -65,7 +65,7 @@
                         <td th:text="${a.aula}"></td>
                         <td>
                             <span th:text="${a.diaHorario}"></span> <br>
-                            <small th:text="${a.horaHorario}"></small>
+                            <small th:text="${a.horaHorario} + ' - ' + ${a.horaFinHorario}"></small>
                         </td>
                         <td>
                             <span th:if="${a.periodo.estatus.name() == 'activo'}" class="badge bg-success" th:text="${a.periodo.clave}"></span>

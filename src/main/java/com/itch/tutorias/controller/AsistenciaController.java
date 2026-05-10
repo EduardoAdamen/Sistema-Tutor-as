@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
 
 @Controller
 @RequestMapping("/asistencia")
@@ -36,47 +37,59 @@ public class AsistenciaController {
         List<AsignacionTutorado> asignacionTutorados = asignacionTutoradoService.buscarPorAsignacion(sesion.getAsignacion());
         List<RegistroAsistencia> asistenciasPrevias = registroAsistenciaService.buscarPorSesion(sesion);
         
-        java.util.Map<Integer, String> estadosPrevios = new java.util.HashMap<>();
+        // Construir set de IDs con asistencia previa de tipo "presente"
+        Set<Integer> presentesPrevios = new HashSet<>();
         for (RegistroAsistencia r : asistenciasPrevias) {
-            estadosPrevios.put(r.getTutorado().getId(), r.getEstatusAsistencia().name());
+            if (r.getEstatusAsistencia() == RegistroAsistencia.EstatusAsistencia.presente) {
+                presentesPrevios.add(r.getTutorado().getId());
+            }
         }
 
         model.addAttribute("sesion", sesion);
         model.addAttribute("tutorados", asignacionTutorados);
-        model.addAttribute("estadosPrevios", estadosPrevios);
+        model.addAttribute("presentesPrevios", presentesPrevios);
 
         return "asistencia/registrarAsistencia";
     }
 
     @PostMapping("/guardar/{sesionId}")
-    public String guardarAsistencias(@PathVariable Integer sesionId, HttpServletRequest request, RedirectAttributes attributes) {
+    public String guardarAsistencias(
+            @PathVariable Integer sesionId,
+            @RequestParam(value = "presentes", required = false) List<Integer> presentes,
+            RedirectAttributes attributes) {
+        
         Sesion sesion = sesionService.buscarPorId(sesionId);
         if (sesion == null) {
             attributes.addFlashAttribute("error", "Sesión no encontrada.");
             return "redirect:/sesion/mis-sesiones";
         }
 
+        Set<Integer> presentesSet = new HashSet<>();
+        if (presentes != null) {
+            presentesSet.addAll(presentes);
+        }
+
         List<AsignacionTutorado> asignacionTutorados = asignacionTutoradoService.buscarPorAsignacion(sesion.getAsignacion());
 
         for (AsignacionTutorado at : asignacionTutorados) {
             Tutorado tutorado = at.getTutorado();
-            String estadoStr = request.getParameter("estado_" + tutorado.getId());
             
-            if (estadoStr != null && !estadoStr.isEmpty()) {
-                RegistroAsistencia.EstatusAsistencia estado = RegistroAsistencia.EstatusAsistencia.valueOf(estadoStr);
-                
-                // RF-29: Si existe, actualizar; si no, crear
-                RegistroAsistencia registro = registroAsistenciaService.buscarPorSesion(sesion).stream()
-                        .filter(r -> r.getTutorado().getId().equals(tutorado.getId()))
-                        .findFirst()
-                        .orElse(new RegistroAsistencia());
+            // Si está en la lista de presentes → presente, si no → ausente
+            RegistroAsistencia.EstatusAsistencia estado = presentesSet.contains(tutorado.getId())
+                    ? RegistroAsistencia.EstatusAsistencia.presente
+                    : RegistroAsistencia.EstatusAsistencia.ausente;
+            
+            // Si existe, actualizar; si no, crear
+            RegistroAsistencia registro = registroAsistenciaService.buscarPorSesion(sesion).stream()
+                    .filter(r -> r.getTutorado().getId().equals(tutorado.getId()))
+                    .findFirst()
+                    .orElse(new RegistroAsistencia());
 
-                registro.setSesion(sesion);
-                registro.setTutorado(tutorado);
-                registro.setEstatusAsistencia(estado);
-                
-                registroAsistenciaService.guardar(registro);
-            }
+            registro.setSesion(sesion);
+            registro.setTutorado(tutorado);
+            registro.setEstatusAsistencia(estado);
+            
+            registroAsistenciaService.guardar(registro);
         }
 
         attributes.addFlashAttribute("msg", "Asistencia registrada correctamente.");

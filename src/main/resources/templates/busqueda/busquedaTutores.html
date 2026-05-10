@@ -60,7 +60,7 @@
                         <td th:text="${asig.grupo.nombre}">A</td>
                         <td th:text="${asig.aula}">Aula 10</td>
                         <td th:text="${asig.diaHorario}">Lunes</td>
-                        <td th:text="${#temporals.format(asig.horaHorario, 'HH:mm')}">10:00</td>
+                        <td th:text="${#temporals.format(asig.horaHorario, 'HH:mm')} + ' - ' + ${#temporals.format(asig.horaFinHorario, 'HH:mm')}">10:00 - 11:00</td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(asignaciones)}">
                         <td colspan="6" class="text-center text-muted py-4">No se encontraron tutores asignados en el periodo seleccionado.</td>

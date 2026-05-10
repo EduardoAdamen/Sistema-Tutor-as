@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <h2 class="mi-titulo mb-2"><i class="bi bi-clipboard2-data-fill me-2"></i>Actividades PAT - Coordinador de Carrera</h2>
+        <h5 class="text-muted mb-4">
+            Carrera: <span class="fw-bold text-primary" th:text="${carrera.nombre}">ISC</span>
+        </h5>
+
+        <div th:if="${msg}" class="alert alert-success alert-dismissible fade show" th:text="${msg}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" th:text="${error}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Actividades Generales disponibles para adaptar -->
+        <div class="card shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-transparent border-bottom pt-3 pb-3">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-journal-bookmark me-2"></i>Actividades PAT Generales Disponibles</h5>
+                <small class="text-muted">Seleccione una actividad general para adaptarla a su carrera.</small>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive m-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Título</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th class="text-center pe-4">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="g : ${generales}">
+                                <td class="ps-4 fw-semibold" th:text="${g.titulo}">Taller</td>
+                                <td><span class="badge bg-secondary px-3 py-2" th:text="${g.tipoActividad}">taller</span></td>
+                                <td class="text-muted" th:text="${g.descripcion != null ? (g.descripcion.length() > 50 ? g.descripcion.substring(0, 50) + '...' : g.descripcion) : '-'}">Desc</td>
+                                <td class="text-center pe-4">
+                                    <a th:href="@{/coordinador/adaptar/{id}(id=${g.id})}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                        <i class="bi bi-pencil-square me-1"></i> Adaptar
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${generales == null or generales.isEmpty()}">
+                                <td colspan="4" class="text-center text-muted py-4">No hay actividades PAT generales creadas por el administrador.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actividades ya adaptadas -->
+        <div class="card shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-transparent border-bottom pt-3 pb-3">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-check2-circle me-2 text-success"></i>Actividades Adaptadas a Mi Carrera</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive m-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Actividad Original</th>
+                                <th>Título Adaptado</th>
+                                <th>Descripción Adaptada</th>
+                                <th>Observaciones</th>
+                                <th class="text-center pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="a : ${adaptadas}">
+                                <td class="ps-4 text-muted" th:text="${a.actividadGeneral.titulo}">General</td>
+                                <td class="fw-semibold" th:text="${a.tituloAdaptado}">Adaptado</td>
+                                <td class="text-muted" th:text="${a.descripcionAdaptada != null ? (a.descripcionAdaptada.length() > 40 ? a.descripcionAdaptada.substring(0, 40) + '...' : a.descripcionAdaptada) : '-'}">Desc</td>
+                                <td class="text-muted" th:text="${a.observaciones != null ? (a.observaciones.length() > 30 ? a.observaciones.substring(0, 30) + '...' : a.observaciones) : '-'}">Obs</td>
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a th:href="@{/coordinador/editar/{id}(id=${a.id})}" class="btn-crud btn-editar" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a th:href="@{/coordinador/eliminar/{id}(id=${a.id})}" class="btn-crud btn-eliminar" title="Eliminar"
+                                           onclick="return confirm('¿Está seguro de eliminar esta adaptación?');">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${adaptadas == null or adaptadas.isEmpty()}">
+                                <td colspan="5" class="text-center text-muted py-4">No has adaptado ninguna actividad PAT para tu carrera aún.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+</body>
+</html>

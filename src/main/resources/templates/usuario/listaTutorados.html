@@ -19,33 +19,22 @@
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mi-titulo mb-0">Gestión de Usuarios</h2>
-            <a th:href="@{/usuario/nuevo}" class="btn btn-encabezado">
-                <i class="bi bi-plus-circle"></i> Nuevo Usuario
+            <div>
+                <h2 class="mi-titulo mb-0"><i class="bi bi-mortarboard-fill me-2"></i>Tutorados</h2>
+                <small class="text-muted">Alumnos registrados en el sistema con perfil de Tutorado</small>
+            </div>
+            <a th:href="@{/usuario/nuevo(rol='TUTORADO')}" class="btn btn-encabezado">
+                <i class="bi bi-plus-circle me-1"></i> Nuevo Tutorado
             </a>
         </div>
 
-        <!-- Barra de filtros -->
-        <form th:action="@{/usuario/usuarios}" method="get" class="d-flex flex-wrap gap-3 mb-4 align-items-center">
-            <div class="card shadow-sm rounded-4 border-0 flex-grow-1" style="min-width: 200px;">
-                <label class="visually-hidden" for="perfilNombre">Perfil</label>
-                <select name="perfilNombre" id="perfilNombre" class="form-select border-0 px-3 py-2 bg-transparent rounded-4">
-                    <option value="">-- Todos los Perfiles --</option>
-                    <option th:each="p : ${perfiles}" th:value="${p.nombre}" th:text="${p.nombre}" th:selected="${p.nombre == filtroPerfilNombre}"></option>
-                </select>
-            </div>
+        <!-- Filtro por carrera -->
+        <form th:action="@{/usuario/tutorados}" method="get" class="d-flex flex-wrap gap-3 mb-4 align-items-center">
             <div class="card shadow-sm rounded-4 border-0 flex-grow-1" style="min-width: 250px;">
                 <label class="visually-hidden" for="carreraId">Carrera</label>
                 <select name="carreraId" id="carreraId" class="form-select border-0 px-3 py-2 bg-transparent rounded-4">
-                    <option value="">TODAS LAS CARRERAS</option>
+                    <option value="">-- Todas las Carreras --</option>
                     <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}" th:selected="${c.id == filtroCarreraId}"></option>
-                </select>
-            </div>
-            <div class="card shadow-sm rounded-4 border-0 flex-grow-1" style="min-width: 200px;">
-                <label class="visually-hidden" for="estado">Estado</label>
-                <select name="estado" id="estado" class="form-select border-0 px-3 py-2 bg-transparent rounded-4">
-                    <option value="">TODOS LOS ESTADOS</option>
-                    <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == filtroEstado}"></option>
                 </select>
             </div>
             <div class="flex-shrink-0">
@@ -61,10 +50,11 @@
                 <thead class="table-light">
                     <tr>
                         <th class="ps-4">Foto</th>
-                        <th>Identificación</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                        <th>Rol</th>
+                        <th>No. Control</th>
+                        <th>Nombre Completo</th>
+                        <th>Correo Institucional</th>
+                        <th>Carrera</th>
+                        <th>Semestre</th>
                         <th>Estado</th>
                         <th class="text-center pe-4">Acciones</th>
                     </tr>
@@ -79,11 +69,14 @@
                         <td th:text="${u.nombreCompleto}" class="fw-semibold"></td>
                         <td th:text="${u.correo}"></td>
                         <td>
-                            <span class="badge rounded-pill bg-primary" th:if="${u.hasPerfil('ADMINISTRADOR')}">Admin</span>
-                            <span class="badge rounded-pill bg-success" th:if="${u.hasPerfil('TUTOR')}">Tutor</span>
-                            <span class="badge rounded-pill bg-info text-dark" th:if="${u.hasPerfil('TUTORADO')}">Tutorado</span>
-                            <span class="badge rounded-pill bg-warning text-dark" th:if="${u.hasPerfil('COORDINADOR_CARRERA')}">Coordinador</span>
-                            <span th:if="${!u.hasPerfil('ADMINISTRADOR') and !u.hasPerfil('TUTOR') and !u.hasPerfil('TUTORADO') and !u.hasPerfil('COORDINADOR_CARRERA')}">Sin Perfil</span>
+                            <span th:if="${carrerasMap.containsKey(u.id)}" class="badge bg-info bg-opacity-10 text-dark border border-info border-opacity-25 px-3 py-2">
+                                <span th:text="${carrerasMap[u.id]}">Carrera</span>
+                            </span>
+                            <span th:unless="${carrerasMap.containsKey(u.id)}" class="text-muted small">Sin carrera</span>
+                        </td>
+                        <td>
+                            <span th:if="${semestresMap.containsKey(u.id)}" class="badge bg-secondary px-3 py-2" th:text="${semestresMap[u.id] + '°'}">1°</span>
+                            <span th:unless="${semestresMap.containsKey(u.id)}" class="text-muted small">-</span>
                         </td>
                         <td>
                             <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25" th:if="${u.estado.name() == 'activo'}"><i class="bi bi-check-circle me-1"></i>Activo</span>
@@ -91,35 +84,25 @@
                         </td>
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center gap-2">
-                                <a th:href="@{/usuario/ver/{id}(id=${u.id})}" class="btn-crud btn-ver" title="Ver">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a th:href="@{/usuario/editar/{id}(id=${u.id})}" class="btn-crud btn-editar" title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
+                                <a th:href="@{/usuario/ver/{id}(id=${u.id})}" class="btn-crud btn-ver" title="Ver"><i class="bi bi-eye"></i></a>
+                                <a th:href="@{/usuario/editar/{id}(id=${u.id})}" class="btn-crud btn-editar" title="Editar"><i class="bi bi-pencil"></i></a>
                                 <a th:if="${u.estado.name() == 'activo'}" th:href="@{/usuario/desactivar/{id}(id=${u.id})}" class="btn-crud btn-eliminar" title="Desactivar"
-                                   onclick="return confirm('¿Está seguro de desactivar este usuario?');">
-                                    <i class="bi bi-person-x"></i>
-                                </a>
+                                   onclick="return confirm('¿Está seguro de desactivar este tutorado?');"><i class="bi bi-person-x"></i></a>
                             </div>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(usuarios)}">
                         <td colspan="8" class="text-center text-muted py-5">
-                            <i class="bi bi-info-circle"></i> No hay usuarios registrados con los filtros actuales.
+                            <i class="bi bi-info-circle"></i> No hay tutorados registrados.
                         </td>
                     </tr>
                 </tbody>
             </table>
             </div>
         </div>
-        </div>
-
     </main>
 
     <footer th:replace="~{fragments/fragment :: footer}"></footer>
     <div th:replace="~{fragments/fragment :: scripts}"></div>
 </body>
 </html>
-
-

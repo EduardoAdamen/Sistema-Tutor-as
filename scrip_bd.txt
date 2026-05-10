@@ -45,7 +45,7 @@ CREATE TABLE usuario (
 
 CREATE TABLE perfil (
     id     INT         NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL COMMENT 'ADMINISTRADOR | TUTOR | TUTORADO',
+    nombre VARCHAR(50) NOT NULL COMMENT 'ADMINISTRADOR | TUTOR | TUTORADO | COORDINADOR_CARRERA',
     CONSTRAINT pk_perfil       PRIMARY KEY (id),
     CONSTRAINT uq_perfil_nombre UNIQUE (nombre)
 ) ENGINE=InnoDB COMMENT='Catálogo de roles del sistema';
@@ -88,6 +88,21 @@ CREATE TABLE tutorado (
         ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB COMMENT='Datos específicos del rol Tutorado';
 
+-- NUEVA TABLA: Coordinador de Carrera
+CREATE TABLE coordinador_carrera (
+    id         INT NOT NULL AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    carrera_id INT NOT NULL,
+    CONSTRAINT pk_coordinador_carrera     PRIMARY KEY (id),
+    CONSTRAINT uq_coordinador_usuario     UNIQUE (usuario_id),
+    CONSTRAINT fk_coordinador_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuario (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_coordinador_carrera
+        FOREIGN KEY (carrera_id) REFERENCES carrera (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Datos específicos del rol Coordinador de Carrera';
+
 CREATE TABLE periodo_semestral (
     id           INT         NOT NULL AUTO_INCREMENT,
     clave        VARCHAR(20) NOT NULL COMMENT 'Ej: ENE-JUN-2025',
@@ -110,7 +125,8 @@ CREATE TABLE asignacion (
     periodo_id    INT         NOT NULL,
     aula          VARCHAR(30) NOT NULL,
     dia_horario   VARCHAR(30) NOT NULL DEFAULT 'Viernes',
-    hora_horario  TIME        NOT NULL,
+    hora_horario      TIME        NOT NULL,
+    hora_fin_horario  TIME        NOT NULL,
     CONSTRAINT pk_asignacion PRIMARY KEY (id),
     CONSTRAINT uq_asignacion UNIQUE (tutor_id, grupo_id, hora_horario, periodo_id),
     CONSTRAINT fk_asignacion_tutor
@@ -173,24 +189,74 @@ CREATE TABLE registro_asistencia (
 ) ENGINE=InnoDB COMMENT='Asistencia de cada tutorado por sesión';
 
 -- ============================================================
---  BLOQUE 4 — PLAN DE ACCIÓN TUTORIAL (PAT)
+--  BLOQUE 4 — PLAN DE ACCIÓN TUTORIAL (PAT) - NUEVO FLUJO
 -- ============================================================
 
-CREATE TABLE actividad_pat (
+-- Actividades PAT generales creadas por el Administrador DDA (para todas las carreras)
+CREATE TABLE actividad_pat_general (
     id             INT          NOT NULL AUTO_INCREMENT,
-    sesion_id      INT          NOT NULL,
     tipo_actividad ENUM('taller','asesoria_academica',
                         'sesion_informativa','otra') NOT NULL,
     titulo         VARCHAR(200) NOT NULL,
     descripcion    TEXT         NULL,
-    observaciones  TEXT         NULL,
-    evidencia      VARCHAR(255) NULL COMMENT 'Ruta relativa JPG/PNG/PDF',
     fecha_registro DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_actividad_pat PRIMARY KEY (id),
-    CONSTRAINT fk_actividad_sesion
+    CONSTRAINT pk_actividad_pat_general PRIMARY KEY (id)
+) ENGINE=InnoDB COMMENT='Actividades PAT generales creadas por Admin DDA';
+
+-- Actividades PAT adaptadas por el Coordinador de Carrera a su carrera correspondiente
+CREATE TABLE actividad_pat_carrera (
+    id                    INT          NOT NULL AUTO_INCREMENT,
+    actividad_general_id  INT          NOT NULL COMMENT 'FK a actividad_pat_general.id',
+    carrera_id            INT          NOT NULL COMMENT 'FK a carrera.id',
+    titulo_adaptado       VARCHAR(200) NOT NULL,
+    descripcion_adaptada  TEXT         NULL,
+    observaciones         TEXT         NULL,
+    fecha_adaptacion      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_actividad_pat_carrera PRIMARY KEY (id),
+    CONSTRAINT uq_actividad_carrera UNIQUE (actividad_general_id, carrera_id),
+    CONSTRAINT fk_act_carrera_general
+        FOREIGN KEY (actividad_general_id) REFERENCES actividad_pat_general (id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_act_carrera_carrera
+        FOREIGN KEY (carrera_id) REFERENCES carrera (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Actividades PAT adaptadas por Coordinador a su carrera';
+
+-- Vinculación de actividades adaptadas a sesiones (el tutor las selecciona al crear sesión)
+CREATE TABLE sesion_actividad (
+    id                    INT          NOT NULL AUTO_INCREMENT,
+    sesion_id             INT          NOT NULL COMMENT 'FK a sesion.id',
+    actividad_carrera_id  INT          NOT NULL COMMENT 'FK a actividad_pat_carrera.id',
+    observaciones         TEXT         NULL,
+    evidencia             VARCHAR(255) NULL COMMENT 'Ruta relativa JPG/PNG/PDF',
+    fecha_registro        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_sesion_actividad PRIMARY KEY (id),
+    CONSTRAINT uq_sesion_actividad UNIQUE (sesion_id, actividad_carrera_id),
+    CONSTRAINT fk_sesact_sesion
         FOREIGN KEY (sesion_id) REFERENCES sesion (id)
-        ON UPDATE CASCADE ON DELETE CASCADE
-) ENGINE=InnoDB COMMENT='Actividades PAT por sesión';
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_sesact_actividad
+        FOREIGN KEY (actividad_carrera_id) REFERENCES actividad_pat_carrera (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Actividades PAT vinculadas a sesiones por el tutor';
+
+CREATE TABLE plan_sesion_carrera (
+    id                    INT  NOT NULL AUTO_INCREMENT,
+    carrera_id            INT  NOT NULL COMMENT 'FK a carrera.id',
+    numero_sesion         INT  NOT NULL COMMENT 'Número de sesión semanal (1-10)',
+    actividad_carrera_id  INT  NOT NULL COMMENT 'FK a actividad_pat_carrera.id',
+    CONSTRAINT pk_plan_sesion_carrera PRIMARY KEY (id),
+    CONSTRAINT uq_plan_sesion_carrera UNIQUE (carrera_id, numero_sesion),
+    CONSTRAINT fk_plan_sesion_carrera
+        FOREIGN KEY (carrera_id) REFERENCES carrera (id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_plan_sesion_actividad
+        FOREIGN KEY (actividad_carrera_id) REFERENCES actividad_pat_carrera (id)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT chk_numero_sesion CHECK (numero_sesion BETWEEN 1 AND 10)
+) ENGINE=InnoDB COMMENT='Plan semanal de actividades organizado por el coordinador de carrera';
+
+-- La tabla actividad_pat original se mantiene por compatibilidad pero ya no se usa en el nuevo flujo
 
 -- ============================================================
 --  ÍNDICES DE RENDIMIENTO
@@ -205,17 +271,23 @@ CREATE INDEX idx_sesion_asignacion    ON sesion (asignacion_id);
 CREATE INDEX idx_sesion_fecha         ON sesion (fecha);
 CREATE INDEX idx_registro_sesion      ON registro_asistencia (sesion_id);
 CREATE INDEX idx_registro_tutorado    ON registro_asistencia (tutorado_id);
-CREATE INDEX idx_actividad_sesion      ON actividad_pat (sesion_id);
-CREATE INDEX idx_actividad_fecha       ON actividad_pat (fecha_registro);
 CREATE INDEX idx_usuario_estado        ON usuario (estado);
 CREATE INDEX idx_tutorado_carrera      ON tutorado (carrera_id);
 CREATE INDEX idx_periodo_estado        ON periodo_semestral (estado);
+CREATE INDEX idx_act_general_tipo      ON actividad_pat_general (tipo_actividad);
+CREATE INDEX idx_act_carrera_general   ON actividad_pat_carrera (actividad_general_id);
+CREATE INDEX idx_act_carrera_carrera   ON actividad_pat_carrera (carrera_id);
+CREATE INDEX idx_sesact_sesion         ON sesion_actividad (sesion_id);
+CREATE INDEX idx_sesact_actividad      ON sesion_actividad (actividad_carrera_id);
+CREATE INDEX idx_coordinador_carrera   ON coordinador_carrera (carrera_id);
+CREATE INDEX idx_plan_sesion_carrera   ON plan_sesion_carrera (carrera_id);
+CREATE INDEX idx_plan_sesion_actividad ON plan_sesion_carrera (actividad_carrera_id);
 
 -- ============================================================
 --  DATOS INICIALES
 -- ============================================================
 
-INSERT INTO perfil (nombre) VALUES ('ADMINISTRADOR'), ('TUTOR'), ('TUTORADO');
+INSERT INTO perfil (nombre) VALUES ('ADMINISTRADOR'), ('TUTOR'), ('TUTORADO'), ('COORDINADOR_CARRERA');
 
 INSERT INTO usuario (numero_identificacion, nombre_completo, correo, contrasena_hash, estado)
 VALUES ('ADMIN001', 'Administrador del Sistema', 'admin@itch.edu.mx',

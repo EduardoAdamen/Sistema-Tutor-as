@@ -1,99 +1,138 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
-<!-- ===================== HEAD ===================== -->
-<head th:replace="~{fragments/fragment :: head}"></head>
-
-<body class="d-flex flex-column min-vh-100">
-
-<!-- ===================== NAVBAR ===================== -->
-<nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-<!-- ===================== CONTENIDO ===================== -->
-<div class="container my-5 flex-grow-1">
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2 class="mi-titulo m-0">Registrar Asistencia</h2>
-        <a th:href="@{/sesion/ver/{id}(id=${sesion.id})}" class="btn btn-outline-secondary shadow-sm">
-            <i class="bi bi-arrow-left me-1"></i> Volver a Sesión
-        </a>
-    </div>
-
-    <!-- Info Sesión -->
-    <div class="card shadow-sm  mb-4 bg-light">
-        <div class="card-body">
-            <div class="row text-muted small fw-semibold">
-                <div class="col-md-3"><i class="bi bi-calendar-event me-1"></i> Fecha: <span class="text-dark" th:text="${sesion.fecha}"></span></div>
-                <div class="col-md-3"><i class="bi bi-clock me-1"></i> Horario: <span class="text-dark" th:text="${sesion.horaInicio} + ' - ' + ${sesion.horaFin}"></span></div>
-                <div class="col-md-3"><i class="bi bi-people me-1"></i> Grupo: <span class="text-dark" th:text="${sesion.asignacion.grupo.nombre}"></span></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Alert -->
-    <div class="alert alert-info shadow-sm">
-        <i class="bi bi-info-circle-fill me-2"></i> Marca la asistencia de cada tutorado. Si guardas sin seleccionar ningún estado para un alumno, se omitirá su registro.
-    </div>
-
-    <form th:action="@{/asistencia/guardar/{id}(id=${sesion.id})}" method="post">
-        <div class="card shadow-sm rounded-4 overflow-hidden mb-4">
-            <div class="card-body p-0">
-                <div class="table-responsive m-0">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-4">No. Control</th>
-                                <th>Nombre del Tutorado</th>
-                                <th class="text-center pe-4">Estado de Asistencia</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:if="${#lists.isEmpty(tutorados)}">
-                                <td colspan="3" class="text-center py-4 text-muted">
-                                    <i class="bi bi-person-x fs-2 d-block mb-2"></i>
-                                    No hay tutorados asignados a este grupo.
-                                </td>
-                            </tr>
-                            <tr th:each="at : ${tutorados}">
-                                <td class="ps-4 fw-semibold" th:text="${at.tutorado.usuario.numeroIdentificacion}">12345678</td>
-                                <td th:text="${at.tutorado.usuario.nombreCompleto}">Juan Pérez</td>
-                                <td class="text-center pe-4">
-                                    <div class="btn-group" role="group" aria-label="Asistencia">
-                                        <!-- Presente -->
-                                        <input type="radio" class="btn-check" th:name="'estado_' + ${at.tutorado.id}" th:id="'presente_' + ${at.tutorado.id}" value="presente"
-                                            th:checked="${estadosPrevios[at.tutorado.id] == 'presente'}" autocomplete="off" required>
-                                        <label class="btn btn-outline-success btn-sm px-3" th:for="'presente_' + ${at.tutorado.id}">Presente</label>
-
-                                        <!-- Ausente -->
-                                        <input type="radio" class="btn-check" th:name="'estado_' + ${at.tutorado.id}" th:id="'ausente_' + ${at.tutorado.id}" value="ausente"
-                                            th:checked="${estadosPrevios[at.tutorado.id] == 'ausente'}" autocomplete="off">
-                                        <label class="btn btn-outline-danger btn-sm px-3" th:for="'ausente_' + ${at.tutorado.id}">Ausente</label>
-
-                                        <!-- Justificado -->
-                                        <input type="radio" class="btn-check" th:name="'estado_' + ${at.tutorado.id}" th:id="'justificado_' + ${at.tutorado.id}" value="justificado"
-                                            th:checked="${estadosPrevios[at.tutorado.id] == 'justificado'}" autocomplete="off">
-                                        <label class="btn btn-outline-warning btn-sm px-3" th:for="'justificado_' + ${at.tutorado.id}">Justificado</label>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- Botón Guardar -->
-            <div class="card-footer  bg-light text-end p-3 rounded-bottom-4">
-                <button type="submit" class="btn btn-encabezado px-5 rounded-pill shadow-sm" th:disabled="${#lists.isEmpty(tutorados)}">
-                    <i class="bi bi-save me-1"></i> Guardar Asistencia
-                </button>
-            </div>
-        </div>
-    </form>
-</div>
-
-<!-- ===================== FOOTER ===================== -->
-<footer th:replace="~{fragments/fragment :: footer}"></footer>
-<div th:replace="~{fragments/fragment :: scripts}"></div>
-
-</body>
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+<div class="container my-5 flex-grow-1">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h2 class="mi-titulo m-0">Registrar Asistencia</h2>
+        <a th:href="@{/sesion/ver/{id}(id=${sesion.id})}" class="btn btn-outline-secondary shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Volver a Sesión
+        </a>
+    </div>
+
+    <!-- Info Sesión -->
+    <div class="card shadow-sm mb-4 bg-light">
+        <div class="card-body">
+            <div class="row text-muted small fw-semibold">
+                <div class="col-md-3"><i class="bi bi-calendar-event me-1"></i> Fecha: <span class="text-dark" th:text="${sesion.fecha}"></span></div>
+                <div class="col-md-3"><i class="bi bi-clock me-1"></i> Horario: <span class="text-dark" th:text="${sesion.horaInicio} + ' - ' + ${sesion.horaFin}"></span></div>
+                <div class="col-md-3"><i class="bi bi-people me-1"></i> Grupo: <span class="text-dark" th:text="${sesion.asignacion.grupo.nombre}"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert alert-info shadow-sm">
+        <i class="bi bi-info-circle-fill me-2"></i> Marca la casilla de los alumnos que asistieron. Los alumnos sin marcar se registran automáticamente como <strong>falta</strong>.
+    </div>
+
+    <form th:action="@{/asistencia/guardar/{id}(id=${sesion.id})}" method="post">
+        <div class="card shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-body p-0">
+                <div class="table-responsive m-0">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4" style="width: 60px;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                        <label class="form-check-label small fw-bold" for="selectAll">Todos</label>
+                                    </div>
+                                </th>
+                                <th>No. Control</th>
+                                <th>Nombre del Tutorado</th>
+                                <th class="text-center pe-4">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(tutorados)}">
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    <i class="bi bi-person-x fs-2 d-block mb-2"></i>
+                                    No hay tutorados asignados a este grupo.
+                                </td>
+                            </tr>
+                            <tr th:each="at : ${tutorados}">
+                                <td class="ps-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input asistencia-check" type="checkbox"
+                                               name="presentes"
+                                               th:value="${at.tutorado.id}"
+                                               th:id="'check_' + ${at.tutorado.id}"
+                                               th:checked="${presentesPrevios.contains(at.tutorado.id)}">
+                                    </div>
+                                </td>
+                                <td class="fw-semibold font-monospace text-secondary" th:text="${at.tutorado.usuario.numeroIdentificacion}">12345</td>
+                                <td th:text="${at.tutorado.usuario.nombreCompleto}">Juan Pérez</td>
+                                <td class="text-center pe-4">
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 estado-badge"
+                                          th:id="'badge_' + ${at.tutorado.id}"
+                                          th:classappend="${presentesPrevios.contains(at.tutorado.id)} ? '' : 'd-none'">
+                                        <i class="bi bi-check-circle me-1"></i>Presente
+                                    </span>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 falta-badge"
+                                          th:id="'falta_' + ${at.tutorado.id}"
+                                          th:classappend="${presentesPrevios.contains(at.tutorado.id)} ? 'd-none' : ''">
+                                        <i class="bi bi-x-circle me-1"></i>Falta
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Botón Guardar -->
+            <div class="card-footer bg-light text-end p-3 rounded-bottom-4">
+                <button type="submit" class="btn btn-encabezado px-5 rounded-pill shadow-sm" th:disabled="${#lists.isEmpty(tutorados)}">
+                    <i class="bi bi-save me-1"></i> Guardar Asistencia
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="~{fragments/fragment :: footer}"></footer>
+<div th:replace="~{fragments/fragment :: scripts}"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const selectAll = document.getElementById("selectAll");
+    const checkboxes = document.querySelectorAll(".asistencia-check");
+    
+    // Toggle all checkboxes
+    selectAll.addEventListener("change", function() {
+        checkboxes.forEach(cb => {
+            cb.checked = selectAll.checked;
+            updateBadge(cb);
+        });
+    });
+    
+    // Toggle individual badge
+    checkboxes.forEach(cb => {
+        cb.addEventListener("change", function() {
+            updateBadge(this);
+            // Update selectAll state
+            selectAll.checked = [...checkboxes].every(c => c.checked);
+        });
+    });
+    
+    function updateBadge(checkbox) {
+        const id = checkbox.value;
+        const badgePresente = document.getElementById("badge_" + id);
+        const badgeFalta = document.getElementById("falta_" + id);
+        if (checkbox.checked) {
+            badgePresente.classList.remove("d-none");
+            badgeFalta.classList.add("d-none");
+        } else {
+            badgePresente.classList.add("d-none");
+            badgeFalta.classList.remove("d-none");
+        }
+    }
+});
+</script>
+
+</body>
+</html>

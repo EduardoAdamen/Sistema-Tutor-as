@@ -1,133 +1,95 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/fragment :: head}"></head>
-<body class="d-flex flex-column min-vh-100">
-
-    <!-- Navbar -->
-    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-    <!-- Contenido principal -->
-    <main class="container my-4 flex-grow-1">
-        <h2 class="mi-titulo mb-4">
-            Reporte General: Actividades
-        </h2>
-        <hr>
-
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light">
-                <strong>Filtros de Búsqueda Avanzada</strong>
-            </div>
-            <div class="card-body">
-                <form th:action="@{/busqueda/pat}" method="get" class="row g-3">
-                    <div class="col-md-3">
-                        <label for="inicio" class="form-label">Fecha Inicio</label>
-                        <input type="date" name="inicio" id="inicio" class="form-control" th:value="${filtroInicio}" />
-                    </div>
-                    <div class="col-md-3">
-                        <label for="fin" class="form-label">Fecha Fin</label>
-                        <input type="date" name="fin" id="fin" class="form-control" th:value="${filtroFin}" />
-                    </div>
-                    <div class="col-md-3">
-                        <label for="tipo" class="form-label">Tipo Actividad</label>
-                        <select name="tipo" id="tipo" class="form-select">
-                            <option value="">Todas</option>
-                            <option th:each="t : ${tiposActividad}"
-                                    th:value="${t}"
-                                    th:text="${t}"
-                                    th:selected="${t == filtroTipo}">
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="carreraId" class="form-label">Carrera</label>
-                        <select name="carreraId" id="carreraId" class="form-select">
-                            <option value="">Todas</option>
-                            <option th:each="c : ${carreras}"
-                                    th:value="${c.id}"
-                                    th:text="${c.nombre}"
-                                    th:selected="${c.id == filtroCarreraId}">
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <label for="tutorId" class="form-label">Tutor (Opcional)</label>
-                        <select name="tutorId" id="tutorId" class="form-select">
-                            <option value="">Cualquier Tutor</option>
-                            <option th:each="tut : ${tutores}"
-                                    th:value="${tut.id}"
-                                    th:text="${tut.usuario.nombreCompleto}"
-                                    th:selected="${tut.id == filtroTutorId}">
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-12 text-end mt-4">
-                        <a th:href="@{/busqueda/pat}" class="btn btn-secondary me-2">Limpiar</a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-funnel"></i> Filtrar Actividades
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <h4 th:if="${actividades != null}" class="mt-4 mb-3">
-            Resultados (Total: <span th:text="${#lists.size(actividades)}"></span>)
-        </h4>
-
-        <div th:if="${actividades != null}">
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped align-middle">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>ID Actividad</th>
-                        <th>Título / Tipo</th>
-                        <th>Fecha de Sesión</th>
-                        <th>Tutor Encargado</th>
-                        <th>Carrera / Grupo</th>
-                        <th>Evidencia</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="act : ${actividades}">
-                        <td th:text="${act.id}">1</td>
-                        <td>
-                            <strong th:text="${act.titulo}">Taller</strong><br>
-                            <span class="badge bg-info text-dark" th:text="${act.tipoActividad}">Taller</span>
-                        </td>
-                        <td>
-                            <span th:text="${#temporals.format(act.sesion.fecha, 'dd/MM/yyyy')}"></span><br>
-                            <span th:text="${act.sesion.horaInicio}"></span>
-                        </td>
-                        <td th:text="${act.sesion.asignacion.tutor.usuario.nombreCompleto}">Juan Pérez</td>
-                        <td>
-                            <span th:text="${act.sesion.asignacion.grupo.carrera.nombre}"></span><br>
-                            Grupo: <strong th:text="${act.sesion.asignacion.grupo.nombre}"></strong>
-                        </td>
-                        <td>
-                            <span th:if="${act.evidencia != null}">
-                                <a th:href="@{'/uploads/actividades/' + ${act.evidencia}}" target="_blank" class="btn btn-sm btn-outline-success">Ver</a>
-                            </span>
-                            <span th:if="${act.evidencia == null}" class="text-muted">No adjuntada</span>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(actividades)}">
-                        <td colspan="6" class="text-center text-muted py-4">No se encontraron actividades que coincidan con los criterios.</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        </div>
-        </div>
-        
-    </main>
-
-    <!-- Footer -->
-    <footer th:replace="~{fragments/fragment :: footer}"></footer>
-
-    <!-- Scripts -->
-    <div th:replace="~{fragments/fragment :: scripts}"></div>
-
-</body>
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <h2 class="mi-titulo mb-4"><i class="bi bi-search me-2"></i>Buscar Actividades PAT</h2>
+        
+        <!-- Filtros -->
+        <form th:action="@{/busqueda/pat}" method="get" class="d-flex flex-wrap gap-3 mb-4 align-items-end">
+            <div class="flex-grow-1" style="min-width: 150px;">
+                <label for="inicio" class="form-label small text-muted">Fecha Inicio</label>
+                <input type="date" name="inicio" id="inicio" class="form-control" th:value="${filtroInicio}">
+            </div>
+            <div class="flex-grow-1" style="min-width: 150px;">
+                <label for="fin" class="form-label small text-muted">Fecha Fin</label>
+                <input type="date" name="fin" id="fin" class="form-control" th:value="${filtroFin}">
+            </div>
+            <div class="flex-grow-1" style="min-width: 150px;">
+                <label for="tipo" class="form-label small text-muted">Tipo</label>
+                <select name="tipo" id="tipo" class="form-select">
+                    <option value="">-- Todos --</option>
+                    <option th:each="t : ${tiposActividad}" th:value="${t.name()}" th:text="${t.name()}" th:selected="${t == filtroTipo}"></option>
+                </select>
+            </div>
+            <div class="flex-grow-1" style="min-width: 150px;">
+                <label for="carreraId" class="form-label small text-muted">Carrera</label>
+                <select name="carreraId" id="carreraId" class="form-select">
+                    <option value="">-- Todas --</option>
+                    <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}" th:selected="${c.id == filtroCarreraId}"></option>
+                </select>
+            </div>
+            <div class="flex-grow-1" style="min-width: 150px;">
+                <label for="tutorId" class="form-label small text-muted">Tutor</label>
+                <select name="tutorId" id="tutorId" class="form-select">
+                    <option value="">-- Todos --</option>
+                    <option th:each="t : ${tutores}" th:value="${t.id}" th:text="${t.usuario.nombreCompleto}" th:selected="${t.id == filtroTutorId}"></option>
+                </select>
+            </div>
+            <div class="flex-shrink-0">
+                <button type="submit" class="btn btn-secondary rounded-4 px-4 py-2 shadow-sm">
+                    <i class="bi bi-funnel me-1"></i> Filtrar
+                </button>
+            </div>
+        </form>
+
+        <div class="card shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive m-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Título Adaptado</th>
+                            <th>Tipo</th>
+                            <th>Carrera / Grupo</th>
+                            <th>Tutor</th>
+                            <th>Fecha Sesión</th>
+                            <th>Evidencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${actividades}">
+                            <td class="ps-4 fw-semibold" th:text="${a.actividadCarrera.tituloAdaptado}">Título</td>
+                            <td><span class="badge bg-secondary px-3 py-2" th:text="${a.actividadCarrera.actividadGeneral.tipoActividad}">tipo</span></td>
+                            <td>
+                                <strong th:text="${a.sesion.asignacion.grupo.carrera.nombre}">ISC</strong><br>
+                                <span class="text-muted" th:text="${a.sesion.asignacion.grupo.nombre}">6-A</span>
+                            </td>
+                            <td th:text="${a.sesion.asignacion.tutor.usuario.nombreCompleto}">Tutor</td>
+                            <td th:text="${#temporals.format(a.sesion.fecha, 'dd/MM/yyyy')}">10/10/2025</td>
+                            <td>
+                                <span th:if="${a.evidencia != null}">
+                                    <a th:href="@{'/uploads/actividades/' + ${a.evidencia}}" target="_blank" class="btn btn-sm btn-outline-info">Ver</a>
+                                </span>
+                                <span th:if="${a.evidencia == null}" class="text-muted">S/E</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${actividades == null or actividades.isEmpty()}">
+                            <td colspan="6" class="text-center text-muted py-4">No se encontraron actividades con los filtros seleccionados.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <a th:href="@{/}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Volver al Inicio</a>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+</body>
+</html>

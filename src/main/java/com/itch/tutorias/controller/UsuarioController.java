@@ -1,11 +1,13 @@
 package com.itch.tutorias.controller;
 
 import com.itch.tutorias.model.Carrera;
+import com.itch.tutorias.model.CoordinadorCarrera;
 import com.itch.tutorias.model.Perfil;
 import com.itch.tutorias.model.Tutor;
 import com.itch.tutorias.model.Tutorado;
 import com.itch.tutorias.model.Usuario;
 import com.itch.tutorias.service.ICarrera;
+import com.itch.tutorias.service.ICoordinadorCarrera;
 import com.itch.tutorias.service.IPerfil;
 import com.itch.tutorias.service.IServicioAlmacenamiento;
 import com.itch.tutorias.service.ITutor;
@@ -50,6 +52,9 @@ public class UsuarioController {
     
     @Autowired
     private ITutorado tutoradoService;
+
+    @Autowired
+    private ICoordinadorCarrera coordinadorCarreraService;
 
     @Autowired
     private IServicioAlmacenamiento servicioAlmacenamiento;
@@ -121,46 +126,89 @@ public class UsuarioController {
     }
 
     @GetMapping("/usuario/usuarios")
-    public String listaUsuarios(
-            @RequestParam(required = false) String perfilNombre,
+    public String listaUsuarios() {
+        // Redirigir a la vista de administradores (ya no existe vista general)
+        return "redirect:/usuario/administradores";
+    }
+
+    // ============ VISTAS SEPARADAS POR ROL ============
+
+    @GetMapping("/usuario/administradores")
+    public String listaAdministradores(Model model) {
+        List<Usuario> admins = usuarioService.buscarPorPerfilYEstado("ADMINISTRADOR", Usuario.EstadoUsuario.activo);
+        model.addAttribute("usuarios", admins);
+        model.addAttribute("estados", Usuario.EstadoUsuario.values());
+        return "usuario/listaAdministradores";
+    }
+
+    @GetMapping("/usuario/coordinadores")
+    public String listaCoordinadores(Model model) {
+        List<Usuario> coordinadores = usuarioService.buscarPorPerfilYEstado("COORDINADOR_CARRERA", Usuario.EstadoUsuario.activo);
+        // Enriquecer con la carrera asignada
+        java.util.Map<Integer, String> carrerasMap = new java.util.HashMap<>();
+        for (Usuario u : coordinadores) {
+            coordinadorCarreraService.buscarPorUsuario(u).ifPresent(c ->
+                carrerasMap.put(u.getId(), c.getCarrera().getNombre())
+            );
+        }
+        model.addAttribute("usuarios", coordinadores);
+        model.addAttribute("carrerasMap", carrerasMap);
+        model.addAttribute("estados", Usuario.EstadoUsuario.values());
+        return "usuario/listaCoordinadores";
+    }
+
+    @GetMapping("/usuario/tutores")
+    public String listaTutores(Model model) {
+        List<Usuario> tutores = usuarioService.buscarPorPerfilYEstado("TUTOR", Usuario.EstadoUsuario.activo);
+        model.addAttribute("usuarios", tutores);
+        model.addAttribute("estados", Usuario.EstadoUsuario.values());
+        return "usuario/listaTutores";
+    }
+
+    @GetMapping("/usuario/tutorados")
+    public String listaTutorados(
             @RequestParam(required = false) Integer carreraId,
-            @RequestParam(required = false) Usuario.EstadoUsuario estado,
             Model model) {
-
-        List<Usuario> listado = usuarioService.buscarTodos().stream()
-                .filter(u -> u.getEstado() == Usuario.EstadoUsuario.activo)
-                .collect(Collectors.toList());
-
-        if (perfilNombre != null && !perfilNombre.isEmpty()) {
-            listado = listado.stream().filter(u -> u.hasPerfil(perfilNombre)).collect(Collectors.toList());
+        List<Usuario> tutorados = usuarioService.buscarPorPerfilYEstado("TUTORADO", Usuario.EstadoUsuario.activo);
+        // Enriquecer con carrera y semestre
+        java.util.Map<Integer, String> carrerasMap = new java.util.HashMap<>();
+        java.util.Map<Integer, Integer> semestresMap = new java.util.HashMap<>();
+        for (Usuario u : tutorados) {
+            tutoradoService.buscarPorUsuario(u).ifPresent(t -> {
+                if (t.getCarrera() != null) carrerasMap.put(u.getId(), t.getCarrera().getNombre());
+                semestresMap.put(u.getId(), t.getSemestre());
+            });
         }
         if (carreraId != null) {
-            listado = listado.stream().filter(u -> {
+            tutorados = tutorados.stream().filter(u -> {
                 Optional<Tutorado> tOpt = tutoradoService.buscarPorUsuario(u);
                 return tOpt.isPresent() && tOpt.get().getCarrera() != null && tOpt.get().getCarrera().getId().equals(carreraId);
             }).collect(Collectors.toList());
         }
-        if (estado != null) {
-            listado = listado.stream().filter(u -> u.getEstado() == estado).collect(Collectors.toList());
-        }
-
-        model.addAttribute("usuarios", listado);
-        model.addAttribute("perfiles", perfilService.buscarTodos());
-        model.addAttribute("estados", Usuario.EstadoUsuario.values());
+        model.addAttribute("usuarios", tutorados);
+        model.addAttribute("carrerasMap", carrerasMap);
+        model.addAttribute("semestresMap", semestresMap);
         model.addAttribute("carreras", carreraService.buscarTodas());
-        model.addAttribute("filtroPerfilNombre", perfilNombre);
         model.addAttribute("filtroCarreraId", carreraId);
-        model.addAttribute("filtroEstado", estado);
-
-        return "usuario/listaUsuarios";
+        model.addAttribute("estados", Usuario.EstadoUsuario.values());
+        return "usuario/listaTutorados";
     }
 
     @GetMapping("/usuario/nuevo")
-    public String formularioNuevoUsuario(Model model) {
+    public String formularioNuevoUsuario(
+            @RequestParam(value = "rol", required = false) String rol,
+            Model model) {
         model.addAttribute("usuario", new Usuario());
         model.addAttribute("carreras", carreraService.buscarTodas());
         model.addAttribute("perfiles", perfilService.buscarTodos());
         model.addAttribute("estados", Usuario.EstadoUsuario.values());
+        model.addAttribute("rolPreseleccionado", rol);
+        // Resolver el ID del perfil para el hidden input
+        if (rol != null) {
+            perfilService.buscarPorNombre(rol).ifPresent(p ->
+                model.addAttribute("rolPerfilId", p.getId())
+            );
+        }
         return "usuario/formUsuario";
     }
 
@@ -219,7 +267,7 @@ public class UsuarioController {
                     actualizarTutorOTutorado(usuarioOpt, carreraId);
                     
                     attributes.addFlashAttribute("msg", "Registro existente en estado inactivo encontrado. El usuario ha sido reactivado y actualizado exitosamente.");
-                    return "redirect:/usuario/usuarios";
+                    return "redirect:" + resolverRedirectPorPerfil(usuarioOpt);
                 } else {
                     attributes.addFlashAttribute("error", "El número de identificación ya está registrado y se encuentra activo.");
                     return "redirect:/usuario/nuevo";
@@ -266,7 +314,14 @@ public class UsuarioController {
         actualizarTutorOTutorado(usuario, carreraId);
         
         attributes.addFlashAttribute("msg", "Usuario guardado exitosamente");
-        return "redirect:/usuario/usuarios";
+        return "redirect:" + resolverRedirectPorPerfil(usuario);
+    }
+
+    private String resolverRedirectPorPerfil(Usuario usuario) {
+        if (usuario.hasPerfil("TUTORADO")) return "/usuario/tutorados";
+        if (usuario.hasPerfil("TUTOR")) return "/usuario/tutores";
+        if (usuario.hasPerfil("COORDINADOR_CARRERA")) return "/usuario/coordinadores";
+        return "/usuario/administradores";
     }
 
     private void actualizarTutorOTutorado(Usuario usuario, Integer carreraId) {
@@ -285,17 +340,32 @@ public class UsuarioController {
             }
             tutoradoService.guardar(tutorado);
         }
+        if (usuario.hasPerfil("COORDINADOR_CARRERA")) {
+            CoordinadorCarrera coordinador = coordinadorCarreraService.buscarPorUsuario(usuario).orElse(new CoordinadorCarrera());
+            coordinador.setUsuario(usuario);
+            if (carreraId != null) {
+                coordinador.setCarrera(carreraService.buscarPorId(carreraId));
+            }
+            coordinadorCarreraService.guardar(coordinador);
+        }
     }
 
     @GetMapping("/usuario/ver/{id}")
     public String detalleUsuario(@PathVariable("id") Integer id, Model model) {
         Usuario usuario = usuarioService.buscarPorId(id);
         model.addAttribute("usuario", usuario);
+        // Pasar el rol para el botón "Volver al listado"
+        model.addAttribute("rolUsuario", resolverRedirectPorPerfil(usuario));
         if (usuario.hasPerfil("TUTORADO")) {
             Optional<Tutorado> tutoradoOpt = tutoradoService.buscarPorUsuario(usuario);
             if (tutoradoOpt.isPresent() && tutoradoOpt.get().getCarrera() != null) {
                 model.addAttribute("carreraNombre", tutoradoOpt.get().getCarrera().getNombre());
             }
+        }
+        if (usuario.hasPerfil("COORDINADOR_CARRERA")) {
+            coordinadorCarreraService.buscarPorUsuario(usuario).ifPresent(c ->
+                model.addAttribute("carreraNombre", c.getCarrera().getNombre())
+            );
         }
         return "usuario/detalleUsuario";
     }
@@ -307,10 +377,15 @@ public class UsuarioController {
         model.addAttribute("carreras", carreraService.buscarTodas());
         model.addAttribute("perfiles", perfilService.buscarTodos());
         model.addAttribute("estados", Usuario.EstadoUsuario.values());
+        model.addAttribute("rolUsuario", resolverRedirectPorPerfil(usuario));
         
         Optional<Tutorado> tutoradoOpt = tutoradoService.buscarPorUsuario(usuario);
         if (tutoradoOpt.isPresent() && tutoradoOpt.get().getCarrera() != null) {
             model.addAttribute("carreraId", tutoradoOpt.get().getCarrera().getId());
+        }
+        Optional<CoordinadorCarrera> coordOpt = coordinadorCarreraService.buscarPorUsuario(usuario);
+        if (coordOpt.isPresent() && coordOpt.get().getCarrera() != null) {
+            model.addAttribute("carreraId", coordOpt.get().getCarrera().getId());
         }
         
         return "usuario/formUsuario";
@@ -339,7 +414,13 @@ public class UsuarioController {
                 if (tutoradoOpt.isPresent() && tutoradoOpt.get().getCarrera() != null) {
                     response.put("carrera", tutoradoOpt.get().getCarrera().getId());
                 } else {
-                    response.put("carrera", "");
+                    // También buscar carrera de coordinador
+                    Optional<CoordinadorCarrera> coordOpt = coordinadorCarreraService.buscarPorUsuario(u);
+                    if (coordOpt.isPresent() && coordOpt.get().getCarrera() != null) {
+                        response.put("carrera", coordOpt.get().getCarrera().getId());
+                    } else {
+                        response.put("carrera", "");
+                    }
                 }
                 
                 response.put("fotoPerfil", u.getFotoPerfil());
@@ -356,7 +437,8 @@ public class UsuarioController {
             u.setEstado(Usuario.EstadoUsuario.inactivo);
             usuarioService.guardar(u);
             attributes.addFlashAttribute("msg", "Usuario desactivado exitosamente");
+            return "redirect:" + resolverRedirectPorPerfil(u);
         }
-        return "redirect:/usuario/usuarios";
+        return "redirect:/usuario/administradores";
     }
 }

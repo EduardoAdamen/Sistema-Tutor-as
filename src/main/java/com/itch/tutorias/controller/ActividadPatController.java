@@ -17,7 +17,7 @@ import java.util.Optional;
 public class ActividadPatController {
 
     @Autowired
-    private IActividadPat actividadPatService;
+    private ISesionActividad sesionActividadService;
 
     @Autowired
     private ISesion sesionService;
@@ -33,6 +33,9 @@ public class ActividadPatController {
 
     @Autowired
     private ITutor tutorService;
+
+    @Autowired
+    private IActividadPatCarrera actividadPatCarreraService;
 
     @GetMapping("/pat/actividades")
     public String listaActividades(
@@ -53,11 +56,11 @@ public class ActividadPatController {
              esAdmin = usuarioLogueado.getPerfiles().stream().anyMatch(p -> p.getNombre().equalsIgnoreCase("ADMINISTRADOR"));
         }
         
-        List<ActividadPat> actividades = new java.util.ArrayList<>();
+        List<SesionActividad> actividades = new java.util.ArrayList<>();
         if (esAdmin) {
-            actividades = actividadPatService.buscarTodas();
+            actividades = sesionActividadService.buscarTodas();
         } else if (tutorReal != null) {
-            actividades = actividadPatService.buscarPorTutor(tutorReal.getId());
+            actividades = sesionActividadService.buscarPorTutor(tutorReal.getId());
         }
         
         if (esAdmin || tutorReal != null) {
@@ -82,12 +85,12 @@ public class ActividadPatController {
         }
 
         if (tipoActividad != null && !tipoActividad.isEmpty()) {
-            actividades.removeIf(a -> !a.getTipoActividad().name().equals(tipoActividad));
+            actividades.removeIf(a -> !a.getActividadCarrera().getActividadGeneral().getTipoActividad().name().equals(tipoActividad));
         }
 
         model.addAttribute("periodos", periodoService.buscarTodos());
         model.addAttribute("tutores", esAdmin ? tutorService.buscarTodos() : null);
-        model.addAttribute("tiposActividad", ActividadPat.TipoActividad.values());
+        model.addAttribute("tiposActividad", ActividadPatGeneral.TipoActividad.values());
         model.addAttribute("filtroPeriodoId", periodoId == null && periodoService.buscarActivo().isPresent() ? periodoService.buscarActivo().get().getId() : periodoId);
         model.addAttribute("filtroTutorId", tutorId);
         model.addAttribute("filtroTipoActividad", tipoActividad);
@@ -97,94 +100,67 @@ public class ActividadPatController {
         return "pat/listaActividades";
     }
 
-    @GetMapping("/pat/nueva/{sesionId}")
-    public String nuevaActividad(@PathVariable Integer sesionId, Model model, RedirectAttributes attributes) {
-        Sesion sesion = sesionService.buscarPorId(sesionId);
-        if (sesion.getAsignacion().getPeriodo().getEstatus() != PeriodoSemestral.EstatusPeriodo.activo) {
-            attributes.addFlashAttribute("error", "No se puede añadir actividades a sesiones de periodos cerrados.");
-            return "redirect:/asignacion/ver/" + sesion.getAsignacion().getId();
+    @GetMapping("/pat/detalle/{id}")
+    public String detalleActividad(@PathVariable Integer id, Model model) {
+        SesionActividad sa = sesionActividadService.buscarPorId(id);
+        if (sa == null) {
+            return "redirect:/pat/actividades";
         }
-
-        ActividadPat actividad = new ActividadPat();
-        actividad.setSesion(sesion);
-        model.addAttribute("actividad", actividad);
-        model.addAttribute("tiposActividad", ActividadPat.TipoActividad.values());
-        return "pat/formActividad";
+        model.addAttribute("actividad", sa);
+        return "pat/detalleActividad";
     }
 
-    @PostMapping("/pat/guardar")
-    public String guardarActividad(
-            @ModelAttribute ActividadPat actividad,
+    @GetMapping("/pat/editar-vinculacion/{id}")
+    public String editarVinculacion(@PathVariable Integer id, Model model, RedirectAttributes attributes) {
+        SesionActividad sa = sesionActividadService.buscarPorId(id);
+        if (sa.getSesion().getAsignacion().getPeriodo().getEstatus() != PeriodoSemestral.EstatusPeriodo.activo) {
+            attributes.addFlashAttribute("error", "No se puede editar vinculaciones de periodos cerrados.");
+            return "redirect:/pat/actividades";
+        }
+        
+        model.addAttribute("sesionActividad", sa);
+        return "pat/formEditarVinculacion";
+    }
+
+    @PostMapping("/pat/guardar-vinculacion")
+    public String guardarVinculacion(
+            @ModelAttribute SesionActividad sesionActividad,
             @RequestParam("archivoEvidencia") MultipartFile archivoEvidencia,
             RedirectAttributes attributes) {
                 
-        boolean esNuevo = (actividad.getId() == null);
+        SesionActividad existente = sesionActividadService.buscarPorId(sesionActividad.getId());
+        sesionActividad.setSesion(existente.getSesion());
+        sesionActividad.setActividadCarrera(existente.getActividadCarrera());
+        sesionActividad.setFechaRegistro(existente.getFechaRegistro());
         
-        Sesion sesion = sesionService.buscarPorId(actividad.getSesion().getId());
-        actividad.setSesion(sesion); // Asegurar el objeto completo
-        
-        if (sesion.getAsignacion().getPeriodo().getEstatus() != PeriodoSemestral.EstatusPeriodo.activo) {
-             attributes.addFlashAttribute("error", "Solo se puede registrar o editar en un periodo activo.");
-             return "redirect:/asignacion/ver/" + sesion.getAsignacion().getId();
-        }
-
-        if (!esNuevo) {
-             ActividadPat existente = actividadPatService.buscarPorId(actividad.getId());
-             actividad.setFechaRegistro(existente.getFechaRegistro());
-             if (archivoEvidencia.isEmpty()) {
-                 actividad.setEvidencia(existente.getEvidencia());
-             }
-        }
-
         if (!archivoEvidencia.isEmpty()) {
             String nombreArchivo = servicioAlmacenamiento.guardar(archivoEvidencia, "actividades");
-            actividad.setEvidencia(nombreArchivo);
+            sesionActividad.setEvidencia(nombreArchivo);
+        } else {
+            sesionActividad.setEvidencia(existente.getEvidencia());
         }
 
-        actividadPatService.guardar(actividad);
-        attributes.addFlashAttribute("msg", "Actividad del PAT guardada exitosamente.");
+        sesionActividadService.guardar(sesionActividad);
+        attributes.addFlashAttribute("msg", "Vinculación de actividad actualizada exitosamente.");
         
         return "redirect:/pat/actividades";
     }
 
-    @GetMapping("/pat/detalle/{id}")
-    public String detalleActividad(@PathVariable Integer id, Model model) {
-        ActividadPat actividad = actividadPatService.buscarPorId(id);
-        if (actividad == null) {
-            return "redirect:/pat/actividades";
-        }
-        model.addAttribute("actividad", actividad);
-        return "pat/detalleActividad";
-    }
-
-    @GetMapping("/pat/editar/{id}")
-    public String editarActividad(@PathVariable Integer id, Model model, RedirectAttributes attributes) {
-        ActividadPat actividad = actividadPatService.buscarPorId(id);
-        if (actividad.getSesion().getAsignacion().getPeriodo().getEstatus() != PeriodoSemestral.EstatusPeriodo.activo) {
-            attributes.addFlashAttribute("error", "No se puede editar actividades de periodos cerrados.");
-            return "redirect:/pat/actividades";
-        }
-        
-        model.addAttribute("actividad", actividad);
-        model.addAttribute("tiposActividad", ActividadPat.TipoActividad.values());
-        return "pat/formActividad";
-    }
-
     @GetMapping("/pat/eliminar/{id}")
     public String eliminarActividad(@PathVariable Integer id, RedirectAttributes attributes) {
-        ActividadPat actividad = actividadPatService.buscarPorId(id);
+        SesionActividad sa = sesionActividadService.buscarPorId(id);
         
-        if (actividad.getSesion().getAsignacion().getPeriodo().getEstatus() != PeriodoSemestral.EstatusPeriodo.activo) {
-            attributes.addFlashAttribute("error", "No se puede eliminar actividades de periodos cerrados.");
+        if (sa.getSesion().getAsignacion().getPeriodo().getEstatus() != PeriodoSemestral.EstatusPeriodo.activo) {
+            attributes.addFlashAttribute("error", "No se puede eliminar vinculaciones de periodos cerrados.");
             return "redirect:/pat/actividades";
         }
 
-        if (actividad.getEvidencia() != null) {
-            servicioAlmacenamiento.eliminar(actividad.getEvidencia(), "actividades");
+        if (sa.getEvidencia() != null) {
+            servicioAlmacenamiento.eliminar(sa.getEvidencia(), "actividades");
         }
 
-        actividadPatService.eliminar(id);
-        attributes.addFlashAttribute("msg", "Actividad PAT eliminada.");
+        sesionActividadService.eliminar(id);
+        attributes.addFlashAttribute("msg", "Vinculación de actividad PAT eliminada.");
         return "redirect:/pat/actividades";
     }
 }

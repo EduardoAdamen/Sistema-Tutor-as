@@ -44,6 +44,9 @@ public class Asignacion {
     @Column(name = "hora_horario", nullable = false)
     private LocalTime horaHorario;
 
+    @Column(name = "hora_fin_horario", nullable = false)
+    private LocalTime horaFinHorario;
+
     public Asignacion() {}
 
     //Getters
@@ -54,6 +57,7 @@ public class Asignacion {
     public String getAula() { return aula; }
     public DiaSemana getDiaHorario() { return diaHorario; }
     public LocalTime getHoraHorario() { return horaHorario; }
+    public LocalTime getHoraFinHorario() { return horaFinHorario; }
 
     //Setters
     public void setId(Integer id) { this.id = id; }
@@ -63,6 +67,7 @@ public class Asignacion {
     public void setAula(String aula) { this.aula = aula; }
     public void setDiaHorario(DiaSemana diaHorario) { this.diaHorario = diaHorario; }
     public void setHoraHorario(LocalTime horaHorario) { this.horaHorario = horaHorario; }
+    public void setHoraFinHorario(LocalTime horaFinHorario) { this.horaFinHorario = horaFinHorario; }
 
     @Override
     public String toString() {

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="mi-titulo mb-4" th:text="${adaptacion.id != null ? 'Editar Adaptación' : 'Adaptar Actividad PAT'}">Adaptar Actividad</h2>
+
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-pencil-square me-1"></i> Adaptación para: <span th:text="${carrera.nombre}">Carrera</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Información de la actividad general -->
+                        <div class="alert alert-secondary mb-4">
+                            <strong>Actividad General Original:</strong><br/>
+                            Título: <span class="fw-bold" th:text="${general.titulo}">Título</span><br/>
+                            Tipo: <span class="badge bg-secondary" th:text="${general.tipoActividad}">tipo</span><br/>
+                            Descripción: <span th:text="${general.descripcion != null ? general.descripcion : 'Sin descripción'}">Desc</span>
+                        </div>
+
+                        <form th:action="@{/coordinador/guardar}" th:object="${adaptacion}" method="post">
+                            <input type="hidden" th:field="*{id}" />
+                            <input type="hidden" th:field="*{actividadGeneral.id}" />
+                            <input type="hidden" th:field="*{carrera.id}" />
+
+                            <div class="mb-3">
+                                <label for="tituloAdaptado" class="form-label fw-semibold">Título Adaptado <span class="text-danger">*</span></label>
+                                <input type="text" id="tituloAdaptado" class="form-control" th:field="*{tituloAdaptado}" required maxlength="200" placeholder="Adapte el título para su carrera" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="descripcionAdaptada" class="form-label fw-semibold">Descripción Adaptada</label>
+                                <textarea id="descripcionAdaptada" class="form-control" th:field="*{descripcionAdaptada}" rows="4" placeholder="Describa cómo se aplicará esta actividad en su carrera..."></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="observaciones" class="form-label fw-semibold">Observaciones</label>
+                                <textarea id="observaciones" class="form-control" th:field="*{observaciones}" rows="2" placeholder="Notas adicionales para los tutores de la carrera..."></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/coordinador/actividades}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-encabezado">
+                                    <i class="bi bi-save me-1"></i> Guardar Adaptación
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+</body>
+</html>

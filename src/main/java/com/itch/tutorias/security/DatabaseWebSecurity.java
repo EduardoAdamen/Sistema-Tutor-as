@@ -148,8 +148,16 @@ public class DatabaseWebSecurity {
         http.authorizeHttpRequests(authorize -> authorize
 
             .requestMatchers("/", "/login", "/registro", "/usuario/guardar", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+            // Búsquedas públicas: accesibles sin autenticación
+            .requestMatchers("/busqueda/**").permitAll()
             .requestMatchers("/asignacion/ver/**").hasAnyAuthority("ADMINISTRADOR", "TUTOR", "TUTORADO")
-            .requestMatchers("/usuario/**", "/carrera/**", "/grupo/**", "/periodo/**", "/asignacion/**", "/busqueda/**").hasAuthority("ADMINISTRADOR")
+            .requestMatchers("/usuario/**").hasAuthority("ADMINISTRADOR")
+            .requestMatchers("/carrera/**", "/grupo/**", "/periodo/**", "/asignacion/**").hasAuthority("ADMINISTRADOR")
+            // Actividades PAT generales: solo Admin DDA
+            .requestMatchers("/pat/general/**").hasAuthority("ADMINISTRADOR")
+            // Actividades PAT por carrera: Coordinador de Carrera
+            .requestMatchers("/coordinador/**").hasAuthority("COORDINADOR_CARRERA")
+            // Actividades PAT (vista legacy) y sesiones: Admin y Tutor
             .requestMatchers("/pat/**", "/sesion/**").hasAnyAuthority("ADMINISTRADOR", "TUTOR")
             .requestMatchers("/tutor/**").hasAuthority("TUTOR")
             .requestMatchers("/tutorado/**").hasAuthority("TUTORADO")
@@ -195,4 +203,5 @@ public class DatabaseWebSecurity {
 
 
 }
+
 

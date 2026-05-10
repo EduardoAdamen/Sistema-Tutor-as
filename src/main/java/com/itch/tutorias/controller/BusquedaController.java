@@ -34,7 +34,7 @@ public class BusquedaController {
     private IAsignacionTutorado asignacionTutoradoService;
 
     @Autowired
-    private IActividadPat actividadPatService;
+    private ISesionActividad sesionActividadService;
 
     @Autowired
     private ICarrera carreraService;
@@ -95,12 +95,12 @@ public class BusquedaController {
     public String buscarPat(
             @RequestParam(required = false) LocalDate inicio,
             @RequestParam(required = false) LocalDate fin,
-            @RequestParam(required = false) ActividadPat.TipoActividad tipo,
+            @RequestParam(required = false) ActividadPatGeneral.TipoActividad tipo,
             @RequestParam(required = false) Integer carreraId,
             @RequestParam(required = false) Integer tutorId,
             Model model) {
             
-        model.addAttribute("tiposActividad", ActividadPat.TipoActividad.values());
+        model.addAttribute("tiposActividad", ActividadPatGeneral.TipoActividad.values());
         model.addAttribute("carreras", carreraService.buscarTodas());
         model.addAttribute("tutores", tutorService.buscarTodos());
         
@@ -110,18 +110,18 @@ public class BusquedaController {
         model.addAttribute("filtroCarreraId", carreraId);
         model.addAttribute("filtroTutorId", tutorId);
         
-        List<ActividadPat> resultados;
+        List<SesionActividad> resultados;
         
         
         if (inicio != null && fin != null) {
-            resultados = actividadPatService.buscarPorRangoFechas(inicio, fin);
+            resultados = sesionActividadService.buscarPorRangoFechas(inicio, fin);
         } else {
-            resultados = actividadPatService.buscarTodas(); 
+            resultados = sesionActividadService.buscarTodas(); 
         }
 
     
         if (tipo != null) {
-            resultados = resultados.stream().filter(a -> a.getTipoActividad() == tipo).collect(Collectors.toList());
+            resultados = resultados.stream().filter(a -> a.getActividadCarrera().getActividadGeneral().getTipoActividad() == tipo).collect(Collectors.toList());
         }
         if (carreraId != null) {
             resultados = resultados.stream().filter(a -> 

@@ -1,167 +1,195 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{fragments/fragment :: head}"></head>
-
-<body class="d-flex flex-column min-vh-100 bg-light">
-
-    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
-
-    <main class="container my-4 flex-grow-1">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
-                <div class="card shadow-sm">
-                    <div class="card-header mi-etiqueta">
-                        <i class="bi bi-person-badge"></i>
-                        <span th:text="${usuario.id == null ? 'Nuevo Usuario' : 'Editar Usuario'}"></span>
-                    </div>
-                    <div class="card-body">
-
-                        <!-- Alerta dinámica al recuperar usuario -->
-                        <div id="alertaRecuperacion" class="alert alert-warning d-none">
-                            <i class="bi bi-info-circle-fill"></i>
-                            Hemos detectado un usuario inactivo con este Número de Identificación.
-                            <button type="button" class="btn btn-sm btn-warning ms-3" id="btnRestaurar">
-                                ¿Desea restaurar sus datos?
-                            </button>
-                        </div>
-
-                        <div th:if="${error}" class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            <span th:text="${error}"></span>
-                        </div>
-
-                        <form th:action="@{/usuario/guardar}" th:object="${usuario}" method="post"
-                            enctype="multipart/form-data">
-                            <input type="hidden" th:field="*{id}" />
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="numeroIdentificacion" class="form-label fw-semibold">Número de
-                                        Identificación</label>
-                                    <input type="text" id="numeroIdentificacion" th:field="*{numeroIdentificacion}"
-                                        class="form-control" required maxlength="30" placeholder="Ej. 123456789" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="nombreCompleto" class="form-label fw-semibold">Nombre Completo</label>
-                                    <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}"
-                                        class="form-control" required maxlength="150" placeholder="Ej. Juan Pérez" />
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="correo" class="form-label fw-semibold">Correo Institucional</label>
-                                <input type="email" id="correo" th:field="*{correo}" class="form-control" required
-                                    maxlength="120" placeholder="usuario@institucion.edu" />
-                            </div>
-
-                            <div class="mb-3" th:if="${usuario.id == null}">
-                                <label for="contrasenaHash" class="form-label fw-semibold">Contraseña</label>
-                                <input type="password" id="contrasenaHash" th:field="*{contrasenaHash}"
-                                    class="form-control" required placeholder="Ingresa la contraseña" />
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label for="perfilesIds" class="form-label fw-semibold">Perfil</label>
-                                    <select id="perfilesIds" name="perfilesIds" class="form-select" required>
-                                        <option value="" disabled selected>Seleccione un perfil</option>
-                                        <option th:each="p : ${perfiles}" th:value="${p.id}" th:text="${p.nombre}"
-                                                th:selected="${usuario.perfiles != null and !usuario.perfiles.isEmpty() and usuario.perfiles.iterator().next().id == p.id}"></option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="carreraId" class="form-label fw-semibold">Carrera</label>
-                                    <select id="carreraId" name="carreraId" class="form-select">
-                                        <option value="">Ninguna</option>
-                                        <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}"
-                                                th:selected="${carreraId != null and c.id == carreraId}"></option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="estado" class="form-label fw-semibold">Estado</label>
-                                    <select id="estado" th:field="*{estado}" class="form-select" required>
-                                        <option th:each="e : ${estados}" th:value="${e}" th:text="${e}"></option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label for="archivoFoto" class="form-label fw-semibold">Fotografía de Perfil
-                                    (JPG/PNG)</label>
-                                <input type="file" name="archivoFoto" id="archivoFoto" class="form-control"
-                                    accept=".jpg,.jpeg,.png">
-                                <small class="text-muted mt-1 d-block" th:if="${usuario.fotoPerfil != null}">Deje en
-                                    blanco para conservar la imagen actual.</small>
-                            </div>
-
-                            <div class="d-flex justify-content-between">
-                                <a th:href="@{/usuario/usuarios}" class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-left"></i> Cancelar
-                                </a>
-                                <button type="submit" class="btn btn-encabezado">
-                                    <i class="bi bi-save"></i> Guardar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer th:replace="~{fragments/fragment :: footer}"></footer>
-    <div th:replace="~{fragments/fragment :: scripts}"></div>
-
-    <script th:if="${usuario.id == null}">
-        document.addEventListener("DOMContentLoaded", function () {
-            const inputIdentificacion = document.getElementById("numeroIdentificacion");
-            const alertaRecuperacion = document.getElementById("alertaRecuperacion");
-            const btnRestaurar = document.getElementById("btnRestaurar");
-
-            let datosUsuarioInactivo = null;
-
-            inputIdentificacion.addEventListener("blur", function () {
-                const numero = this.value.trim();
-                if (numero.length > 0) {
-                    fetch(`/usuario/verificar-inactivo/${numero}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.encontrado) {
-                                datosUsuarioInactivo = data;
-                                alertaRecuperacion.classList.remove("d-none");
-                            } else {
-                                alertaRecuperacion.classList.add("d-none");
-                                datosUsuarioInactivo = null;
-                            }
-                        })
-                        .catch(error => console.error("Error al verificar usuario:", error));
-                }
-            });
-
-            btnRestaurar.addEventListener("click", function () {
-                if (datosUsuarioInactivo) {
-                    document.getElementById("nombreCompleto").value = datosUsuarioInactivo.nombreCompleto || "";
-                    document.getElementById("correo").value = datosUsuarioInactivo.correo || "";
-                    if (datosUsuarioInactivo.perfil) {
-                        // Podrías seleccionar el perfil basándote en el nombre si fuera necesario
-                    }
-                    if (datosUsuarioInactivo.carrera) {
-                        document.getElementById("carreraId").value = datosUsuarioInactivo.carrera;
-                    }
-
-                    // Hacer la contraseña opcional al restaurar un usuario inactivo
-                    const inputPassword = document.getElementById("contrasenaHash");
-                    if (inputPassword) {
-                        inputPassword.removeAttribute("required");
-                    }
-
-
-                    alertaRecuperacion.classList.add("d-none");
-                }
-            });
-        });
-    </script>
-</body>
-
-</html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/fragment :: head}"></head>
+
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-person-badge"></i>
+                        <span th:if="${usuario.id != null}">Editar Usuario</span>
+                        <span th:if="${usuario.id == null and rolPreseleccionado == 'ADMINISTRADOR'}">Nuevo Administrador</span>
+                        <span th:if="${usuario.id == null and rolPreseleccionado == 'COORDINADOR_CARRERA'}">Nuevo Coordinador de Carrera</span>
+                        <span th:if="${usuario.id == null and rolPreseleccionado == 'TUTOR'}">Nuevo Tutor</span>
+                        <span th:if="${usuario.id == null and rolPreseleccionado == 'TUTORADO'}">Nuevo Tutorado</span>
+                        <span th:if="${usuario.id == null and rolPreseleccionado == null}">Nuevo Usuario</span>
+                    </div>
+                    <div class="card-body">
+
+                        <!-- Alerta dinámica al recuperar usuario -->
+                        <div id="alertaRecuperacion" class="alert alert-warning d-none">
+                            <i class="bi bi-info-circle-fill"></i>
+                            Hemos detectado un usuario inactivo con este Número de Identificación.
+                            <button type="button" class="btn btn-sm btn-warning ms-3" id="btnRestaurar">
+                                ¿Desea restaurar sus datos?
+                            </button>
+                        </div>
+
+                        <div th:if="${error}" class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span th:text="${error}"></span>
+                        </div>
+
+                        <form th:action="@{/usuario/guardar}" th:object="${usuario}" method="post"
+                            enctype="multipart/form-data">
+                            <input type="hidden" th:field="*{id}" />
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="numeroIdentificacion" class="form-label fw-semibold">Número de
+                                        Identificación <span class="text-danger">*</span></label>
+                                    <input type="text" id="numeroIdentificacion" th:field="*{numeroIdentificacion}"
+                                        class="form-control" required maxlength="30" placeholder="Ej. 123456789" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="nombreCompleto" class="form-label fw-semibold">Nombre Completo <span class="text-danger">*</span></label>
+                                    <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}"
+                                        class="form-control" required maxlength="150" placeholder="Ej. Juan Pérez" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="correo" class="form-label fw-semibold">Correo Institucional <span class="text-danger">*</span></label>
+                                <input type="email" id="correo" th:field="*{correo}" class="form-control" required
+                                    maxlength="120" placeholder="usuario@institucion.edu" />
+                            </div>
+
+                            <div class="mb-3" th:if="${usuario.id == null}">
+                                <label for="contrasenaHash" class="form-label fw-semibold">Contraseña <span class="text-danger">*</span></label>
+                                <input type="password" id="contrasenaHash" th:field="*{contrasenaHash}"
+                                    class="form-control" required placeholder="Ingresa la contraseña" />
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="perfilesIds" class="form-label fw-semibold">Perfil <span class="text-danger">*</span></label>
+                                    <!-- Perfil pre-seleccionado y bloqueado -->
+                                    <th:block th:if="${rolPreseleccionado != null and usuario.id == null}">
+                                        <input type="hidden" name="perfilesIds" th:value="${rolPerfilId}" />
+                                        <input type="text" class="form-control" th:value="${rolPreseleccionado}" disabled />
+                                    </th:block>
+                                    <!-- Selector libre (edición o sin rol preseleccionado) -->
+                                    <th:block th:if="${rolPreseleccionado == null or usuario.id != null}">
+                                        <select id="perfilesIds" name="perfilesIds" class="form-select" required>
+                                            <option value="" disabled selected>Seleccione un perfil</option>
+                                            <option th:each="p : ${perfiles}" th:value="${p.id}" th:text="${p.nombre}"
+                                                    th:selected="${usuario.perfiles != null and !usuario.perfiles.isEmpty() and usuario.perfiles.iterator().next().id == p.id}"></option>
+                                        </select>
+                                    </th:block>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="carreraId" class="form-label fw-semibold">Carrera
+                                        <span class="text-danger" th:if="${rolPreseleccionado == 'TUTORADO' or rolPreseleccionado == 'COORDINADOR_CARRERA'}">*</span>
+                                    </label>
+                                    <select id="carreraId" name="carreraId" class="form-select"
+                                            th:required="${rolPreseleccionado == 'TUTORADO' or rolPreseleccionado == 'COORDINADOR_CARRERA'}">
+                                        <option value="">Ninguna</option>
+                                        <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}"
+                                                th:selected="${carreraId != null and c.id == carreraId}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="estado" class="form-label fw-semibold">Estado</label>
+                                    <select id="estado" th:field="*{estado}" class="form-select" required>
+                                        <option th:each="e : ${estados}" th:value="${e}" th:text="${e}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="archivoFoto" class="form-label fw-semibold">Fotografía de Perfil
+                                    (JPG/PNG)</label>
+                                <input type="file" name="archivoFoto" id="archivoFoto" class="form-control"
+                                    accept=".jpg,.jpeg,.png">
+                                <small class="text-muted mt-1 d-block" th:if="${usuario.fotoPerfil != null}">Deje en
+                                    blanco para conservar la imagen actual.</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <!-- Botón Cancelar contextual: edición usa rolUsuario, nuevo usa rolPreseleccionado -->
+                                <a th:if="${rolUsuario != null}" th:href="@{${rolUsuario}}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <a th:if="${rolUsuario == null and rolPreseleccionado == 'ADMINISTRADOR'}" th:href="@{/usuario/administradores}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <a th:if="${rolUsuario == null and rolPreseleccionado == 'COORDINADOR_CARRERA'}" th:href="@{/usuario/coordinadores}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <a th:if="${rolUsuario == null and rolPreseleccionado == 'TUTOR'}" th:href="@{/usuario/tutores}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <a th:if="${rolUsuario == null and rolPreseleccionado == 'TUTORADO'}" th:href="@{/usuario/tutorados}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <a th:if="${rolUsuario == null and rolPreseleccionado == null}" th:href="@{/usuario/administradores}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-encabezado">
+                                    <i class="bi bi-save"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+    <script th:if="${usuario.id == null}">
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputIdentificacion = document.getElementById("numeroIdentificacion");
+            const alertaRecuperacion = document.getElementById("alertaRecuperacion");
+            const btnRestaurar = document.getElementById("btnRestaurar");
+
+            let datosUsuarioInactivo = null;
+
+            inputIdentificacion.addEventListener("blur", function () {
+                const numero = this.value.trim();
+                if (numero.length > 0) {
+                    fetch(`/usuario/verificar-inactivo/${numero}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.encontrado) {
+                                datosUsuarioInactivo = data;
+                                alertaRecuperacion.classList.remove("d-none");
+                            } else {
+                                alertaRecuperacion.classList.add("d-none");
+                                datosUsuarioInactivo = null;
+                            }
+                        })
+                        .catch(error => console.error("Error al verificar usuario:", error));
+                }
+            });
+
+            btnRestaurar.addEventListener("click", function () {
+                if (datosUsuarioInactivo) {
+                    document.getElementById("nombreCompleto").value = datosUsuarioInactivo.nombreCompleto || "";
+                    document.getElementById("correo").value = datosUsuarioInactivo.correo || "";
+                    if (datosUsuarioInactivo.carrera) {
+                        document.getElementById("carreraId").value = datosUsuarioInactivo.carrera;
+                    }
+
+                    // Hacer la contraseña opcional al restaurar un usuario inactivo
+                    const inputPassword = document.getElementById("contrasenaHash");
+                    if (inputPassword) {
+                        inputPassword.removeAttribute("required");
+                    }
+
+                    alertaRecuperacion.classList.add("d-none");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

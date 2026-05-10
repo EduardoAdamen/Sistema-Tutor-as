@@ -45,7 +45,7 @@
                     <div class="col-md-5 text-md-end mt-4 mt-md-0">
                         <div class="d-inline-block text-start border-start border-3 border-secondary ps-4">
                             <div class="mb-2 text-muted fw-semibold fs-6"><i class="bi bi-calendar-event-fill text-secondary me-2"></i>Día: <span class="text-dark" th:text="${asignacion.diaHorario}"></span></div>
-                            <div class="mb-2 text-muted fw-semibold fs-6"><i class="bi bi-clock-fill text-secondary me-2"></i>Hora: <span class="text-dark" th:text="${asignacion.horaHorario}"></span></div>
+                            <div class="mb-2 text-muted fw-semibold fs-6"><i class="bi bi-clock-fill text-secondary me-2"></i>Horario: <span class="text-dark" th:text="${asignacion.horaHorario} + ' - ' + ${asignacion.horaFinHorario}"></span></div>
                             <div class="text-muted fw-semibold fs-6"><i class="bi bi-door-open-fill text-secondary me-2"></i>Aula: <span class="text-dark" th:text="${asignacion.aula}"></span></div>
                         </div>
                     </div>

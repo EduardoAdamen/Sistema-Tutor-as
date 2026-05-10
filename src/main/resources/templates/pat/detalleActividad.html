@@ -1,84 +1,84 @@
-﻿<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/fragment :: head}"></head>
-<body class="d-flex flex-column min-vh-100 bg-light">
+<body class="d-flex flex-column min-vh-100">
 
-    <!-- Navbar -->
     <nav th:replace="~{fragments/fragment :: navbar}"></nav>
 
-    <!-- Contenido principal -->
     <main class="container my-4 flex-grow-1">
         <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10">
-                <div class="card shadow-sm rounded-4 overflow-hidden">
-                    <div class="card-header bg-transparent border-bottom pt-3 pb-3">
-                        <span class="fs-5 fw-bold text-dark">Detalle de Actividad PAT</span>
+            <div class="col-lg-8">
+                <h2 class="mi-titulo mb-4">Detalle de Actividad PAT</h2>
+                
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-journal-text me-1"></i> Información de la Vinculación
                     </div>
                     <div class="card-body p-4">
-                        <table class="table table-borderless mb-0">
-                            <tr>
-                                <th class="text-end fw-bold text-dark" style="width: 35%;">ID de Actividad:</th>
-                                <td class="text-secondary" th:text="${actividad.id}"></td>
-                            </tr>
-                            <th:block sec:authorize="hasAuthority('ADMINISTRADOR')">
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Tutor de la Actividad:</th>
-                                <td class="text-secondary" th:text="${actividad.sesion.asignacion.tutor.usuario.nombreCompleto}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Carrera:</th>
-                                <td class="text-secondary" th:text="${actividad.sesion.asignacion.grupo.carrera.nombre}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Grupo:</th>
-                                <td class="text-secondary" th:text="${actividad.sesion.asignacion.grupo.nombre}"></td>
-                            </tr>
-                            </th:block>
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Sesión (Fecha):</th>
-                                <td class="text-secondary" th:text="${#temporals.format(actividad.sesion.fecha, 'dd/MM/yyyy')}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Tipo de Actividad:</th>
-                                <td class="text-secondary" th:text="${actividad.tipoActividad.name()}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Título:</th>
-                                <td class="text-secondary fw-bold" th:text="${actividad.titulo}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Descripción:</th>
-                                <td class="text-secondary" th:text="${actividad.descripcion}"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-end fw-bold text-dark">Evidencia:</th>
-                                <td class="text-secondary">
-                                    <span th:if="${actividad.evidencia != null}">
-                                        <a th:href="@{'/uploads/actividades/' + ${actividad.evidencia}}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3">
-                                            Ver Documento
-                                        </a>
-                                    </span>
-                                    <span th:if="${actividad.evidencia == null}" class="text-muted fst-italic">Sin evidencia adjunta</span>
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Título Adaptado:</strong><br>
+                                <span th:text="${actividad.actividadCarrera.tituloAdaptado}">Título</span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Tipo de Actividad:</strong><br>
+                                <span class="badge bg-secondary px-3 py-2" th:text="${actividad.actividadCarrera.actividadGeneral.tipoActividad}">tipo</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Actividad General Original:</strong><br>
+                            <span class="text-muted" th:text="${actividad.actividadCarrera.actividadGeneral.titulo}">General</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Descripción:</strong><br>
+                            <span th:text="${actividad.actividadCarrera.descripcionAdaptada != null ? actividad.actividadCarrera.descripcionAdaptada : actividad.actividadCarrera.actividadGeneral.descripcion}">Desc</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Observaciones del Coordinador:</strong><br>
+                            <span th:text="${actividad.actividadCarrera.observaciones != null ? actividad.actividadCarrera.observaciones : 'Sin observaciones'}">Obs</span>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Sesión:</strong><br>
+                                Fecha: <span th:text="${#temporals.format(actividad.sesion.fecha, 'dd/MM/yyyy')}">01/01/2026</span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Grupo/Carrera:</strong><br>
+                                <span th:text="${actividad.sesion.asignacion.grupo.carrera.nombre}">ISC</span> - 
+                                <span th:text="${actividad.sesion.asignacion.grupo.nombre}">6-A</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Tutor:</strong><br>
+                            <span th:text="${actividad.sesion.asignacion.tutor.usuario.nombreCompleto}">Nombre</span>
+                        </div>
+                        <div class="mb-3" th:if="${actividad.observaciones != null}">
+                            <strong>Observaciones del Tutor:</strong><br>
+                            <span th:text="${actividad.observaciones}">Obs</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Evidencia:</strong>
+                            <span th:if="${actividad.evidencia != null}">
+                                <a th:href="@{'/uploads/actividades/' + ${actividad.evidencia}}" target="_blank" class="badge bg-info text-decoration-none">
+                                    <i class="bi bi-file-earmark-check"></i> Ver Archivo
+                                </a>
+                            </span>
+                            <span th:if="${actividad.evidencia == null}" class="text-muted">Sin evidencia</span>
+                        </div>
                     </div>
-                    <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-between">
-                        <a th:href="@{/pat/actividades}" class="btn btn-outline-secondary rounded-pill px-4">
-                            Volver al listado
-                        </a>
-                        <a th:href="@{/pat/editar/{id}(id=${actividad.id})}" class="btn btn-primary rounded-pill px-4" style="background-color: #1b396a; border-color: #1b396a;">
-                            Editar
-                        </a>
-                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <a th:href="@{/pat/actividades}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Regresar
+                    </a>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
     <footer th:replace="~{fragments/fragment :: footer}"></footer>
     <div th:replace="~{fragments/fragment :: scripts}"></div>
-
 </body>
 </html>

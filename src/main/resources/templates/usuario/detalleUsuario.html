@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/fragment :: head}"></head>
 <body class="d-flex flex-column min-vh-100 bg-light">
@@ -40,7 +40,7 @@
                                     <span th:if="${usuario.hasPerfil('TUTORADO')}" class="badge bg-info text-dark rounded-pill px-3 py-2">Tutorado</span>
                                 </td>
                             </tr>
-                            <tr th:if="${usuario.hasPerfil('TUTORADO')}">
+                            <tr th:if="${usuario.hasPerfil('TUTORADO') or usuario.hasPerfil('COORDINADOR_CARRERA')}">
                                 <th class="text-end fw-bold text-dark">Carrera:</th>
                                 <td class="text-secondary" th:text="${carreraNombre != null ? carreraNombre : 'Sin carrera asignada'}"></td>
                             </tr>
@@ -65,7 +65,7 @@
                         </table>
                     </div>
                     <div class="card-footer bg-transparent border-top p-3 d-flex justify-content-between">
-                        <a th:href="@{/usuario/usuarios}" class="btn btn-outline-secondary rounded-pill px-4">
+                        <a th:href="@{${rolUsuario}}" class="btn btn-outline-secondary rounded-pill px-4">
                             Volver al listado
                         </a>
                     </div>

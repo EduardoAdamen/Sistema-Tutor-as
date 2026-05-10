@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="mi-titulo mb-4">Editar Vinculación de Actividad</h2>
+
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-pencil-square me-1"></i> Datos de la Vinculación
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Información de la actividad vinculada -->
+                        <div class="alert alert-secondary mb-4">
+                            <strong>Actividad:</strong> <span th:text="${sesionActividad.actividadCarrera.tituloAdaptado}">Título</span><br/>
+                            <strong>Tipo:</strong> <span class="badge bg-secondary" th:text="${sesionActividad.actividadCarrera.actividadGeneral.tipoActividad}">tipo</span><br/>
+                            <strong>Sesión:</strong> <span th:text="${#temporals.format(sesionActividad.sesion.fecha, 'dd/MM/yyyy')}">01/01/2026</span> |
+                            <strong>Grupo:</strong> <span th:text="${sesionActividad.sesion.asignacion.grupo.nombre}">6-A</span>
+                        </div>
+
+                        <form th:action="@{/pat/guardar-vinculacion}" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="id" th:value="${sesionActividad.id}" />
+
+                            <div class="mb-3">
+                                <label for="observaciones" class="form-label fw-semibold">Observaciones del Tutor</label>
+                                <textarea id="observaciones" name="observaciones" class="form-control" rows="3" placeholder="Notas o comentarios sobre la ejecución de esta actividad..." th:text="${sesionActividad.observaciones}"></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="archivoEvidencia" class="form-label fw-semibold">Subir Evidencia (PDF, Imagen)</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="archivoEvidencia" name="archivoEvidencia" accept=".pdf,.png,.jpg,.jpeg" />
+                                    <div th:if="${sesionActividad.evidencia != null}" class="input-group-text bg-success text-white">
+                                        <i class="bi bi-file-earmark-check"></i> Archivo Previo OK
+                                    </div>
+                                </div>
+                                <small class="text-muted">Deje vacío si no desea reemplazar o subir archivo.</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/pat/actividades}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-encabezado">
+                                    <i class="bi bi-save me-1"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+</body>
+</html>

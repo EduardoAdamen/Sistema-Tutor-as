@@ -3,7 +3,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 
-
 <!-- ===================== HEAD ===================== -->
 
 <head th:fragment="head">
@@ -62,126 +61,66 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-
-
-                <!-- Enlace a Carreras (Solo Admin) -->
-
+                <!-- ========== Links directos: Catálogos ========== -->
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link" th:href="@{/carrera/carreras}">
-
-                        Carreras
-
-                    </a>
-
+                    <a class="nav-link" th:href="@{/carrera/carreras}"><i class="bi bi-building me-1"></i> Carreras</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/grupo/grupos}"><i class="bi bi-people me-1"></i> Grupos</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/periodo/periodos}"><i class="bi bi-calendar3 me-1"></i> Periodos</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/asignacion/asignaciones}"><i class="bi bi-diagram-3 me-1"></i> Asignaciones</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/pat/general/actividades}"><i class="bi bi-journal-bookmark-fill me-1"></i> Actividades PAT</a>
                 </li>
 
-                <!-- Enlace a Grupos (Solo Admin) -->
-
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link" th:href="@{/grupo/grupos}">
-
-                        Grupos
-
-                    </a>
-
-                </li>
-
-                <!-- Enlace a Periodos (Solo Admin) -->
-
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link" th:href="@{/periodo/periodos}">
-
-                        Periodos
-
-                    </a>
-
-                </li>
-
-                <!-- Enlace a Usuarios (Solo Admin) -->
-
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link" th:href="@{/usuario/usuarios}">
-
-                        Usuarios
-
-                    </a>
-
-                </li>
-
-                <!-- Enlace a Asignaciones (Solo Admin) -->
-
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link" th:href="@{/asignacion/asignaciones}">
-
-                        Asignaciones
-
-                    </a>
-
-                </li>
-
-                <!-- Enlace a Actividades (Solo Tutor) -->
-
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link" th:href="@{/pat/actividades}">
-
-                        Actividades
-
-                    </a>
-
-                </li>
-
-
-
-                <!-- Enlace a Mis Grupos (Solo Tutor) -->
-
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link" th:href="@{/tutor/mis-grupos}">
-
-                        Mis Grupos
-
-                    </a>
-
-                </li>
-
-                <!-- Enlace a Mi Tutoría (Solo Tutorado) -->
-
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link" th:href="@{/tutorado/mi-tutoria}">
-
-                        Mi Tutoría
-
-                    </a>
-
-                </li>
-
-                <!-- Dropdown Búsquedas -->
-
+                <!-- ========== Dropdown: Usuarios (único spinner) ========== -->
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-
-                    <a class="nav-link dropdown-toggle" href="#" id="busquedasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-
-                        Búsquedas
-
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-badge-fill me-1"></i> Usuarios
                     </a>
-
-                    <ul class="dropdown-menu" aria-labelledby="busquedasDropdown">
-
-                        <li><a class="dropdown-item" th:href="@{/busqueda/tutores}">Buscar Tutores</a></li>
-
-                        <li><a class="dropdown-item" th:href="@{/busqueda/tutorado}">Buscar Tutorado</a></li>
-
-                        <li><a class="dropdown-item" th:href="@{/busqueda/pat}">Buscar Actividades PAT</a></li>
-
+                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                        <li><a class="dropdown-item" th:href="@{/usuario/administradores}"><i class="bi bi-shield-lock me-2"></i>Administradores</a></li>
+                        <li><a class="dropdown-item" th:href="@{/usuario/coordinadores}"><i class="bi bi-clipboard2-data me-2"></i>Coordinadores de Carrera</a></li>
+                        <li><a class="dropdown-item" th:href="@{/usuario/tutores}"><i class="bi bi-person-workspace me-2"></i>Tutores</a></li>
+                        <li><a class="dropdown-item" th:href="@{/usuario/tutorados}"><i class="bi bi-mortarboard me-2"></i>Tutorados</a></li>
                     </ul>
+                </li>
 
+                <!-- ========== Dropdown: Coordinador de Carrera ========== -->
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="coordDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-clipboard2-data-fill me-1"></i> Coordinador
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="coordDropdown">
+                        <li><a class="dropdown-item" th:href="@{/coordinador/actividades}"><i class="bi bi-pencil-square me-2"></i>Adaptar Actividades PAT</a></li>
+                        <li><a class="dropdown-item" th:href="@{/coordinador/plan-sesiones}"><i class="bi bi-calendar2-week me-2"></i>Organizar Plan de Sesiones</a></li>
+                    </ul>
+                </li>
+
+                <!-- ========== Dropdown: Tutor ========== -->
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="tutorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-workspace me-1"></i> Tutor
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="tutorDropdown">
+                        <li><a class="dropdown-item" th:href="@{/tutor/mis-grupos}"><i class="bi bi-collection me-2"></i>Mis Grupos</a></li>
+                        <li><a class="dropdown-item" th:href="@{/pat/actividades}"><i class="bi bi-journal-text me-2"></i>Actividades</a></li>
+                    </ul>
+                </li>
+
+                <!-- ========== Dropdown: Tutorado ========== -->
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="tutoradoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-mortarboard-fill me-1"></i> Tutorado
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="tutoradoDropdown">
+                        <li><a class="dropdown-item" th:href="@{/tutorado/mi-tutoria}"><i class="bi bi-journal-bookmark me-2"></i>Mi Tutoría</a></li>
+                    </ul>
                 </li>
 
             </ul>

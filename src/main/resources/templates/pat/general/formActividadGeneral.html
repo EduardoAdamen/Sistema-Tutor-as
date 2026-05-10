@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="mi-titulo mb-4" th:text="${actividad.id != null ? 'Editar Actividad PAT General' : 'Nueva Actividad PAT General'}">Nueva Actividad PAT General</h2>
+
+                <div class="card shadow-sm">
+                    <div class="card-header mi-etiqueta">
+                        <i class="bi bi-journal-bookmark-fill me-1"></i> Datos de la Actividad
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/pat/general/guardar}" th:object="${actividad}" method="post">
+                            <input type="hidden" th:field="*{id}" />
+
+                            <div class="mb-3">
+                                <label for="titulo" class="form-label fw-semibold">Título de la Actividad <span class="text-danger">*</span></label>
+                                <input type="text" id="titulo" class="form-control" th:field="*{titulo}" required maxlength="200" placeholder="Ej: Taller de Técnicas de Estudio" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="tipoActividad" class="form-label fw-semibold">Tipo de Actividad <span class="text-danger">*</span></label>
+                                <select id="tipoActividad" class="form-select" th:field="*{tipoActividad}" required>
+                                    <option value="" disabled selected>-- Seleccione un Tipo --</option>
+                                    <option th:each="tipo : ${tiposActividad}" th:value="${tipo}" th:text="${tipo}">Tipo</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="descripcion" class="form-label fw-semibold">Descripción</label>
+                                <textarea id="descripcion" class="form-control" th:field="*{descripcion}" rows="4" placeholder="Describa el objetivo y contenido general de esta actividad..."></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/pat/general/actividades}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-encabezado">
+                                    <i class="bi bi-save me-1"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+</body>
+</html>

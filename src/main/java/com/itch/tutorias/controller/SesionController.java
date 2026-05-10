@@ -2,7 +2,6 @@ package com.itch.tutorias.controller;
 
 import com.itch.tutorias.model.*;
 import com.itch.tutorias.service.*;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +23,13 @@ public class SesionController {
     private ISesion sesionService;
 
     @Autowired
-    private IActividadPat actividadPatService;
+    private ISesionActividad sesionActividadService;
+
+    @Autowired
+    private IActividadPatCarrera actividadPatCarreraService;
+
+    @Autowired
+    private IPlanSesionCarrera planSesionCarreraService;
 
     @Autowired
     private IAsignacionTutorado asignacionTutoradoService;
@@ -81,13 +86,28 @@ public class SesionController {
 
         Sesion sesion = new Sesion();
         sesion.setAsignacion(asignacionActiva);
+
+        // Auto-llenar hora inicio y fin desde la asignación
+        sesion.setHoraInicio(asignacionActiva.getHoraHorario());
+        sesion.setHoraFin(asignacionActiva.getHoraFinHorario());
+
+        // Determinar número de sesión (siguiente)
+        int siguienteNumSesion = sesionesActuales.size() + 1;
+
+        // Buscar actividad planeada por el coordinador para esta sesión
+        Carrera carreraGrupo = asignacionActiva.getGrupo().getCarrera();
+        Optional<PlanSesionCarrera> planOpt = planSesionCarreraService.buscarPorCarreraYSesion(carreraGrupo, siguienteNumSesion);
+
         model.addAttribute("sesion", sesion);
+        model.addAttribute("numSesion", siguienteNumSesion);
+        model.addAttribute("actividadPlanificada", planOpt.orElse(null));
         return "sesion/formSesion";
     }
 
     @PostMapping("/guardar")
     public String guardarSesion(@ModelAttribute Sesion sesion,
                                 @RequestParam("archivoEvidencia") MultipartFile archivoEvidencia,
+                                @RequestParam(value = "actividadCarreraId", required = false) Integer actividadCarreraId,
                                 Principal principal,
                                 RedirectAttributes attributes) {
                                 
@@ -107,7 +127,7 @@ public class SesionController {
             }
         }
 
-        // Validar la fecha de la sesión no puede ser posterior a la fecha fin del periodo
+        // Validar la fecha de la sesión dentro del periodo
         if (sesion.getFecha().isAfter(asignacionActiva.getPeriodo().getFechaFin()) || sesion.getFecha().isBefore(asignacionActiva.getPeriodo().getFechaInicio())) {
             attributes.addFlashAttribute("error", "La fecha de la sesión debe estar dentro del periodo escolar activo (" 
                     + asignacionActiva.getPeriodo().getFechaInicio() + " a " + asignacionActiva.getPeriodo().getFechaFin() + ").");
@@ -116,16 +136,31 @@ public class SesionController {
 
         sesion.setAsignacion(asignacionActiva);
 
+        // Auto-llenar horas desde la asignación (siempre)
+        sesion.setHoraInicio(asignacionActiva.getHoraHorario());
+        sesion.setHoraFin(asignacionActiva.getHoraFinHorario());
+
         if (!archivoEvidencia.isEmpty()) {
             String nombreArchivo = servicioAlmacenamiento.guardar(archivoEvidencia, "sesiones");
             sesion.setEvidencia(nombreArchivo);
         } else if (sesion.getId() != null) {
-            // Mantener archivo existente si estamos editando y no se subió uno nuevo
             Sesion actual = sesionService.buscarPorId(sesion.getId());
             sesion.setEvidencia(actual.getEvidencia());
         }
 
-        sesionService.guardar(sesion);
+        Sesion sesionGuardada = sesionService.guardar(sesion);
+
+        // Vincular la actividad del plan del coordinador (solo sesiones nuevas)
+        if (sesion.getId() == null && actividadCarreraId != null) {
+            ActividadPatCarrera actCarrera = actividadPatCarreraService.buscarPorId(actividadCarreraId);
+            if (actCarrera != null) {
+                SesionActividad sa = new SesionActividad();
+                sa.setSesion(sesionGuardada);
+                sa.setActividadCarrera(actCarrera);
+                sesionActividadService.guardar(sa);
+            }
+        }
+
         attributes.addFlashAttribute("msg", "Sesión guardada exitosamente.");
         return "redirect:/sesion/grupo/" + asignacionActiva.getId();
     }
@@ -138,6 +173,21 @@ public class SesionController {
             return "redirect:/sesion/mis-sesiones";
         }
         model.addAttribute("sesion", sesion);
+
+        // Determinar número de sesión para mostrar actividad vinculada
+        List<Sesion> todas = sesionService.buscarPorAsignacion(sesion.getAsignacion());
+        int numSesion = 0;
+        for (int i = 0; i < todas.size(); i++) {
+            if (todas.get(i).getId().equals(sesion.getId())) {
+                numSesion = i + 1;
+                break;
+            }
+        }
+
+        List<SesionActividad> actividadesVinculadas = sesionActividadService.buscarPorSesion(sesion);
+        model.addAttribute("numSesion", numSesion);
+        model.addAttribute("actividadPlanificada", actividadesVinculadas.isEmpty() ? null : actividadesVinculadas.get(0));
+
         return "sesion/formSesion";
     }
 
@@ -167,11 +217,22 @@ public class SesionController {
             return "redirect:/";
         }
         
-        List<ActividadPat> actividades = actividadPatService.buscarPorSesion(sesion);
+        List<SesionActividad> actividades = sesionActividadService.buscarPorSesion(sesion);
         List<AsignacionTutorado> tutorados = asignacionTutoradoService.buscarPorAsignacion(sesion.getAsignacion());
         List<RegistroAsistencia> asistencias = asistenciaService.buscarPorSesion(sesion);
-        
+
+        // Determinar número de sesión
+        List<Sesion> todas = sesionService.buscarPorAsignacion(sesion.getAsignacion());
+        int numSesion = 0;
+        for (int i = 0; i < todas.size(); i++) {
+            if (todas.get(i).getId().equals(sesion.getId())) {
+                numSesion = i + 1;
+                break;
+            }
+        }
+
         model.addAttribute("sesion", sesion);
+        model.addAttribute("numSesion", numSesion);
         model.addAttribute("actividades", actividades);
         model.addAttribute("tutorados", tutorados);
         model.addAttribute("asistencias", asistencias);
