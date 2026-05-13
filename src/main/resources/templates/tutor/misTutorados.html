@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/fragment :: head}"></head>
+
 <body class="d-flex flex-column min-vh-100">
 
     <nav th:replace="~{fragments/fragment :: navbar}"></nav>
@@ -10,14 +12,14 @@
             Mis Tutorados
         </h2>
 
-       
+
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         <div th:if="${msgInfo}" class="alert alert-info">
             <i class="bi bi-info-circle me-1"></i> <span th:text="${msgInfo}"></span>
         </div>
 
         <div th:if="${asignacion != null}">
-            
+
             <div class="card shadow-sm mb-4">
                 <div class="card-header mi-etiqueta pt-3 pb-3">Detalles de Mi Grupo</div>
                 <div class="card-body">
@@ -32,7 +34,9 @@
                             <strong>Aula: </strong> <span th:text="${asignacion.aula}"></span>
                         </div>
                         <div class="col-md-6 mb-2">
-                            <strong>Horario Fijo: </strong> <span th:text="${asignacion.diaHorario}"></span> de <span th:text="${asignacion.horaHorario}"></span> a <span th:text="${asignacion.horaFinHorario}"></span>
+                            <strong>Horario Fijo: </strong> <span th:text="${asignacion.diaHorario}"></span> de <span
+                                th:text="${asignacion.horaHorario}"></span> a <span
+                                th:text="${asignacion.horaFinHorario}"></span>
                         </div>
                     </div>
                 </div>
@@ -40,38 +44,40 @@
 
             <!-- Lista de Tutorados -->
             <div class="card shadow-sm mb-4">
-                 <div class="card-header mi-etiqueta pt-3 pb-3 d-flex justify-content-between align-items-center">
-                     <span>Lista de Estudiantes (Tutorados)</span>
-                     <span class="badge bg-light text-dark border">Total: <span th:text="${#lists.size(tutorados)}"></span></span>
-                 </div>
-                 
-                 <div class="table-responsive m-0">
-                      <table class="table table-hover align-middle mb-0 bordes-fuertes">
-                           <thead class="table-light">
-                               <tr>
-                                   <th class="ps-4">No.</th>
-                                   <th>Nombre del Tutorado</th>
-                                   <th>No. Control</th>
-                                   <th>Correo Electrónico</th>
-                               </tr>
-                           </thead>
-                           <tbody>
-                               <tr th:each="at, iter : ${tutorados}">
-                                   <td class="ps-4 text-muted" th:text="${iter.count}"></td>
-                                   <td class="fw-semibold" th:text="${at.tutorado.nombreCompleto}"></td>
-                                   <td class="font-monospace" th:text="${at.tutorado.numeroIdentificacion}"></td>
-                                   <td>
-                                        <a th:href="'mailto:' + ${at.tutorado.correo}" class="text-decoration-none" th:text="${at.tutorado.correo}"></a>
-                                   </td>
-                               </tr>
-                               <tr th:if="${tutorados.empty}">
-                                   <td colspan="4" class="text-center py-4 text-muted">
-                                       No hay estudiantes asignados en este momento.
-                                   </td>
-                               </tr>
-                           </tbody>
-                      </table>
-                 </div>
+                <div class="card-header mi-etiqueta pt-3 pb-3 d-flex justify-content-between align-items-center">
+                    <span>Lista de Estudiantes</span>
+                    <span class="badge bg-light text-dark border">Total: <span
+                            th:text="${#lists.size(tutorados)}"></span></span>
+                </div>
+
+                <div class="table-responsive m-0">
+                    <table class="table table-hover align-middle mb-0 bordes-fuertes">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">No.</th>
+                                <th>Nombre del Tutorado</th>
+                                <th>No. Control</th>
+                                <th>Correo Electrónico</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="at, iter : ${tutorados}">
+                                <td class="ps-4 text-muted" th:text="${iter.count}"></td>
+                                <td class="fw-semibold" th:text="${at.tutorado.nombreCompleto}"></td>
+                                <td class="font-monospace" th:text="${at.tutorado.numeroIdentificacion}"></td>
+                                <td>
+                                    <a th:href="'mailto:' + ${at.tutorado.correo}" class="text-decoration-none"
+                                        th:text="${at.tutorado.correo}"></a>
+                                </td>
+                            </tr>
+                            <tr th:if="${tutorados.empty}">
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    No hay estudiantes asignados en este momento.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -80,4 +86,5 @@
     <footer th:replace="~{fragments/fragment :: footer}"></footer>
     <div th:replace="~{fragments/fragment :: scripts}"></div>
 </body>
+
 </html>

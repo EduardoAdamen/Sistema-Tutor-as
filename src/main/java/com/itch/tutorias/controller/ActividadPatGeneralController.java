@@ -62,4 +62,11 @@ public class ActividadPatGeneralController {
         }
         return "redirect:/pat/general/actividades";
     }
+
+    @GetMapping("/ver/{id}")
+    public String verActividad(@PathVariable Integer id, Model model) {
+        ActividadPatGeneral actividad = actividadPatGeneralService.buscarPorId(id);
+        model.addAttribute("actividad", actividad);
+        return "pat/general/detalleActividadGeneral";
+    }
 }

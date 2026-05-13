@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/fragment :: head}"></head>
 <body class="d-flex flex-column min-vh-100 bg-light">
@@ -54,7 +54,7 @@
                                onclick="return confirm('¿Está seguro de cerrar este periodo?');">
                                 Cerrar
                             </a>
-                            <a th:href="@{/periodo/editar/{id}(id=${periodo.id})}" class="btn btn-primary rounded-pill px-4" style="background-color: #1b396a; border-color: #1b396a;">
+                            <a th:href="@{/periodo/editar/{id}(id=${periodo.id})}" class="btn btn-encabezado rounded-pill px-4">
                                 Editar
                             </a>
                         </div>

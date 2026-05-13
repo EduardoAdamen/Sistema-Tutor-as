@@ -29,8 +29,11 @@
             <div class="card-body p-4">
                 <div class="row align-items-center">
                     <div class="col-md-7">
-                        <div class="fw-bold mb-2 text-dark fs-5">
-                            Tutor: <span class="fw-normal" th:text="${asignacion.tutor.usuario.nombreCompleto}">Tutor</span>
+                        <div class="fw-bold mb-2 text-dark fs-5 d-flex align-items-center gap-3">
+                            <div>Tutor: <span class="fw-normal" th:text="${asignacion.tutor.usuario.nombreCompleto}">Tutor</span></div>
+                            <a th:href="@{/constancia/tutor/{id}(id=${asignacion.id})}" class="btn btn-sm btn-outline-danger rounded-pill" target="_blank" title="Constancia de Participación del Tutor">
+                                <i class="bi bi-file-pdf-fill"></i> Constancia
+                            </a>
                         </div>
                         <div class="text-dark mb-1 fs-6 fw-bold">
                             Carrera: <span class="fw-normal" th:text="${asignacion.grupo.carrera.nombre}">Carrera</span>
@@ -69,14 +72,15 @@
                                 <tr>
                                     <th class="ps-4 ">Matrícula</th>
                                     <th class="">Nombre del Alumno</th>
-                                    <th class="text-center pe-4 " style="width: 30%">Asistencia</th>
+                                    <th class="text-center " style="width: 25%">Asistencia</th>
+                                    <th class="text-center pe-4 ">Constancia</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="at : ${asigTutorados}">
                                     <td class="ps-4 fw-semibold text-muted" th:text="${at.tutorado.usuario.numeroIdentificacion}"></td>
                                     <td th:text="${at.tutorado.usuario.nombreCompleto}"></td>
-                                    <td class="text-center pe-4">
+                                    <td class="text-center ">
                                         <div class="progress shadow-sm" style="height: 18px; font-size: 0.75rem;">
                                             <div class="progress-bar bg-success"
                                                  role="progressbar"
@@ -85,9 +89,15 @@
                                             </div>
                                         </div>
                                     </td>
+                                    <td class="text-center pe-4">
+                                        <a href="#" th:attr="onclick=|verificarDescargaConstancia(event, ${porcentajes[at.tutorado.id]}, ${#lists.size(sesiones)}, '@{/constancia/tutorado/{idA}/{idT}(idA=${asignacion.id},idT=${at.tutorado.id})}')|" 
+                                           class="btn btn-sm btn-outline-danger rounded-pill" title="Descargar Constancia">
+                                            <i class="bi bi-file-pdf-fill"></i> PDF
+                                        </a>
+                                    </td>
                                 </tr>
                                 <tr th:if="${asigTutorados.empty}">
-                                    <td colspan="3" class="text-center py-5 text-muted">
+                                    <td colspan="4" class="text-center py-5 text-muted">
                                         <i class="bi bi-people fs-1 d-block mb-2 text-light"></i>
                                         No hay alumnos vinculados.
                                     </td>
@@ -103,34 +113,42 @@
                 <div class="card shadow-sm rounded-4 overflow-hidden h-100">
                     <div class="card-header bg-transparent border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center">
                         <span class="fs-5 fw-bold text-secondary">Sesiones Registradas</span>
-                        <span class="badge bg-light text-dark border rounded-pill"><span th:text="${#lists.size(sesiones)}"></span> Sesiones</span>
+                        <span class="badge bg-light text-dark border rounded-pill"><span th:text="${#lists.size(sesiones)}"></span> / 10</span>
                     </div>
                     <div class="table-responsive m-0">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="ps-4 ">Fecha</th>
-                                    <th class="text-center ">Horas</th>
-                                    <th class="pe-4 text-center ">Estado</th>
+                                    <th class="ps-4 text-center" style="width: 40px;">#</th>
+                                    <th>Fecha</th>
+                                    <th>Horario</th>
+                                    <th class="pe-4 text-center">Evidencia</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="sesion : ${sesiones}">
-                                    <td class="ps-4 fw-semibold text-dark">
-                                        <i class="bi bi-calendar-check text-secondary me-2"></i>
-                                        <span th:text="${#dates.format(sesion.fecha, 'dd/MM/yyyy')}"></span>
+                                <tr th:each="sesion, iterStat : ${sesiones}">
+                                    <td class="ps-4 text-center">
+                                        <span class="badge bg-secondary rounded-circle px-2 py-1" th:text="${iterStat.count}">1</span>
                                     </td>
-                                    <td class="text-center text-muted" th:text="${sesion.horasFormativas} + ' hrs'"></td>
+                                    <td class="fw-semibold text-dark">
+                                        <i class="bi bi-calendar-check text-secondary me-1"></i>
+                                        <span th:text="${#temporals.format(sesion.fecha, 'dd/MM/yyyy')}"></span>
+                                    </td>
+                                    <td class="text-muted small">
+                                        <span th:text="${#temporals.format(sesion.horaInicio, 'HH:mm')}"></span>
+                                        -
+                                        <span th:if="${sesion.horaFin != null}" th:text="${#temporals.format(sesion.horaFin, 'HH:mm')}"></span>
+                                        <span th:if="${sesion.horaFin == null}">--:--</span>
+                                    </td>
                                     <td class="text-center pe-4">
-                                        <a th:href="@{/sesion/ver/{id}(id=${sesion.id})}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                                            <i class="bi bi-eye"></i> Ver
-                                        </a>
+                                        <i th:if="${sesion.evidencia != null and !sesion.evidencia.isEmpty()}" class="bi bi-check-circle-fill text-success"></i>
+                                        <i th:if="${sesion.evidencia == null or sesion.evidencia.isEmpty()}" class="bi bi-dash-circle text-muted"></i>
                                     </td>
                                 </tr>
                                 <tr th:if="${sesiones.empty}">
-                                    <td colspan="3" class="text-center py-5 text-muted">
+                                    <td colspan="4" class="text-center py-5 text-muted">
                                         <i class="bi bi-calendar-x fs-1 d-block mb-2 text-light"></i>
-                                        Aún no hay comprobantes de sesiones.
+                                        Aún no hay sesiones registradas.
                                     </td>
                                 </tr>
                             </tbody>

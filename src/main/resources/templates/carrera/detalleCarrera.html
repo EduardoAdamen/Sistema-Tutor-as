@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/fragment :: head}"></head>
 <body class="d-flex flex-column min-vh-100 bg-light">
@@ -43,7 +43,7 @@
                         <a th:href="@{/carrera/carreras}" class="btn btn-outline-secondary rounded-pill px-4">
                             Volver al listado
                         </a>
-                        <a th:href="@{/carrera/editar/{id}(id=${carrera.id})}" class="btn btn-primary rounded-pill px-4" style="background-color: #1b396a; border-color: #1b396a;">
+                        <a th:href="@{/carrera/editar/{id}(id=${carrera.id})}" class="btn btn-encabezado rounded-pill px-4">
                             Editar
                         </a>
                     </div>

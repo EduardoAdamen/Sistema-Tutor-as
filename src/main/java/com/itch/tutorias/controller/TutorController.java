@@ -44,6 +44,9 @@ public class TutorController {
     @Autowired
     private com.itch.tutorias.service.IRegistroAsistencia registroAsistenciaService;
 
+    @Autowired
+    private com.itch.tutorias.service.ISesion sesionService;
+
     @GetMapping("/mis-grupos")
     public String misGrupos(Principal principal, Model model, RedirectAttributes attributes) {
         if (principal == null) {
@@ -91,6 +94,9 @@ public class TutorController {
         model.addAttribute("asignacion", asignacion);
         model.addAttribute("tutorados", tutorados);
         model.addAttribute("porcentajes", porcentajesAsistencia);
+        
+        List<com.itch.tutorias.model.Sesion> sesiones = sesionService.buscarPorAsignacion(asignacion);
+        model.addAttribute("cantidadSesiones", sesiones.size());
 
         return "tutor/detalleGrupo";
     }

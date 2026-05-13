@@ -63,63 +63,63 @@
 
                 <!-- ========== Links directos: Catálogos ========== -->
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" th:href="@{/carrera/carreras}"><i class="bi bi-building me-1"></i> Carreras</a>
+                    <a class="nav-link" th:href="@{/carrera/carreras}">Carreras</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" th:href="@{/grupo/grupos}"><i class="bi bi-people me-1"></i> Grupos</a>
+                    <a class="nav-link" th:href="@{/grupo/grupos}">Grupos</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" th:href="@{/periodo/periodos}"><i class="bi bi-calendar3 me-1"></i> Periodos</a>
+                    <a class="nav-link" th:href="@{/periodo/periodos}">Periodos</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" th:href="@{/asignacion/asignaciones}"><i class="bi bi-diagram-3 me-1"></i> Asignaciones</a>
+                    <a class="nav-link" th:href="@{/asignacion/asignaciones}">Asignaciones</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" th:href="@{/pat/general/actividades}"><i class="bi bi-journal-bookmark-fill me-1"></i> Actividades PAT</a>
+                    <a class="nav-link" th:href="@{/pat/general/actividades}">Actividades PAT</a>
                 </li>
 
                 <!-- ========== Dropdown: Usuarios (único spinner) ========== -->
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                     <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-badge-fill me-1"></i> Usuarios
+                        Usuarios
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                        <li><a class="dropdown-item" th:href="@{/usuario/administradores}"><i class="bi bi-shield-lock me-2"></i>Administradores</a></li>
-                        <li><a class="dropdown-item" th:href="@{/usuario/coordinadores}"><i class="bi bi-clipboard2-data me-2"></i>Coordinadores de Carrera</a></li>
-                        <li><a class="dropdown-item" th:href="@{/usuario/tutores}"><i class="bi bi-person-workspace me-2"></i>Tutores</a></li>
-                        <li><a class="dropdown-item" th:href="@{/usuario/tutorados}"><i class="bi bi-mortarboard me-2"></i>Tutorados</a></li>
+                        <li><a class="dropdown-item" th:href="@{/usuario/administradores}">Administradores</a></li>
+                        <li><a class="dropdown-item" th:href="@{/usuario/coordinadores}">Coordinadores de Carrera</a></li>
+                        <li><a class="dropdown-item" th:href="@{/usuario/tutores}">Tutores</a></li>
+                        <li><a class="dropdown-item" th:href="@{/usuario/tutorados}">Tutorados</a></li>
                     </ul>
                 </li>
 
                 <!-- ========== Dropdown: Coordinador de Carrera ========== -->
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                     <a class="nav-link dropdown-toggle" href="#" id="coordDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-clipboard2-data-fill me-1"></i> Coordinador
+                        Coordinador
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="coordDropdown">
-                        <li><a class="dropdown-item" th:href="@{/coordinador/actividades}"><i class="bi bi-pencil-square me-2"></i>Adaptar Actividades PAT</a></li>
-                        <li><a class="dropdown-item" th:href="@{/coordinador/plan-sesiones}"><i class="bi bi-calendar2-week me-2"></i>Organizar Plan de Sesiones</a></li>
+                        <li><a class="dropdown-item" th:href="@{/coordinador/actividades}">Adaptar Actividades PAT</a></li>
+                        <li><a class="dropdown-item" th:href="@{/coordinador/plan-sesiones}">Organizar Plan de Sesiones</a></li>
                     </ul>
                 </li>
 
                 <!-- ========== Dropdown: Tutor ========== -->
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                     <a class="nav-link dropdown-toggle" href="#" id="tutorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-workspace me-1"></i> Tutor
+                        Tutor
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="tutorDropdown">
-                        <li><a class="dropdown-item" th:href="@{/tutor/mis-grupos}"><i class="bi bi-collection me-2"></i>Mis Grupos</a></li>
-                        <li><a class="dropdown-item" th:href="@{/pat/actividades}"><i class="bi bi-journal-text me-2"></i>Actividades</a></li>
+                        <li><a class="dropdown-item" th:href="@{/tutor/mis-grupos}">Mis Grupos</a></li>
+                        <li><a class="dropdown-item" th:href="@{/pat/actividades}">Actividades</a></li>
                     </ul>
                 </li>
 
                 <!-- ========== Dropdown: Tutorado ========== -->
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                     <a class="nav-link dropdown-toggle" href="#" id="tutoradoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-mortarboard-fill me-1"></i> Tutorado
+                        Tutorado
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="tutoradoDropdown">
-                        <li><a class="dropdown-item" th:href="@{/tutorado/mi-tutoria}"><i class="bi bi-journal-bookmark me-2"></i>Mi Tutoría</a></li>
+                        <li><a class="dropdown-item" th:href="@{/tutorado/mi-tutoria}">Mi Tutoría</a></li>
                     </ul>
                 </li>
 
@@ -133,10 +133,11 @@
 
                 <li class="nav-item dropdown">
 
-                    <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-
-                        <span th:text="${session.usuarioLogueado != null ? session.usuarioLogueado.nombreCompleto : #authentication.name}">Usuario</span>
-
+                    <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="text-end" style="line-height: 1.2;">
+                            <span class="d-block fw-semibold" th:text="${session.usuarioLogueado != null ? session.usuarioLogueado.nombreCompleto : #authentication.name}">Usuario</span>
+                            <small class="text-white-50" th:if="${session.usuarioLogueado != null}" style="font-size: 0.75rem;" th:text="${session.usuarioLogueado.getPrimerPerfil()}">Rol</small>
+                        </div>
                     </a>
 
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
@@ -210,9 +211,48 @@
 <!-- ===================== SCRIPTS ===================== -->
 
 <div th:fragment="scripts">
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function verificarDescargaConstancia(event, porcentaje, sesiones, url) {
+            event.preventDefault();
+            if (sesiones < 10) {
+                Swal.fire({
+                    title: 'Aviso',
+                    text: 'No se puede generar la constancia. Se requieren al menos 10 sesiones registradas (Actuales: ' + sesiones + ').',
+                    icon: 'warning',
+                    confirmButtonColor: '#198754'
+                });
+                return false;
+            }
+            if (porcentaje < 80.0) {
+                Swal.fire({
+                    title: 'Aviso',
+                    text: 'No se puede generar la constancia. El porcentaje de asistencia (' + porcentaje + '%) es menor al 80% requerido.',
+                    icon: 'warning',
+                    confirmButtonColor: '#198754'
+                });
+                return false;
+            }
+            window.open(url, '_blank');
+            return true;
+        }
 
+        function verificarDescargaConstanciaTutor(event, sesiones, url) {
+            event.preventDefault();
+            if (sesiones < 10) {
+                Swal.fire({
+                    title: 'Aviso',
+                    text: 'No se puede generar la constancia. Has registrado ' + sesiones + ' sesiones, pero se requiere un mínimo de 10 sesiones en el periodo.',
+                    icon: 'warning',
+                    confirmButtonColor: '#198754'
+                });
+                return false;
+            }
+            window.open(url, '_blank');
+            return true;
+        }
+    </script>
 </div>
 
 

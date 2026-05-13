@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 
-<html xmlns:th="http://www.thymeleaf.org"
-
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 
 
@@ -13,61 +11,61 @@
 <body class="d-flex flex-column min-vh-100">
 
 
-<nav th:replace="~{fragments/fragment :: navbar}"></nav>
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
 
 
-<main class="container my-5 flex-grow-1">
+    <main class="container my-5 flex-grow-1">
 
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
 
-        <h2 class="mi-titulo m-0">Mis Grupos Asignados</h2>
+            <h2 class="mi-titulo m-0">Mis Grupos Asignados</h2>
 
-    </div>
-
-
-    <div th:if="${msg}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-
-        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${msg}"></span>
-
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
-    </div>
-
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-
-        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
-
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
-    </div>
+        </div>
 
 
+        <div th:if="${msg}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
 
-    <div class="card shadow-sm rounded-4 overflow-hidden">
+            <i class="bi bi-check-circle-fill me-2"></i><span th:text="${msg}"></span>
 
-        <div class="table-responsive m-0">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 
-            <table class="table table-hover mb-0 align-middle">
+        </div>
 
-                <thead class="table-light">
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
 
-                    <tr>
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
 
-                        <th class="ps-4">Periodo</th>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 
-                        <th>Carrera</th>
+        </div>
 
-                        <th>Grupo</th>
 
-                        <th>Horario y Aula</th>
 
-                        <th class="text-center pe-4">Acción</th>
+        <div class="card shadow-sm rounded-4 overflow-hidden">
 
-                    </tr>
+            <div class="table-responsive m-0">
 
-                </thead>
+                <table class="table table-hover mb-0 align-middle">
 
-                <tbody>
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="ps-4">Periodo</th>
+
+                            <th>Carrera</th>
+
+                            <th>Grupo</th>
+
+                            <th>Horario y Aula</th>
+
+                            <th class="text-center pe-4">Acción</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
 
                         <tr th:if="${#lists.isEmpty(asignaciones)}">
 
@@ -87,7 +85,8 @@
 
                                 <span th:text="${a.periodo.clave}"></span>
 
-                                <span th:if="${a.periodo.estatus.name() == 'activo'}" class="badge bg-success ms-1">Activo</span>
+                                <span th:if="${a.periodo.estatus.name() == 'activo'}"
+                                    class="badge bg-success ms-1">Activo</span>
 
                             </td>
 
@@ -97,7 +96,8 @@
 
                             <td>
 
-                                <span th:text="${a.diaHorario} + ' ' + ${a.horaHorario} + ' - ' + ${a.horaFinHorario}"></span><br>
+                                <span
+                                    th:text="${a.diaHorario} + ' ' + ${a.horaHorario} + ' - ' + ${a.horaFinHorario}"></span><br>
 
                                 <small class="text-muted">Aula: <span th:text="${a.aula}"></span></small>
 
@@ -123,21 +123,20 @@
 
         </div>
 
-    </div>
+        </div>
 
-</main>
+    </main>
 
 
 
-<!-- ===================== FOOTER ===================== -->
+    <!-- ===================== FOOTER ===================== -->
 
-<footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
 
-<div th:replace="~{fragments/fragment :: scripts}"></div>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
 
 
 
 </body>
 
 </html>
-

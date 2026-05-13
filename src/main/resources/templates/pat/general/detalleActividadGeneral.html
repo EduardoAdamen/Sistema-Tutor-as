@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <main class="container my-4 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="mi-titulo mb-4">Detalle de Actividad PAT General</h2>
+                
+                <div class="card shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header mi-etiqueta py-3">
+                        <i class="bi bi-info-circle me-1"></i> Información General
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <span class="text-muted small d-block mb-1">ID Actividad</span>
+                                <span class="fw-bold fs-5" th:text="${actividad.id}">1</span>
+                            </div>
+                            <div class="col-md-8">
+                                <span class="text-muted small d-block mb-1">Tipo de Actividad</span>
+                                <span class="badge bg-secondary px-3 py-2 fs-6" th:text="${actividad.tipoActividad}">TIPO</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <span class="text-muted small d-block mb-1">Título de la Actividad</span>
+                            <span class="fw-bold fs-5 text-dark" th:text="${actividad.titulo}">Título</span>
+                        </div>
+                        
+                        <div class="mb-4 bg-light p-3 rounded-3 border">
+                            <span class="text-muted small d-block mb-2 fw-semibold">Descripción:</span>
+                            <p class="mb-0 text-dark" th:text="${actividad.descripcion != null ? actividad.descripcion : 'Sin descripción'}" style="white-space: pre-wrap;"></p>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12 text-end text-muted small">
+                                <i class="bi bi-clock me-1"></i>Registrada el: 
+                                <span th:text="${actividad.fechaRegistro != null ? #temporals.format(actividad.fechaRegistro, 'dd/MM/yyyy HH:mm') : '-'}">01/01/2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                    <a th:href="@{/pat/general/actividades}" class="btn btn-outline-secondary rounded-pill px-4">
+                        <i class="bi bi-arrow-left me-1"></i> Regresar al listado
+                    </a>
+                    <a th:href="@{/pat/general/editar/{id}(id=${actividad.id})}" class="btn btn-encabezado rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-pencil me-1"></i> Editar Actividad
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+</body>
+</html>

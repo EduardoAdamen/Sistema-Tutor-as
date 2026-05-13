@@ -9,7 +9,7 @@
     <!-- Contenido principal -->
     <main class="container my-4 flex-grow-1">
         <h2 class="mi-titulo mb-4">
-            Reporte: Tutores con Asignación de Grupo Tuto-re-ado
+           Buscar tutores
         </h2>
         <hr>
 
@@ -19,7 +19,7 @@
                     <div class="col-md-5">
                         <label for="periodoId" class="form-label">Periodo Semestral</label>
                         <select name="periodoId" id="periodoId" class="form-select" required>
-                            <option value="">-- Seleccione un periodo --</option>
+                            <option value=""> Seleccione un periodo </option>
                             <option th:each="p : ${periodos}"
                                     th:value="${p.id}"
                                     th:text="${p.clave}"

@@ -48,9 +48,9 @@ body {
     border: 1px solid #b0c4de;
 }
 
-/* Botón de encabezado (Agregar) */
+/* Botón de encabezado (Agregar/Guardar) */
 .btn-encabezado {
-    background-color: var(--color-acento);
+    background-color: #198754; /* Bootstrap success green */
     color: #fff;
     border: none;
     font-weight: 600;
@@ -58,7 +58,7 @@ body {
     padding: 0.4rem 1rem;
 }
 .btn-encabezado:hover {
-    background-color: #96281b;
+    background-color: #157347; /* Darker green on hover */
     color: #fff;
 }
 

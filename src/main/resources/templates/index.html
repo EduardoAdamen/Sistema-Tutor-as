@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/fragment :: head}"></head>
+
 <body class="d-flex flex-column min-vh-100 bg-light">
 
     <!-- Navbar -->
@@ -14,63 +16,28 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
-        <!-- Hero Section -->
-        <div class="row align-items-center justify-content-center pt-4">
-            <div class="col-lg-8 text-center bg-white p-5 rounded-4 shadow-sm">
-                <i class="bi bi-mortarboard text-primary mb-3" style="font-size: 4rem;"></i>
-                <h1 class="display-5 fw-bold text-dark mb-3">Programa de Acción Tutorial</h1>
-                <p class="lead text-muted mb-4">
-                    <span th:if="${session.usuarioLogueado != null}">
-                        Bienvenido, <strong th:text="${session.usuarioLogueado.nombreCompleto}" class="text-primary"></strong>.<br>
-                        <span th:if="${session.usuarioLogueado.hasPerfil('ADMINISTRADOR')}">Utilice el menú superior para administrar Catálogos, Asignaciones, Usuarios y Actividades PAT.</span>
-                        <span th:if="${session.usuarioLogueado.hasPerfil('COORDINADOR_CARRERA')}">Acceda al módulo de Coordinador para adaptar las actividades PAT a su carrera.</span>
-                        <span th:if="${session.usuarioLogueado.hasPerfil('TUTOR')}">Acceda de forma rápida a sus grupos de asignación y al registro de sus actividades.</span>
-                        <span th:if="${session.usuarioLogueado.hasPerfil('TUTORADO')}">Consulte su historial de tutorías y manténgase al tanto de su progreso.</span>
-                    </span>
-                    <span th:if="${session.usuarioLogueado == null}">
-                        Bienvenido al Sistema de Tutorías del Instituto Tecnológico de Chilpancingo.<br>
-                        Utilice las búsquedas públicas para consultar información.
-                    </span>
-                </p>
-                <div class="mt-4" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('TUTOR')}">
-                    <a th:href="@{/pat/actividades}" class="btn btn-primary btn-lg rounded-pill shadow-sm px-4">
-                        <i class="bi bi-journal-text me-2"></i> Mis Actividades
-                    </a>
-                </div>
-                <div class="mt-4" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('ADMINISTRADOR')}">
-                    <a th:href="@{/usuario/usuarios}" class="btn btn-primary btn-lg rounded-pill shadow-sm px-4 me-2">
-                        <i class="bi bi-people me-2"></i> Gestión de Usuarios
-                    </a>
-                    <a th:href="@{/pat/general/actividades}" class="btn btn-outline-primary btn-lg rounded-pill shadow-sm px-4">
-                        <i class="bi bi-journal-bookmark me-2"></i> Actividades PAT
-                    </a>
-                </div>
-                <div class="mt-4" th:if="${session.usuarioLogueado != null and session.usuarioLogueado.hasPerfil('COORDINADOR_CARRERA')}">
-                    <a th:href="@{/coordinador/actividades}" class="btn btn-primary btn-lg rounded-pill shadow-sm px-4">
-                        <i class="bi bi-clipboard2-data me-2"></i> Adaptar Actividades
-                    </a>
-                </div>
-            </div>
-        </div>
 
         <!-- Sección de Búsquedas Públicas -->
         <div class="row justify-content-center mt-5">
             <div class="col-lg-10">
                 <h3 class="mi-titulo text-center mb-4">
-                    <i class="bi bi-search me-2"></i>Búsquedas Informativas
+                    Búsquedas Informativas
                 </h3>
-                <p class="text-muted text-center mb-4">Consulte información sobre tutores, tutorados y actividades del Programa de Acción Tutorial sin necesidad de iniciar sesión.</p>
+
                 <div class="row g-4">
                     <!-- Buscar Tutores -->
                     <div class="col-md-4">
                         <div class="card shadow-sm rounded-4 border-0 h-100 text-center p-4">
                             <div class="card-body d-flex flex-column align-items-center">
-                                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3"
+                                    style="width: 80px; height: 80px;">
                                     <i class="bi bi-person-workspace text-primary" style="font-size: 2rem;"></i>
                                 </div>
                                 <h5 class="card-title fw-bold">Buscar Tutores</h5>
-                                <p class="card-text text-muted flex-grow-1">Consulte los tutores asignados por periodo semestral, junto con sus grupos y horarios.</p>
-                                <a th:href="@{/busqueda/tutores}" class="btn btn-outline-primary rounded-pill px-4 mt-2">
+                                <p class="card-text text-muted flex-grow-1">Consulte los tutores asignados por periodo
+                                    semestral, junto con sus grupos y horarios.</p>
+                                <a th:href="@{/busqueda/tutores}"
+                                    class="btn btn-outline-primary rounded-pill px-4 mt-2">
                                     <i class="bi bi-search me-1"></i> Consultar
                                 </a>
                             </div>
@@ -80,12 +47,15 @@
                     <div class="col-md-4">
                         <div class="card shadow-sm rounded-4 border-0 h-100 text-center p-4">
                             <div class="card-body d-flex flex-column align-items-center">
-                                <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3"
+                                    style="width: 80px; height: 80px;">
                                     <i class="bi bi-mortarboard text-success" style="font-size: 2rem;"></i>
                                 </div>
                                 <h5 class="card-title fw-bold">Buscar Tutorado</h5>
-                                <p class="card-text text-muted flex-grow-1">Busque un tutorado por número de control para ver su historial y porcentaje de asistencia.</p>
-                                <a th:href="@{/busqueda/tutorado}" class="btn btn-outline-success rounded-pill px-4 mt-2">
+                                <p class="card-text text-muted flex-grow-1">Busque un tutorado por número de control
+                                    para ver su historial y porcentaje de asistencia.</p>
+                                <a th:href="@{/busqueda/tutorado}"
+                                    class="btn btn-outline-success rounded-pill px-4 mt-2">
                                     <i class="bi bi-search me-1"></i> Consultar
                                 </a>
                             </div>
@@ -95,12 +65,15 @@
                     <div class="col-md-4">
                         <div class="card shadow-sm rounded-4 border-0 h-100 text-center p-4">
                             <div class="card-body d-flex flex-column align-items-center">
-                                <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3"
+                                    style="width: 80px; height: 80px;">
                                     <i class="bi bi-journal-text text-warning" style="font-size: 2rem;"></i>
                                 </div>
                                 <h5 class="card-title fw-bold">Buscar Actividades PAT</h5>
-                                <p class="card-text text-muted flex-grow-1">Explore las actividades del Plan de Acción Tutorial filtradas por fecha, tipo, carrera o tutor.</p>
-                                <a th:href="@{/busqueda/pat}" class="btn btn-outline-warning rounded-pill px-4 mt-2 text-dark">
+                                <p class="card-text text-muted flex-grow-1">Explore las actividades del Plan de Acción
+                                    Tutorial filtradas por fecha, tipo, carrera o tutor.</p>
+                                <a th:href="@{/busqueda/pat}"
+                                    class="btn btn-outline-warning rounded-pill px-4 mt-2 text-dark">
                                     <i class="bi bi-search me-1"></i> Consultar
                                 </a>
                             </div>
@@ -116,4 +89,5 @@
     <div th:replace="~{fragments/fragment :: scripts}"></div>
 
 </body>
+
 </html>
