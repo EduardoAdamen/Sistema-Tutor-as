@@ -26,6 +26,9 @@ public class SesionController {
     private ISesionActividad sesionActividadService;
 
     @Autowired
+    private IActividadPatGeneral actividadPatGeneralService;
+
+    @Autowired
     private IActividadPatCarrera actividadPatCarreraService;
 
     @Autowired
@@ -98,6 +101,10 @@ public class SesionController {
         Carrera carreraGrupo = asignacionActiva.getGrupo().getCarrera();
         Optional<PlanSesionCarrera> planOpt = planSesionCarreraService.buscarPorCarreraYSesion(carreraGrupo, siguienteNumSesion);
 
+        if (planOpt.isEmpty()) {
+            model.addAttribute("actividadesGenerales", actividadPatGeneralService.buscarTodas());
+        }
+
         model.addAttribute("sesion", sesion);
         model.addAttribute("numSesion", siguienteNumSesion);
         model.addAttribute("actividadPlanificada", planOpt.orElse(null));
@@ -108,6 +115,7 @@ public class SesionController {
     public String guardarSesion(@ModelAttribute Sesion sesion,
                                 @RequestParam("archivoEvidencia") MultipartFile archivoEvidencia,
                                 @RequestParam(value = "actividadCarreraId", required = false) Integer actividadCarreraId,
+                                @RequestParam(value = "actividadGeneralId", required = false) Integer actividadGeneralId,
                                 Principal principal,
                                 RedirectAttributes attributes) {
                                 
@@ -151,13 +159,37 @@ public class SesionController {
         Sesion sesionGuardada = sesionService.guardar(sesion);
 
         // Vincular la actividad del plan del coordinador (solo sesiones nuevas)
-        if (sesion.getId() == null && actividadCarreraId != null) {
-            ActividadPatCarrera actCarrera = actividadPatCarreraService.buscarPorId(actividadCarreraId);
-            if (actCarrera != null) {
-                SesionActividad sa = new SesionActividad();
-                sa.setSesion(sesionGuardada);
-                sa.setActividadCarrera(actCarrera);
-                sesionActividadService.guardar(sa);
+        if (sesion.getId() == null) {
+            if (actividadCarreraId != null) {
+                ActividadPatCarrera actCarrera = actividadPatCarreraService.buscarPorId(actividadCarreraId);
+                if (actCarrera != null) {
+                    SesionActividad sa = new SesionActividad();
+                    sa.setSesion(sesionGuardada);
+                    sa.setActividadCarrera(actCarrera);
+                    sesionActividadService.guardar(sa);
+                }
+            } else if (actividadGeneralId != null) {
+                ActividadPatGeneral actGeneral = actividadPatGeneralService.buscarPorId(actividadGeneralId);
+                Carrera carrera = asignacionActiva.getGrupo().getCarrera();
+                if (actGeneral != null) {
+                    ActividadPatCarrera actCarrera = actividadPatCarreraService.buscarPorCarrera(carrera).stream()
+                            .filter(a -> a.getActividadGeneral().getId().equals(actividadGeneralId))
+                            .findFirst().orElse(null);
+
+                    if (actCarrera == null) {
+                        actCarrera = new ActividadPatCarrera();
+                        actCarrera.setActividadGeneral(actGeneral);
+                        actCarrera.setCarrera(carrera);
+                        actCarrera.setTituloAdaptado(actGeneral.getTitulo());
+                        actCarrera.setDescripcionAdaptada(actGeneral.getDescripcion());
+                        actCarrera = actividadPatCarreraService.guardar(actCarrera);
+                    }
+
+                    SesionActividad sa = new SesionActividad();
+                    sa.setSesion(sesionGuardada);
+                    sa.setActividadCarrera(actCarrera);
+                    sesionActividadService.guardar(sa);
+                }
             }
         }
 

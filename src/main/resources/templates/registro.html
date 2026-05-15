@@ -41,26 +41,26 @@
             <div th:if="${msg}" class="alert alert-success p-2" role="alert" th:text="${msg}"></div>
 
             <div class="form-floating mb-2">
-                <input type="text" class="form-control" id="username" name="username" placeholder="No. Control" required autofocus>
+                <input type="text" class="form-control" id="username" name="username" placeholder="No. Control" required autofocus th:value="${username}">
                 <label for="username">Número de Control <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating mb-2">
-                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre Completo" required>
+                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre Completo" required th:value="${nombre}">
                 <label for="nombre">Nombre Completo <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating mb-2">
-                <input type="email" class="form-control" id="email" name="email" placeholder="Correo Institucional" required>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Correo Institucional" required th:value="${email}">
                 <label for="email">Correo Institucional <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating mb-2">
                 <select class="form-select" id="carreraId" name="carreraId" required>
                     <option value="" disabled selected>Selecciona tu carrera</option>
-                    <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}"></option>
+                    <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}" th:selected="${c.id == carreraId}"></option>
                 </select>
                 <label for="carreraId">Carrera <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating mb-2">
-                <input type="number" class="form-control" id="semestre" name="semestre" placeholder="Semestre" min="1" max="14" required>
+                <input type="number" class="form-control" id="semestre" name="semestre" placeholder="Semestre" min="1" max="14" required th:value="${semestre}">
                 <label for="semestre">Semestre <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating mb-3">

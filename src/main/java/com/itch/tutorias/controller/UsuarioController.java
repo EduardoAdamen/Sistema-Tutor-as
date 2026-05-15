@@ -93,6 +93,11 @@ public class UsuarioController {
         
         if (usuarioService.existeCorreo(email) || usuarioService.existeNumeroIdentificacion(username)) {
             attributes.addFlashAttribute("error", "El usuario o correo ya existe.");
+            attributes.addFlashAttribute("username", username);
+            attributes.addFlashAttribute("email", email);
+            attributes.addFlashAttribute("nombre", nombre);
+            attributes.addFlashAttribute("carreraId", carreraId);
+            attributes.addFlashAttribute("semestre", semestre);
             return "redirect:/registro";
         }
         
@@ -198,7 +203,9 @@ public class UsuarioController {
     public String formularioNuevoUsuario(
             @RequestParam(value = "rol", required = false) String rol,
             Model model) {
-        model.addAttribute("usuario", new Usuario());
+        if (!model.containsAttribute("usuario")) {
+            model.addAttribute("usuario", new Usuario());
+        }
         model.addAttribute("carreras", carreraService.buscarTodas());
         model.addAttribute("perfiles", perfilService.buscarTodos());
         model.addAttribute("estados", Usuario.EstadoUsuario.values());
@@ -251,6 +258,7 @@ public class UsuarioController {
                     
                     if (!usuarioOpt.getCorreo().equals(usuario.getCorreo()) && usuarioService.existeCorreo(usuario.getCorreo())) {
                         attributes.addFlashAttribute("error", "El correo proporcionado ya está registrado por otro usuario.");
+                        attributes.addFlashAttribute("usuario", usuario);
                         return "redirect:/usuario/nuevo";
                     }
                     
@@ -270,12 +278,14 @@ public class UsuarioController {
                     return "redirect:" + resolverRedirectPorPerfil(usuarioOpt);
                 } else {
                     attributes.addFlashAttribute("error", "El número de identificación ya está registrado y se encuentra activo.");
+                    attributes.addFlashAttribute("usuario", usuario);
                     return "redirect:/usuario/nuevo";
                 }
             }
 
             if (usuarioService.existeCorreo(usuario.getCorreo())) {
                 attributes.addFlashAttribute("error", "El correo ya está registrado.");
+                attributes.addFlashAttribute("usuario", usuario);
                 return "redirect:/usuario/nuevo";
             }
         } else {
@@ -284,12 +294,14 @@ public class UsuarioController {
                 Optional<Usuario> o = usuarioService.buscarPorNumeroIdentificacion(usuario.getNumeroIdentificacion());
                 if (o.isPresent()) {
                     attributes.addFlashAttribute("error", "El número de identificación ya está registrado.");
+                    attributes.addFlashAttribute("usuario", usuario);
                     return "redirect:/usuario/editar/" + usuario.getId();
                 }
             }
             if (!usuarioExistente.getCorreo().equals(usuario.getCorreo()) &&
                     usuarioService.existeCorreo(usuario.getCorreo())) {
                 attributes.addFlashAttribute("error", "El correo ya está registrado.");
+                attributes.addFlashAttribute("usuario", usuario);
                 return "redirect:/usuario/editar/" + usuario.getId();
             }
             // Mantener contraseña y otros valores si es edición

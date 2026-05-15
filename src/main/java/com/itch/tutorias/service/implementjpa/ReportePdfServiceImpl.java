@@ -78,4 +78,59 @@ public class ReportePdfServiceImpl implements IReportePdfService {
             return baos.toByteArray();
         }
     }
+
+    @Override
+    public byte[] generarReporteActividadesGenerales(List<com.itch.tutorias.model.ActividadPatGeneral> actividades) throws Exception {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            Document document = new Document(PageSize.A4);
+            PdfWriter.getInstance(document, baos);
+            
+            document.open();
+            
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
+            Font subtitleFont = FontFactory.getFont(FontFactory.HELVETICA, 14);
+            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, Color.WHITE);
+            Font cellFont = FontFactory.getFont(FontFactory.HELVETICA, 11);
+            
+            Paragraph title = new Paragraph("Catálogo de Actividades PAT Generales", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(10);
+            document.add(title);
+            
+            Paragraph subtitle = new Paragraph("Sistema Web de Tutorías", subtitleFont);
+            subtitle.setAlignment(Element.ALIGN_CENTER);
+            subtitle.setSpacingAfter(30);
+            document.add(subtitle);
+            
+            if (actividades == null || actividades.isEmpty()) {
+                Paragraph emptyMsg = new Paragraph("No hay actividades registradas en el catálogo.", subtitleFont);
+                emptyMsg.setAlignment(Element.ALIGN_CENTER);
+                document.add(emptyMsg);
+            } else {
+                PdfPTable table = new PdfPTable(3);
+                table.setWidthPercentage(100);
+                table.setWidths(new float[]{3f, 5f, 2f});
+                
+                String[] headers = {"Título", "Descripción", "Tipo de Actividad"};
+                for (String h : headers) {
+                    PdfPCell cell = new PdfPCell(new Phrase(h, headerFont));
+                    cell.setBackgroundColor(new Color(13, 110, 253)); // Primary blue #0d6efd
+                    cell.setPadding(8);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    table.addCell(cell);
+                }
+                
+                for (com.itch.tutorias.model.ActividadPatGeneral act : actividades) {
+                    table.addCell(new PdfPCell(new Phrase(act.getTitulo(), cellFont)));
+                    table.addCell(new PdfPCell(new Phrase(act.getDescripcion() != null ? act.getDescripcion() : "", cellFont)));
+                    table.addCell(new PdfPCell(new Phrase(act.getTipoActividad().name(), cellFont)));
+                }
+                
+                document.add(table);
+            }
+            
+            document.close();
+            return baos.toByteArray();
+        }
+    }
 }

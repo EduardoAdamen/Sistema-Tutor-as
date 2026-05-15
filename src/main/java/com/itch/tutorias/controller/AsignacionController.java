@@ -75,7 +75,9 @@ public class AsignacionController {
             return "redirect:/asignacion/asignaciones";
         }
 
-        model.addAttribute("asignacion", new Asignacion());
+        if (!model.containsAttribute("asignacion")) {
+            model.addAttribute("asignacion", new Asignacion());
+        }
         model.addAttribute("tutores", tutorService.buscarTodos().stream().filter(t -> t.getUsuario().getEstado() == Usuario.EstadoUsuario.activo).collect(java.util.stream.Collectors.toList()));
         model.addAttribute("grupos", grupoService.buscarTodos());
         model.addAttribute("periodoActivo", periodoActivoOpt.get());
@@ -100,6 +102,7 @@ public class AsignacionController {
                     asignacion.getHoraHorario(),
                     asignacion.getPeriodo())) {
                 attributes.addFlashAttribute("error", "Ya existe una asignación para ese tutor, en el mismo grupo y horario en el periodo actual.");
+                attributes.addFlashAttribute("asignacion", asignacion);
                 return "redirect:/asignacion/nuevo";
             }
         } else {
@@ -146,12 +149,44 @@ public class AsignacionController {
 
         Asignacion asignacion = asignacionService.buscarPorId(id);
         List<AsignacionTutorado> tutorados = asignacionTutoradoService.buscarPorAsignacion(asignacion);
+        
+        List<Tutorado> tutoradosCarrera = tutoradoService.buscarPorCarrera(asignacion.getGrupo().getCarrera());
+        java.util.Set<Integer> inscritosIds = tutorados.stream()
+                .map(at -> at.getTutorado().getId())
+                .collect(java.util.stream.Collectors.toSet());
 
         model.addAttribute("usuarioLogueado", usuarioLogueado);
         model.addAttribute("asignacion", asignacion);
         model.addAttribute("asigTutorados", tutorados);
+        model.addAttribute("tutoradosCarrera", tutoradosCarrera);
+        model.addAttribute("inscritosIds", inscritosIds);
 
         return "asignacion/inscripcionTutorados";
+    }
+
+    @PostMapping("/asignacion/{id}/inscribir-tutorados")
+    public String inscribirTutoradosMultiples(@PathVariable Integer id, @RequestParam(value = "tutoradoIds", required = false) List<Integer> tutoradoIds, RedirectAttributes attributes) {
+        if (tutoradoIds == null || tutoradoIds.isEmpty()) {
+            attributes.addFlashAttribute("error", "No se seleccionó ningún tutorado.");
+            return "redirect:/asignacion/inscripcion/" + id;
+        }
+
+        Asignacion asignacion = asignacionService.buscarPorId(id);
+        int inscritos = 0;
+
+        for (Integer tId : tutoradoIds) {
+            Tutorado tutorado = tutoradoService.buscarPorId(tId);
+            if (tutorado != null && !asignacionTutoradoService.existeRelacion(asignacion, tutorado)) {
+                AsignacionTutorado relacion = new AsignacionTutorado();
+                relacion.setAsignacion(asignacion);
+                relacion.setTutorado(tutorado);
+                asignacionTutoradoService.guardar(relacion);
+                inscritos++;
+            }
+        }
+        
+        attributes.addFlashAttribute("msg", inscritos + " tutorado(s) inscrito(s) exitosamente.");
+        return "redirect:/asignacion/inscripcion/" + id;
     }
 
     @GetMapping("/asignacion/editar/{id}")

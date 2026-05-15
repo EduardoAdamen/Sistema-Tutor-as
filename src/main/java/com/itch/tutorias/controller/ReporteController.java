@@ -42,6 +42,26 @@ public class ReporteController {
     @Autowired
     private IPeriodoSemestral periodoService;
 
+    @Autowired
+    private com.itch.tutorias.service.IActividadPatGeneral actividadPatGeneralService;
+
+    @GetMapping("/actividades-generales")
+    public ResponseEntity<byte[]> descargarReporteActividadesGenerales() {
+        try {
+            List<com.itch.tutorias.model.ActividadPatGeneral> actividades = actividadPatGeneralService.buscarTodas();
+            byte[] pdfBytes = reportePdfService.generarReporteActividadesGenerales(actividades);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("filename", "Actividades_PAT_Generales_Catalogo.pdf");
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage().getBytes());
+        }
+    }
+
     @GetMapping("/actividades")
     public ResponseEntity<byte[]> descargarReporteActividades(
             @RequestParam(name = "periodoId", required = false) Integer periodoId,
