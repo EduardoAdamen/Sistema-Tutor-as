@@ -100,4 +100,51 @@ public class TutorController {
 
         return "tutor/detalleGrupo";
     }
+
+    @GetMapping("/todas-sesiones")
+    public String todasSesiones(Principal principal, Model model, RedirectAttributes attributes) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        
+        Optional<Usuario> tutorOpt = usuarioService.buscarPorNumeroIdentificacion(principal.getName());
+        if (tutorOpt.isEmpty()) {
+            attributes.addFlashAttribute("error", "No se pudo identificar tu cuenta de tutor.");
+            return "redirect:/";
+        }
+        
+        Usuario usuario = tutorOpt.get();
+        Optional<Tutor> tOpt = tutorService.buscarPorUsuario(usuario);
+        if (tOpt.isEmpty()) {
+            attributes.addFlashAttribute("error", "No se encontró el registro de tutor para este usuario.");
+            return "redirect:/";
+        }
+        
+        Tutor tutor = tOpt.get();
+        
+        Optional<PeriodoSemestral> periodoActivoOpt = periodoService.buscarActivo();
+        if (periodoActivoOpt.isEmpty()) {
+            model.addAttribute("msg", "No hay un periodo semestral activo actualmente.");
+            model.addAttribute("sesiones", java.util.Collections.emptyList());
+            return "tutor/todasSesiones";
+        }
+        
+        PeriodoSemestral periodoActivo = periodoActivoOpt.get();
+        
+        List<Asignacion> asignaciones = asignacionService.buscarPorTutor(tutor);
+        List<Asignacion> asignacionesActivas = asignaciones.stream()
+                .filter(a -> a.getPeriodo().getId().equals(periodoActivo.getId()))
+                .collect(java.util.stream.Collectors.toList());
+                
+        List<com.itch.tutorias.model.Sesion> sesiones = new java.util.ArrayList<>();
+        for (Asignacion a : asignacionesActivas) {
+            sesiones.addAll(sesionService.buscarPorAsignacion(a));
+        }
+        
+        sesiones.sort((s1, s2) -> s2.getFecha().compareTo(s1.getFecha()));
+        
+        model.addAttribute("sesiones", sesiones);
+        model.addAttribute("periodo", periodoActivo);
+        return "tutor/todasSesiones";
+    }
 }

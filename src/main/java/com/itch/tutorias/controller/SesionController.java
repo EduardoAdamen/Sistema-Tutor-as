@@ -239,7 +239,7 @@ public class SesionController {
     }
 
     @GetMapping("/ver/{id}")
-    public String verSesion(@PathVariable Integer id, Model model, Principal principal, RedirectAttributes attributes) {
+    public String verSesion(@PathVariable Integer id, @RequestParam(value = "origen", required = false) String origen, Model model, Principal principal, RedirectAttributes attributes) {
         if (principal == null) return "redirect:/login";
         Usuario usuarioLogueado = usuarioService.buscarPorNumeroIdentificacion(principal.getName()).orElse(null);
         
@@ -268,6 +268,7 @@ public class SesionController {
         model.addAttribute("actividades", actividades);
         model.addAttribute("tutorados", tutorados);
         model.addAttribute("asistencias", asistencias);
+        model.addAttribute("origen", origen);
         return "sesion/detalleSesion";
     }
 }

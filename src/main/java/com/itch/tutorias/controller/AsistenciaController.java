@@ -27,7 +27,7 @@ public class AsistenciaController {
     private IRegistroAsistencia registroAsistenciaService;
 
     @GetMapping("/registrar/{sesionId}")
-    public String registrarFormulario(@PathVariable Integer sesionId, Model model, RedirectAttributes attributes) {
+    public String registrarFormulario(@PathVariable Integer sesionId, @RequestParam(value = "origen", required = false) String origen, Model model, RedirectAttributes attributes) {
         Sesion sesion = sesionService.buscarPorId(sesionId);
         if (sesion == null) {
             attributes.addFlashAttribute("error", "Sesión no encontrada.");
@@ -48,6 +48,7 @@ public class AsistenciaController {
         model.addAttribute("sesion", sesion);
         model.addAttribute("tutorados", asignacionTutorados);
         model.addAttribute("presentesPrevios", presentesPrevios);
+        model.addAttribute("origen", origen);
 
         return "asistencia/registrarAsistencia";
     }
@@ -56,6 +57,7 @@ public class AsistenciaController {
     public String guardarAsistencias(
             @PathVariable Integer sesionId,
             @RequestParam(value = "presentes", required = false) List<Integer> presentes,
+            @RequestParam(value = "origen", required = false) String origen,
             RedirectAttributes attributes) {
         
         Sesion sesion = sesionService.buscarPorId(sesionId);
@@ -93,6 +95,9 @@ public class AsistenciaController {
         }
 
         attributes.addFlashAttribute("msg", "Asistencia registrada correctamente.");
+        if (origen != null && !origen.isEmpty()) {
+            attributes.addAttribute("origen", origen);
+        }
         return "redirect:/sesion/ver/" + sesionId;
     }
 }

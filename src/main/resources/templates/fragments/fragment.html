@@ -106,10 +106,16 @@
                 <li class="nav-item" sec:authorize="hasAuthority('TUTOR')">
                     <a class="nav-link" th:href="@{/pat/actividades}">Actividades</a>
                 </li>
+                <li class="nav-item" sec:authorize="hasAuthority('TUTOR')">
+                    <a class="nav-link" th:href="@{/tutor/todas-sesiones}">Sesiones registradas</a>
+                </li>
 
                 <!-- ========== Links directos: Tutorado ========== -->
                 <li class="nav-item" sec:authorize="hasAuthority('TUTORADO')">
                     <a class="nav-link" th:href="@{/tutorado/mi-tutoria}">Mi Tutoría</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('TUTORADO')">
+                    <a class="nav-link" th:href="@{/tutorado/sesiones}">Sesiones registradas</a>
                 </li>
 
             </ul>

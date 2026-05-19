@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragment :: head}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments/fragment :: navbar}"></nav>
+
+    <!-- Contenido principal -->
+    <main class="container my-4 flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <div>
+                <h2 class="mi-titulo m-0 d-inline-block me-3">Sesiones Registradas</h2>
+                <span class="badge bg-secondary fs-6" th:if="${periodo != null}">
+                    Periodo Activo: <span th:text="${periodo.clave}"></span>
+                </span>
+            </div>
+        </div>
+
+        <div class="card shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-transparent border-bottom pt-3 pb-3">
+                <span class="fs-5 fw-bold text-secondary">Registro de Sesiones</span>
+            </div>
+            
+            <div class="table-responsive m-0">
+                <table class="table table-hover align-middle mb-0 text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4 text-start">Fecha</th>
+                            <th>Hora</th>
+                            <th>Tu Asistencia</th>
+                            <th class="pe-4">Evidencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="sesion : ${sesiones}">
+                            <td class="ps-4 text-start fw-semibold text-dark" th:text="${#temporals.format(sesion.fecha, 'dd/MM/yyyy')}"></td>
+                            <td class="text-muted" th:text="${sesion.horaInicio} + ' - ' + ${sesion.horaFin}"></td>
+                            <td>
+                                <span th:if="${estadosAsistencia[sesion.id] == 'presente'}" class="badge bg-success rounded-pill px-3 py-2">Presente</span>
+                                <span th:if="${estadosAsistencia[sesion.id] == 'ausente'}" class="badge bg-danger rounded-pill px-3 py-2">Ausente</span>
+                                <span th:if="${estadosAsistencia[sesion.id] == 'justificado'}" class="badge bg-warning text-dark rounded-pill px-3 py-2">Justificado</span>
+                                <span th:if="${estadosAsistencia[sesion.id] == null}" class="badge bg-secondary rounded-pill px-3 py-2">Pendiente</span>
+                            </td>
+                            <td class="pe-4">
+                                <span th:if="${sesion.evidencia != null}">
+                                    <a th:href="@{'/uploads/sesiones/' + ${sesion.evidencia}}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3">
+                                         Ver Documento
+                                    </a>
+                                </span>
+                                <span th:if="${sesion.evidencia == null}" class="text-muted small">
+                                    No hay
+                                </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${sesiones.empty}">
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                Tu tutor aún no ha registrado ninguna sesión.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/fragment :: footer}"></footer>
+    <div th:replace="~{fragments/fragment :: scripts}"></div>
+
+</body>
+</html>

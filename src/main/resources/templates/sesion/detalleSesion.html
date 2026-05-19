@@ -16,7 +16,14 @@
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
         <div class="mb-3">
-            <a th:href="@{/sesion/grupo/{id}(id=${sesion.asignacion.id})}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Regresar a Mis Sesiones</a>
+            <!-- If coming from general list of sessions -->
+            <a th:if="${origen == 'general'}" th:href="@{/tutor/todas-sesiones}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Regresar a todas las sesiones
+            </a>
+            <!-- Default (coming from specific group sessions) -->
+            <a th:if="${origen != 'general'}" th:href="@{/sesion/grupo/{id}(id=${sesion.asignacion.id})}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Regresar a Mis Sesiones
+            </a>
         </div>
 
         <div class="row">
@@ -47,7 +54,7 @@
                 <div class="card shadow-sm rounded-4 overflow-hidden h-100">
                     <div class="card-header bg-transparent border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center">
                         <span class="fs-5 fw-bold text-dark">Asistencia Registrada</span>
-                        <a th:href="@{/asistencia/registrar/{id}(id=${sesion.id})}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        <a th:href="@{/asistencia/registrar/{id}(id=${sesion.id}, origen=${origen})}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                             <i class="bi bi-pencil-square"></i> Modificar Asistencia
                         </a>
                     </div>
