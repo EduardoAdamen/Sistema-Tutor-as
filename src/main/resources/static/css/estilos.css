@@ -74,9 +74,10 @@ body {
     text-decoration: none;
     transition: opacity 0.2s;
 }
-.btn-ver     { background-color: #17a2b8; color: #fff; }
+.btn-ver, .btn-detalle { background-color: #17a2b8; color: #fff; }
 .btn-editar  { background-color: #ffc107; color: #212529; }
 .btn-eliminar{ background-color: #dc3545; color: #fff; }
+.btn-crud.btn-success { background-color: #198754; color: #fff; }
 .btn-crud:hover { opacity: 0.8; color: inherit; }
 
 /* Miniatura de foto en tabla */

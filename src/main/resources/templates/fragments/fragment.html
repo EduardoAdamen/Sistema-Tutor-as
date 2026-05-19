@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 
 <!-- ===================== HEAD ===================== -->
@@ -62,24 +62,24 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <!-- ========== Links directos: Catálogos ========== -->
-                <li class="nav-item" sec:authorize="isAuthenticated()">
+                <li class="nav-item" sec:authorize="hasAuthority('ADMINISTRADOR')">
                     <a class="nav-link" th:href="@{/carrera/carreras}">Carreras</a>
                 </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
+                <li class="nav-item" sec:authorize="hasAuthority('ADMINISTRADOR')">
                     <a class="nav-link" th:href="@{/grupo/grupos}">Grupos</a>
                 </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
+                <li class="nav-item" sec:authorize="hasAuthority('ADMINISTRADOR')">
                     <a class="nav-link" th:href="@{/periodo/periodos}">Periodos</a>
                 </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
+                <li class="nav-item" sec:authorize="hasAuthority('ADMINISTRADOR')">
                     <a class="nav-link" th:href="@{/asignacion/asignaciones}">Asignaciones</a>
                 </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
+                <li class="nav-item" sec:authorize="hasAuthority('ADMINISTRADOR')">
                     <a class="nav-link" th:href="@{/pat/general/actividades}">Actividades PAT</a>
                 </li>
 
                 <!-- ========== Dropdown: Usuarios (único spinner) ========== -->
-                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                <li class="nav-item dropdown" sec:authorize="hasAuthority('ADMINISTRADOR')">
                     <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Usuarios
                     </a>
@@ -91,36 +91,25 @@
                     </ul>
                 </li>
 
-                <!-- ========== Dropdown: Coordinador de Carrera ========== -->
-                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle" href="#" id="coordDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Coordinador
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="coordDropdown">
-                        <li><a class="dropdown-item" th:href="@{/coordinador/actividades}">Adaptar Actividades PAT</a></li>
-                        <li><a class="dropdown-item" th:href="@{/coordinador/plan-sesiones}">Organizar Plan de Sesiones</a></li>
-                    </ul>
+                <!-- ========== Links directos: Coordinador de Carrera ========== -->
+                <li class="nav-item" sec:authorize="hasAuthority('COORDINADOR_CARRERA')">
+                    <a class="nav-link" th:href="@{/coordinador/actividades}">Adaptar Actividades PAT</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('COORDINADOR_CARRERA')">
+                    <a class="nav-link" th:href="@{/coordinador/plan-sesiones}">Organizar Plan de Sesiones</a>
                 </li>
 
-                <!-- ========== Dropdown: Tutor ========== -->
-                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle" href="#" id="tutorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Tutor
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="tutorDropdown">
-                        <li><a class="dropdown-item" th:href="@{/tutor/mis-grupos}">Mis Grupos</a></li>
-                        <li><a class="dropdown-item" th:href="@{/pat/actividades}">Actividades</a></li>
-                    </ul>
+                <!-- ========== Links directos: Tutor ========== -->
+                <li class="nav-item" sec:authorize="hasAuthority('TUTOR')">
+                    <a class="nav-link" th:href="@{/tutor/mis-grupos}">Mis Grupos</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasAuthority('TUTOR')">
+                    <a class="nav-link" th:href="@{/pat/actividades}">Actividades</a>
                 </li>
 
-                <!-- ========== Dropdown: Tutorado ========== -->
-                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle" href="#" id="tutoradoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Tutorado
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="tutoradoDropdown">
-                        <li><a class="dropdown-item" th:href="@{/tutorado/mi-tutoria}">Mi Tutoría</a></li>
-                    </ul>
+                <!-- ========== Links directos: Tutorado ========== -->
+                <li class="nav-item" sec:authorize="hasAuthority('TUTORADO')">
+                    <a class="nav-link" th:href="@{/tutorado/mi-tutoria}">Mi Tutoría</a>
                 </li>
 
             </ul>
