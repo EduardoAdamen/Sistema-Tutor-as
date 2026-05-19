@@ -190,7 +190,7 @@ public class DatabaseWebSecurity {
     }
 
 
-    // funcion para encriptar
+    //funcion para encriptar
 
     @Bean
 
