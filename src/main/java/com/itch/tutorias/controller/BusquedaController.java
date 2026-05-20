@@ -43,49 +43,107 @@ public class BusquedaController {
     private IRegistroAsistencia registroAsistenciaService;
 
     @GetMapping("/busqueda/tutores") 
-    public String buscarTutores(@RequestParam(required = false) Integer periodoId, Model model) {
-        model.addAttribute("periodos", periodoService.buscarTodos());
-        model.addAttribute("filtroPeriodoId", periodoId);
-
-        if (periodoId != null) {
-            PeriodoSemestral p = periodoService.buscarPorId(periodoId);
-            List<Asignacion> asignaciones = asignacionService.buscarPorPeriodo(p);
+    public String buscarTutores(
+            @RequestParam(required = false) Integer periodoId,
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) Integer carreraId,
+            Model model) {
             
-            model.addAttribute("asignaciones", asignaciones);
+        PeriodoSemestral activo = periodoService.buscarActivo().orElse(null);
+        if (periodoId == null && activo != null) {
+            periodoId = activo.getId();
         }
 
+        model.addAttribute("periodos", periodoService.buscarTodos());
+        model.addAttribute("carreras", carreraService.buscarTodas());
+        model.addAttribute("filtroPeriodoId", periodoId);
+        model.addAttribute("filtroNombre", nombre);
+        model.addAttribute("filtroCarreraId", carreraId);
+
+        List<Asignacion> asignaciones = new java.util.ArrayList<>();
+        if (periodoId != null) {
+            PeriodoSemestral p = periodoService.buscarPorId(periodoId);
+            if (p != null) {
+                asignaciones = asignacionService.buscarPorPeriodo(p);
+            }
+        } else {
+            asignaciones = asignacionService.buscarTodas();
+        }
+
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            String nameLower = nombre.toLowerCase().trim();
+            asignaciones = asignaciones.stream()
+                .filter(asig -> asig.getTutor().getUsuario().getNombreCompleto().toLowerCase().contains(nameLower))
+                .collect(Collectors.toList());
+        }
+
+        if (carreraId != null) {
+            asignaciones = asignaciones.stream()
+                .filter(asig -> asig.getGrupo().getCarrera().getId().equals(carreraId))
+                .collect(Collectors.toList());
+        }
+
+        model.addAttribute("asignaciones", asignaciones);
         return "busqueda/busquedaTutores";
     }
 
     @GetMapping("/busqueda/tutorado") 
-    public String buscarTutorado(@RequestParam(required = false) String numeroControl, Model model) {
+    public String buscarTutorado(
+            @RequestParam(required = false) String numeroControl,
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) Integer carreraId,
+            Model model) {
+            
+        model.addAttribute("carreras", carreraService.buscarTodas());
         model.addAttribute("filtroNumeroControl", numeroControl);
+        model.addAttribute("filtroNombre", nombre);
+        model.addAttribute("filtroCarreraId", carreraId);
 
-        if (numeroControl != null && !numeroControl.trim().isEmpty()) {
-            Optional<Usuario> uOpt = usuarioService.buscarPorNumeroIdentificacion(numeroControl);
-            if (uOpt.isPresent()) {
-                Optional<Tutorado> tutoradoOpt = tutoradoService.buscarPorUsuario(uOpt.get());
-                if (tutoradoOpt.isPresent()) {
-                    Tutorado tutorado = tutoradoOpt.get();
-                    model.addAttribute("tutorado", tutorado.getUsuario());
-                    
-                    List<AsignacionTutorado> historico = asignacionTutoradoService.buscarPorTutorado(tutorado);
-                    
-                    // Mapear cada asignación con su porcentaje de asistencia
-                    java.util.Map<Integer, Double> promedios = new java.util.HashMap<>();
-                    for (AsignacionTutorado at : historico) {
-                        double pct = registroAsistenciaService.calcularPorcentajeAsistencia(at.getAsignacion().getId(), tutorado.getId());
-                        promedios.put(at.getAsignacion().getId(), pct);
-                    }
-                    
-                    model.addAttribute("historialAsignaciones", historico);
-                    model.addAttribute("porcentajes", promedios);
-                } else {
-                    model.addAttribute("error", "No se encontró un tutorado con ese número de control.");
-                }
-            } else {
-                model.addAttribute("error", "No se encontró un usuario con ese número de control.");
+        boolean tieneFiltro = (numeroControl != null && !numeroControl.trim().isEmpty()) 
+            || (nombre != null && !nombre.trim().isEmpty()) 
+            || (carreraId != null);
+            
+        if (tieneFiltro) {
+            List<Tutorado> tutorados = tutoradoService.buscarTodos();
+
+            if (numeroControl != null && !numeroControl.trim().isEmpty()) {
+                String ncTrim = numeroControl.trim();
+                tutorados = tutorados.stream()
+                    .filter(t -> t.getUsuario().getNumeroIdentificacion().equals(ncTrim))
+                    .collect(Collectors.toList());
             }
+
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                String nameLower = nombre.toLowerCase().trim();
+                tutorados = tutorados.stream()
+                    .filter(t -> t.getUsuario().getNombreCompleto().toLowerCase().contains(nameLower))
+                    .collect(Collectors.toList());
+            }
+
+            if (carreraId != null) {
+                tutorados = tutorados.stream()
+                    .filter(t -> t.getCarrera().getId().equals(carreraId))
+                    .collect(Collectors.toList());
+            }
+
+            // Find current active assignment for each tutorado
+            PeriodoSemestral periodoActivo = periodoService.buscarActivo().orElse(null);
+            java.util.Map<Integer, Asignacion> asignacionesMap = new java.util.HashMap<>();
+            if (periodoActivo != null) {
+                for (Tutorado t : tutorados) {
+                    List<AsignacionTutorado> relaciones = asignacionTutoradoService.buscarPorTutorado(t);
+                    AsignacionTutorado activa = relaciones.stream()
+                        .filter(r -> r.getAsignacion().getPeriodo().getId().equals(periodoActivo.getId()))
+                        .findFirst()
+                        .orElse(null);
+                    if (activa != null) {
+                        asignacionesMap.put(t.getId(), activa.getAsignacion());
+                    }
+                }
+            }
+
+            model.addAttribute("resultadosTutorados", tutorados);
+            model.addAttribute("asignacionesMap", asignacionesMap);
         }
 
         return "busqueda/busquedaTutorado";

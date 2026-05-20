@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/fragment :: head}"></head>
+
 <body class="d-flex flex-column min-vh-100">
 
     <nav th:replace="~{fragments/fragment :: navbar}"></nav>
@@ -32,12 +34,14 @@
             <div class="card shadow-sm rounded-4 border-0 flex-grow-1" style="min-width: 250px;">
                 <label class="visually-hidden" for="carreraId">Carrera</label>
                 <select name="carreraId" id="carreraId" class="form-select border-0 px-3 py-2 bg-transparent rounded-4">
-                    <option value="">-- Todas las Carreras --</option>
-                    <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}" th:selected="${c.id == filtroCarreraId}"></option>
+                    <option value="">Todas las Carreras</option>
+                    <option th:each="c : ${carreras}" th:value="${c.id}" th:text="${c.nombre}"
+                        th:selected="${c.id == filtroCarreraId}"></option>
                 </select>
             </div>
             <div class="flex-shrink-0">
-                <button type="submit" class="btn btn-secondary rounded-4 px-4 py-2 shadow-sm d-flex align-items-center justify-content-center border-0">
+                <button type="submit"
+                    class="btn btn-secondary rounded-4 px-4 py-2 shadow-sm d-flex align-items-center justify-content-center border-0">
                     <i class="bi bi-funnel me-2"></i> Filtrar
                 </button>
             </div>
@@ -46,57 +50,73 @@
         <div class="card shadow-sm rounded-4 overflow-hidden">
             <div class="table-responsive m-0">
                 <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="ps-4">Foto</th>
-                        <th>No. Control</th>
-                        <th>Nombre Completo</th>
-                        <th>Correo Institucional</th>
-                        <th>Carrera</th>
-                        <th>Semestre</th>
-                        <th>Estado</th>
-                        <th class="text-center pe-4">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="u : ${usuarios}">
-                        <td class="ps-4">
-                            <img th:if="${u.fotoPerfil != null}" th:src="@{'/uploads/usuarios/' + ${u.fotoPerfil}}" alt="Foto" width="40" height="40" class="rounded-circle object-fit-cover shadow-sm">
-                            <img th:if="${u.fotoPerfil == null}" src="/img/sin-imagen.png" alt="Sin foto" width="40" height="40" class="rounded-circle object-fit-cover opacity-50 shadow-sm">
-                        </td>
-                        <td th:text="${u.numeroIdentificacion}" class="font-monospace text-secondary"></td>
-                        <td th:text="${u.nombreCompleto}" class="fw-semibold"></td>
-                        <td th:text="${u.correo}"></td>
-                        <td>
-                            <span th:if="${carrerasMap.containsKey(u.id)}" class="badge bg-info bg-opacity-10 text-dark border border-info border-opacity-25 px-3 py-2">
-                                <span th:text="${carrerasMap[u.id]}">Carrera</span>
-                            </span>
-                            <span th:unless="${carrerasMap.containsKey(u.id)}" class="text-muted small">Sin carrera</span>
-                        </td>
-                        <td>
-                            <span th:if="${semestresMap.containsKey(u.id)}" class="badge bg-secondary px-3 py-2" th:text="${semestresMap[u.id] + '°'}">1°</span>
-                            <span th:unless="${semestresMap.containsKey(u.id)}" class="text-muted small">-</span>
-                        </td>
-                        <td>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25" th:if="${u.estado.name() == 'activo'}"><i class="bi bi-check-circle me-1"></i>Activo</span>
-                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25" th:if="${u.estado.name() == 'inactivo'}"><i class="bi bi-x-circle me-1"></i>Inactivo</span>
-                        </td>
-                        <td class="text-center pe-4">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a th:href="@{/usuario/ver/{id}(id=${u.id})}" class="btn-crud btn-ver" title="Ver"><i class="bi bi-eye"></i></a>
-                                <a th:href="@{/usuario/editar/{id}(id=${u.id})}" class="btn-crud btn-editar" title="Editar"><i class="bi bi-pencil"></i></a>
-                                <a th:if="${u.estado.name() == 'activo'}" th:href="@{/usuario/desactivar/{id}(id=${u.id})}" class="btn-crud btn-eliminar" title="Desactivar"
-                                   onclick="return confirm('¿Está seguro de desactivar este tutorado?');"><i class="bi bi-person-x"></i></a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(usuarios)}">
-                        <td colspan="8" class="text-center text-muted py-5">
-                            <i class="bi bi-info-circle"></i> No hay tutorados registrados.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Foto</th>
+                            <th>No. Control</th>
+                            <th>Nombre Completo</th>
+                            <th>Correo Institucional</th>
+                            <th>Carrera</th>
+                            <th>Semestre</th>
+                            <th>Estado</th>
+                            <th class="text-center pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${usuarios}">
+                            <td class="ps-4">
+                                <img th:if="${u.fotoPerfil != null}" th:src="@{'/uploads/usuarios/' + ${u.fotoPerfil}}"
+                                    alt="Foto" width="40" height="40" class="rounded-circle object-fit-cover shadow-sm">
+                                <img th:if="${u.fotoPerfil == null}" src="/img/sin-imagen.png" alt="Sin foto" width="40"
+                                    height="40" class="rounded-circle object-fit-cover opacity-50 shadow-sm">
+                            </td>
+                            <td th:text="${u.numeroIdentificacion}" class="font-monospace text-secondary"></td>
+                            <td th:text="${u.nombreCompleto}" class="fw-semibold"></td>
+                            <td th:text="${u.correo}"></td>
+                            <td>
+                                <span th:if="${carrerasMap.containsKey(u.id)}"
+                                    class="badge bg-info bg-opacity-10 text-dark border border-info border-opacity-25 px-3 py-2">
+                                    <span th:text="${carrerasMap[u.id]}">Carrera</span>
+                                </span>
+                                <span th:unless="${carrerasMap.containsKey(u.id)}" class="text-muted small">Sin
+                                    carrera</span>
+                            </td>
+                            <td>
+                                <span th:if="${semestresMap.containsKey(u.id)}" class="badge bg-secondary px-3 py-2"
+                                    th:text="${semestresMap[u.id] + '°'}">1°</span>
+                                <span th:unless="${semestresMap.containsKey(u.id)}" class="text-muted small">-</span>
+                            </td>
+                            <td>
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"
+                                    th:if="${u.estado.name() == 'activo'}"><i
+                                        class="bi bi-check-circle me-1"></i>Activo</span>
+                                <span
+                                    class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25"
+                                    th:if="${u.estado.name() == 'inactivo'}"><i
+                                        class="bi bi-x-circle me-1"></i>Inactivo</span>
+                            </td>
+                            <td class="text-center pe-4">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a th:href="@{/usuario/ver/{id}(id=${u.id})}" class="btn-crud btn-ver"
+                                        title="Ver"><i class="bi bi-eye"></i></a>
+                                    <a th:href="@{/usuario/editar/{id}(id=${u.id})}" class="btn-crud btn-editar"
+                                        title="Editar"><i class="bi bi-pencil"></i></a>
+                                    <a th:if="${u.estado.name() == 'activo'}"
+                                        th:href="@{/usuario/desactivar/{id}(id=${u.id})}" class="btn-crud btn-eliminar"
+                                        title="Desactivar"
+                                        onclick="return confirm('¿Está seguro de desactivar este tutorado?');"><i
+                                            class="bi bi-person-x"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(usuarios)}">
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="bi bi-info-circle"></i> No hay tutorados registrados.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
@@ -104,4 +124,5 @@
     <footer th:replace="~{fragments/fragment :: footer}"></footer>
     <div th:replace="~{fragments/fragment :: scripts}"></div>
 </body>
+
 </html>
