@@ -42,10 +42,10 @@ public class RegistroAsistenciaServiceImpl implements IRegistroAsistencia {
     @Override
     public double calcularPorcentajeAsistencia(Integer asignacionId, Integer tutoradoId) {
         Sesion ejemplo = new Sesion();
-        long presentes = registroRepository.countByAsignacionIdAndTutoradoIdAndEstatus(
-            asignacionId, tutoradoId, RegistroAsistencia.EstatusAsistencia.presente);
-        long justificados = registroRepository.countByAsignacionIdAndTutoradoIdAndEstatus(
-            asignacionId, tutoradoId, RegistroAsistencia.EstatusAsistencia.justificado);
+        long presentes = registroRepository.countBySesion_Asignacion_IdAndTutorado_IdAndEstatusAsistencia(
+                asignacionId, tutoradoId, RegistroAsistencia.EstatusAsistencia.presente);
+        long justificados = registroRepository.countBySesion_Asignacion_IdAndTutorado_IdAndEstatusAsistencia(
+                asignacionId, tutoradoId, RegistroAsistencia.EstatusAsistencia.justificado);
 
         double porcentaje = ((presentes + justificados) * 100.0) / 10.0;
         return Math.min(100.0, Math.round(porcentaje * 100.0) / 100.0);

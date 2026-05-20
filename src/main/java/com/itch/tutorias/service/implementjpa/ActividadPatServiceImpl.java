@@ -27,12 +27,12 @@ public class ActividadPatServiceImpl implements IActividadPat {
 
     @Override
     public List<ActividadPat> buscarPorTutor(Integer tutorId) {
-        return actividadPatRepository.findByTutorId(tutorId);
+        return actividadPatRepository.findBySesion_Asignacion_Tutor_IdOrderBySesion_FechaAsc(tutorId);
     }
 
     @Override
     public List<ActividadPat> buscarPorRangoFechas(LocalDate inicio, LocalDate fin) {
-        return actividadPatRepository.findByFechaSesionBetween(inicio, fin);
+        return actividadPatRepository.findBySesion_FechaBetween(inicio, fin);
     }
 
     @Override

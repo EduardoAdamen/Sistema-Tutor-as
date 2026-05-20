@@ -3,8 +3,6 @@ package com.itch.tutorias.repository;
 import com.itch.tutorias.model.RegistroAsistencia;
 import com.itch.tutorias.model.Sesion;
 import com.itch.tutorias.model.Tutorado;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,13 +15,8 @@ public interface RegistroAsistenciaRepository extends JpaRepository<RegistroAsis
     boolean existsBySesionAndTutorado(Sesion sesion, Tutorado tutorado);
 
     //Consulta para contar registros de asistencia por asignación, tutorado y estatus
-    @Query("SELECT COUNT(ra) FROM RegistroAsistencia ra " +
-           "JOIN ra.sesion s " +
-           "WHERE s.asignacion.id = :asignacionId " +
-           "AND ra.tutorado.id = :tutoradoId " +
-           "AND ra.estatusAsistencia = :estatus")
-    long countByAsignacionIdAndTutoradoIdAndEstatus(
-        @Param("asignacionId") Integer asignacionId,
-        @Param("tutoradoId") Integer tutoradoId,
-        @Param("estatus") RegistroAsistencia.EstatusAsistencia estatus);
+    long countBySesion_Asignacion_IdAndTutorado_IdAndEstatusAsistencia(
+        Integer asignacionId,
+        Integer tutoradoId,
+        RegistroAsistencia.EstatusAsistencia estatus);
 }

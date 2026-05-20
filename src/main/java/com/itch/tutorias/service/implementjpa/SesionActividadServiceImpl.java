@@ -28,12 +28,12 @@ public class SesionActividadServiceImpl implements ISesionActividad {
 
     @Override
     public List<SesionActividad> buscarPorTutor(Integer tutorId) {
-        return sesionActividadRepository.findByTutorId(tutorId);
+        return sesionActividadRepository.findBySesion_Asignacion_Tutor_IdOrderBySesion_FechaAsc(tutorId);
     }
 
     @Override
     public List<SesionActividad> buscarPorRangoFechas(LocalDate inicio, LocalDate fin) {
-        return sesionActividadRepository.findByFechaSesionBetween(inicio, fin);
+        return sesionActividadRepository.findBySesion_FechaBetween(inicio, fin);
     }
 
     @Override

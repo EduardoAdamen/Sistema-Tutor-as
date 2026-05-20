@@ -31,7 +31,8 @@
                     <div class="col-md-7">
                         <div class="fw-bold mb-2 text-dark fs-5 d-flex align-items-center gap-3">
                             <div>Tutor: <span class="fw-normal" th:text="${asignacion.tutor.usuario.nombreCompleto}">Tutor</span></div>
-                            <a th:href="@{/constancia/tutor/{id}(id=${asignacion.id})}" class="btn btn-sm btn-outline-danger rounded-pill" target="_blank" title="Constancia de Participación del Tutor">
+                            <a th:href="@{/constancia/tutor/{id}(id=${asignacion.id})}" class="btn btn-sm btn-outline-danger rounded-pill" target="_blank" title="Constancia de Participación del Tutor"
+                               th:onclick="return verificarDescargaConstanciaTutor(event, [[${#lists.size(sesiones)}]], this.href)">
                                 <i class="bi bi-file-pdf-fill"></i> Constancia
                             </a>
                         </div>
