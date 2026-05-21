@@ -1,0 +1,13 @@
+.git
+.mvn/wrapper/maven-wrapper.jar
+target
+build
+.settings
+.vscode
+.idea
+*.iml
+*.log
+.env
+uploads
+application-local.properties
+application-prod.properties

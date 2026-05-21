@@ -289,8 +289,5 @@ CREATE INDEX idx_plan_sesion_actividad ON plan_sesion_carrera (actividad_carrera
 
 INSERT INTO perfil (nombre) VALUES ('ADMINISTRADOR'), ('TUTOR'), ('TUTORADO'), ('COORDINADOR_CARRERA');
 
-INSERT INTO usuario (numero_identificacion, nombre_completo, correo, contrasena_hash, estado)
-VALUES ('ADMIN001', 'Administrador del Sistema', 'admin@itch.edu.mx',
-        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'activo');
-
-INSERT INTO usuario_perfil (usuario_id, perfil_id) VALUES (1, 1);
+-- El administrador inicial se crea al arrancar la aplicacion mediante variables
+-- de entorno APP_ADMIN_*. No guardar contrasenas iniciales en este script.

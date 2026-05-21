@@ -7,9 +7,10 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Paths;
+
 /**
- * Expone los archivos guardados en C:/Evidencias/ bajo la URL /uploads/{subcarpeta}/**
- * Ejemplo: /uploads/sesiones/uuid-archivo.jpg  →  C:/Evidencias/sesiones/uuid-archivo.jpg
+ * Expone los archivos guardados en storage.location bajo la URL /uploads/{subcarpeta}/**.
  */
 @Configuration
 public class StorageConfig implements WebMvcConfigurer {
@@ -29,14 +30,19 @@ public class StorageConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Carpeta de usuarios (fotos de perfil)
         registry.addResourceHandler("/uploads/usuarios/**")
-                .addResourceLocations("file:///" + storageLocation + "/usuarios/");
+                .addResourceLocations(resourceLocation("usuarios"));
 
         // Carpeta de evidencias de sesiones
         registry.addResourceHandler("/uploads/sesiones/**")
-                .addResourceLocations("file:///" + storageLocation + "/sesiones/");
+                .addResourceLocations(resourceLocation("sesiones"));
 
         // Carpeta de evidencias de actividades PAT
         registry.addResourceHandler("/uploads/actividades/**")
-                .addResourceLocations("file:///" + storageLocation + "/actividades/");
+                .addResourceLocations(resourceLocation("actividades"));
+    }
+
+    private String resourceLocation(String subcarpeta) {
+        String location = Paths.get(storageLocation, subcarpeta).toUri().toString();
+        return location.endsWith("/") ? location : location + "/";
     }
 }

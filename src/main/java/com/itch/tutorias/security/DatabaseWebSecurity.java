@@ -2,8 +2,6 @@ package com.itch.tutorias.security;
 
 
 
-import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.context.annotation.Bean;
 
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
-import org.springframework.security.core.userdetails.User;
-
-import org.springframework.security.core.userdetails.UserDetails;
 
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
@@ -38,23 +32,9 @@ import javax.sql.DataSource;
 
 public class DatabaseWebSecurity {
 
-
-
-    @Value("${app.admin.username}")
-
-    private String adminUsername;
-
-
-
-    @Value("${app.admin.password}")
-
-    private String adminPassword;
-
-
-
     @Bean
 
-    public UserDetailsManager users(DataSource dataSource, PasswordEncoder encoder) {
+    public UserDetailsManager users(DataSource dataSource) {
 
         JdbcUserDetailsManager dbUsers = new JdbcUserDetailsManager(dataSource);
 
@@ -80,62 +60,7 @@ public class DatabaseWebSecurity {
 
 
 
-        return new UserDetailsManager() {
-
-            @Override
-
-            public UserDetails loadUserByUsername(String username) {
-
-                if (adminUsername.equals(username)) {
-
-                    // Recrear el usuario admin para credenciales 
-
-
-                    return User.builder()
-
-                            .username(adminUsername)
-
-                            .password("{noop}" + adminPassword)
-
-                            .authorities("ADMINISTRADOR")
-
-                            .build();
-
-                }
-
-                return dbUsers.loadUserByUsername(username);
-
-            }
-
-
-
-            @Override
-
-            public void createUser(UserDetails user) { dbUsers.createUser(user); }
-
-            @Override
-
-            public void updateUser(UserDetails user) { dbUsers.updateUser(user); }
-
-            @Override
-
-            public void deleteUser(String username) { dbUsers.deleteUser(username); }
-
-            @Override
-
-            public void changePassword(String oldPassword, String newPassword) { dbUsers.changePassword(oldPassword, newPassword); }
-
-            @Override
-
-            public boolean userExists(String username) {
-
-                if (adminUsername.equals(username)) return true;
-
-                return dbUsers.userExists(username); 
-
-            }
-
-        };
+        return dbUsers;
 
     }
 
@@ -147,7 +72,7 @@ public class DatabaseWebSecurity {
 
         http.authorizeHttpRequests(authorize -> authorize
 
-            .requestMatchers("/", "/login", "/registro", "/usuario/guardar", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+            .requestMatchers("/", "/login", "/registro", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
             // Búsquedas públicas: accesibles sin autenticación
             .requestMatchers("/busqueda/**").permitAll()
             .requestMatchers("/asignacion/ver/**").hasAnyAuthority("ADMINISTRADOR", "TUTOR", "TUTORADO")
@@ -203,5 +128,4 @@ public class DatabaseWebSecurity {
 
 
 }
-
 

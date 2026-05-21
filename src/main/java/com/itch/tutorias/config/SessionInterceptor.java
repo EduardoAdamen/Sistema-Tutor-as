@@ -1,6 +1,5 @@
 package com.itch.tutorias.config;
 
-import com.itch.tutorias.model.Perfil;
 import com.itch.tutorias.model.Usuario;
 import com.itch.tutorias.service.IUsuario;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,13 +27,6 @@ public class SessionInterceptor implements HandlerInterceptor {
                 Optional<Usuario> usuarioOpt = usuarioService.buscarPorNumeroIdentificacion(principal.getName());
                 if (usuarioOpt.isPresent()) {
                     session.setAttribute("usuarioLogueado", usuarioOpt.get());
-                } else if ("ADMIN001".equals(principal.getName())) {
-                    // Crear objeto Usuario en memoria para el ADMIN por defecto
-                    Usuario admin = new Usuario();
-                    admin.setNombreCompleto("Administrador DDA");
-                    admin.setNumeroIdentificacion("ADMIN001");
-                    admin.setPerfiles(java.util.Set.of(new Perfil("ADMINISTRADOR")));
-                    session.setAttribute("usuarioLogueado", admin);
                 }
             }
         }

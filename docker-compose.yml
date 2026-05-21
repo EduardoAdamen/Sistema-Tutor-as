@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-sistema_tutorias}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD en .env}
+      MYSQL_USER: ${MYSQL_USER:-tutorias_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Define MYSQL_PASSWORD en .env}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-sistema_tutorias}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Mexico_City
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-tutorias_app}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:?Define MYSQL_PASSWORD en .env}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+      SPRING_JPA_SHOW_SQL: "false"
+      SPRING_THYMELEAF_CACHE: "true"
+      APP_ADMIN_BOOTSTRAP_ENABLED: "true"
+      APP_ADMIN_USERNAME: ${APP_ADMIN_USERNAME:-admin}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:?Define APP_ADMIN_PASSWORD en .env}
+      APP_ADMIN_EMAIL: ${APP_ADMIN_EMAIL:-admin@itch.edu.mx}
+      APP_ADMIN_FULL_NAME: ${APP_ADMIN_FULL_NAME:-Administrador del Sistema}
+      APP_ADMIN_RESET_PASSWORD: ${APP_ADMIN_RESET_PASSWORD:-false}
+      STORAGE_LOCATION: /app/uploads
+      JAVA_OPTS: ${JAVA_OPTS:-}
+    volumes:
+      - app-uploads:/app/uploads
+
+volumes:
+  mysql-data:
+  app-uploads:
